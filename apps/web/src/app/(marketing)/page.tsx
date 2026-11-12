@@ -16,11 +16,30 @@ export default function LandingPage() {
     let cleanupFn: (() => void) | undefined;
     let unmounted = false;
 
-    const timer = setTimeout(() => {
-      if (!unmounted) {
+    const hideWhenStylesReady = () => {
+      if (unmounted) return;
+      const bannerEl = document.querySelector('.banner');
+      const isCssApplied =
+        bannerEl &&
+        window.getComputedStyle(bannerEl).position === 'relative';
+
+      if (document.readyState === 'complete' || isCssApplied) {
         setPreloaderHidden(true);
+      } else {
+        window.addEventListener(
+          'load',
+          () => {
+            if (!unmounted) setPreloaderHidden(true);
+          },
+          { once: true }
+        );
       }
-    }, 150);
+    };
+
+    const timer = setTimeout(hideWhenStylesReady, 120);
+    const maxFallbackTimer = setTimeout(() => {
+      if (!unmounted) setPreloaderHidden(true);
+    }, 1500);
 
     bootLandingInteractions(() => {
       if (!unmounted) {
@@ -37,6 +56,7 @@ export default function LandingPage() {
     return () => {
       unmounted = true;
       clearTimeout(timer);
+      clearTimeout(maxFallbackTimer);
       if (cleanupFn) {
         cleanupFn();
       }
