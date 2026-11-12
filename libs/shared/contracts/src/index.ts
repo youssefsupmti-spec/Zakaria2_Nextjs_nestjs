@@ -13,6 +13,12 @@ export const HealthStatusSchema = z.object({
     connected: z.boolean(),
     latencyMs: z.number().nonnegative(),
   }),
+  redis: z
+    .object({
+      connected: z.boolean(),
+      latencyMs: z.number().nonnegative(),
+    })
+    .optional(),
 });
 
 export type HealthStatusDto = z.infer<typeof HealthStatusSchema>;

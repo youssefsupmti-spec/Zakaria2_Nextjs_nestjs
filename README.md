@@ -6,37 +6,33 @@ Plateforme logistique e-commerce nouvelle génération de **G4D — Group For De
 - **Backend Jobs (`apps/worker`)** : **NestJS 12** Worker autonome (`createApplicationContext`) pour les files d'attente **BullMQ / Redis**.
 - **Contrats & Données (`libs/*`)** :
   - `@zakaria/shared-contracts` (`libs/shared/contracts`) : Schémas `zod` et DTOs partagés entre `apps/web` et `apps/api`.
-  - `@zakaria/backend-config` (`libs/backend/config`) : Validation stricte des variables d'environnement serveur au démarrage.
-  - `@zakaria/backend-database` (`libs/backend/database`) : **Prisma 7** + `@prisma/adapter-pg` + Pool PostgreSQL (`pg`).
+  - `@zakaria/backend-config` (`libs/backend/config`) : Validation stricte des variables d'environnement serveur au démarrage (`DATABASE_URL`, `REDIS_URL`, `CORS_ORIGINS`).
+  - `@zakaria/backend-database` (`libs/backend/database`) : **Prisma 7** + `@prisma/adapter-pg` + Pool PostgreSQL (`pg`) + client Redis (`ioredis`).
 
 ---
 
-## 🎨 Identité Visuelle & Règles Propriétaires G4D
-
-- **Couleurs officielles G4D** :
-  - Bleu primaire : `#1B9DD9` (`#3FB4E8` clair, `#0E86C2` foncé)
-  - Orange accent : `#F9A03F` (`#E08A2B` foncé)
-  - Navy profond : `#0F172A` / `#0c1e2c`
-- **Typographie 100 % locale (Zéro Google Fonts)** :
-  - `Inter Variable` (`/fonts/InterVariable.woff2`) avec `tabular-nums` pour les montants CRBT et codes de suivi
-  - `Droid Arabic Kufi` (`/fonts/DroidKufi-Regular.woff`, `/fonts/DroidKufi-Bold.woff`)
-- **Logos officiels intégrés** :
-  - `/brand/g4d.png` (Header & fonds clairs)
-  - `/brand/logoPro-trim.png` (Login Split-Screen & Footer sombre)
-
----
-
-## 🚀 Commandes Principales
+## 💻 1. Pour lancer le projet en développement local
 
 ```powershell
-# Démarrer simultanément le Frontend Next.js (:3100) et l'API NestJS/Fastify (:3101)
+cd C:\Users\youssef\Desktop\Project\Zakaria2_Nextjs_nestjs
 pnpm dev
+```
 
+- **Landing Page** : [http://localhost:3100/](http://localhost:3100/)
+- **Page Login** : [http://localhost:3100/login](http://localhost:3100/login)
+- **API Healthcheck** : [http://localhost:3101/api/v1/health](http://localhost:3101/api/v1/health)
+
+### Autres commandes locales utiles
+
+```powershell
 # Démarrer uniquement le Frontend Next.js sur http://localhost:3100
 pnpm dev:web
 
 # Démarrer uniquement l'API NestJS/Fastify sur http://localhost:3101/api/v1/health
 pnpm dev:api
+
+# Démarrer uniquement le Worker BullMQ
+pnpm dev:worker
 
 # Vérification TypeScript stricte sur l'ensemble des applications et librairies
 pnpm typecheck
@@ -47,11 +43,85 @@ pnpm build
 
 ---
 
-## 🌐 Routes Livrées au Sprint 01
+## 🚀 2. Déploiement en Production sur VPS (Dokploy)
 
-| Route | Description |
-|---|---|
-| `http://localhost:3100/` | **Landing Page Publique G4D** (Topbar + Header sticky, Hero + Suivi rapide colis, 4 Piliers G4D avec icônes SVG, À propos, 6 Services, Processus 4 étapes, Formulaire Contact & Footer complet) |
-| `http://localhost:3100/login` | **Page de Connexion Split-Screen G4D** (Panneau gauche `auth-aside-bg.webp` + 3 cartes glassmorphism, Panneau droit centré avec logo `logoPro-trim.png` et validation Zod) |
-| `http://localhost:3101/api/v1/health` | **Healthcheck API & PostgreSQL** (État du service NestJS/Fastify + latence `SELECT 1` PostgreSQL) |
+### Accès Serveur VPS
+- **SSH** : `ssh root@152.239.116.87`
+- **Projet Dokploy** : `NestjsNextjs` (`production`)
+- **Dépôt GitHub** : `https://github.com/youssefsupmti-spec/Zakaria2_Nextjs_nestjs.git` (branche `main`)
 
+---
+
+### Architecture des 4 Conteneurs Dokploy (`dokploy-network`)
+
+| Service Dokploy | Nom Interne Conteneur | Domaine Public | Port Interne | Dockerfile / Image |
+|---|---|---|---|---|
+| **1. Frontend (`frontend`)** | `nestjsnextjs-frontend-mrwfoz` | [`https://app.g4dmaroc.xyz`](https://app.g4dmaroc.xyz/) | `3100` | `Dockerfile.frontend` (ou `apps/web/Dockerfile`) |
+| **2. Backend API + Worker (`backend`)** | `nestjsnextjs-backend-1ybpq9` | [`https://api.g4dmaroc.xyz`](https://api.g4dmaroc.xyz/) | `3101` | `Dockerfile.backend` (ou `apps/api/Dockerfile`) |
+| **3. PostgreSQL (`database`)** | `nestjsnextjs-database-mujw4w` | *(Interne)* | `5432` | `postgres:16` |
+| **4. Redis (`reduis`)** | `nestjsnextjs-reduis-cksyka` | *(Interne)* | `6379` | `redis:7` |
+
+---
+
+### Configuration Dokploy — Service `backend` (`https://api.g4dmaroc.xyz`)
+
+1. **Onglet `General` → `Provider`** :
+   - **Source** : `Github` (`Dokploy-2026-06-19-ih3pmy`)
+   - **Repository** : `Zakaria2_Nextjs_nestjs`
+   - **Branch** : `main`
+   - **Build Path** : `/`
+   - **Build Type** : `Dockerfile`
+   - **Dockerfile Path** : `Dockerfile.backend`
+2. **Onglet `Environment`** :
+   ```env
+   NODE_ENV=production
+   PORT=3101
+   API_PORT=3101
+   API_HOST=0.0.0.0
+   RUN_WORKER=true
+   CORS_ORIGINS=https://app.g4dmaroc.xyz,https://api.g4dmaroc.xyz,http://localhost:3100
+   DATABASE_URL=postgresql://postgres:cbln6b6dcoghkpva@nestjsnextjs-database-mujw4w:5432/postgres
+   REDIS_URL=redis://default:hfvzvp2saihxz7pc@nestjsnextjs-reduis-cksyka:6379
+   REDIS_PREFIX=zakaria2
+   ```
+3. **Onglet `Domains`** :
+   - **Host** : `api.g4dmaroc.xyz`
+   - **Path** : `/`
+   - **Container Port** : `3101`
+   - **HTTPS** : Activé (`Let's Encrypt`)
+   - **Healthcheck URL** : `https://api.g4dmaroc.xyz/api/v1/health`
+
+---
+
+### Configuration Dokploy — Service `frontend` (`https://app.g4dmaroc.xyz`)
+
+1. **Onglet `General` → `Provider`** :
+   - **Source** : `Github` (`Dokploy-2026-06-19-ih3pmy`)
+   - **Repository** : `Zakaria2_Nextjs_nestjs`
+   - **Branch** : `main`
+   - **Build Path** : `/`
+   - **Build Type** : `Dockerfile`
+   - **Dockerfile Path** : `Dockerfile.frontend`
+2. **Onglet `Environment`** :
+   ```env
+   NODE_ENV=production
+   PORT=3100
+   WEB_PORT=3100
+   HOSTNAME=0.0.0.0
+   NEXT_PUBLIC_API_URL=https://api.g4dmaroc.xyz/api/v1
+   ```
+3. **Onglet `Domains`** :
+   - **Host** : `app.g4dmaroc.xyz`
+   - **Path** : `/`
+   - **Container Port** : `3100`
+   - **HTTPS** : Activé (`Let's Encrypt`)
+
+---
+
+## 🌐 3. Routes Livrées au Sprint 01
+
+| Route Locale | Route Production | Description |
+|---|---|---|
+| `http://localhost:3100/` | `https://app.g4dmaroc.xyz/` | **Landing Page Publique G4D** (1:1 avec vidéo Hero, nouveaux logos 3D `nouveau_logo_G4d.png`, Suivi colis, Services, Grille tarifaire 472 villes, Carte Leaflet 20 hubs) |
+| `http://localhost:3100/login` | `https://app.g4dmaroc.xyz/login` | **Page de Connexion Split-Screen G4D** (1:1 avec `auth-aside-bg.webp`, carrousel 4 slides, nouveau logo `nouveau_logo_trim.png` et validation Zod) |
+| `http://localhost:3101/api/v1/health` | `https://api.g4dmaroc.xyz/api/v1/health` | **Healthcheck API, PostgreSQL & Redis** (État du service NestJS/Fastify + latence `SELECT 1` PostgreSQL + `PING` Redis) |

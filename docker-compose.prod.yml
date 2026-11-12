@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: g4d-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3101
+      API_PORT: 3101
+      API_HOST: 0.0.0.0
+      RUN_WORKER: "true"
+      CORS_ORIGINS: "https://app.g4dmaroc.xyz,https://api.g4dmaroc.xyz,http://localhost:3100"
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:cbln6b6dcoghkpva@nestjsnextjs-database-mujw4w:5432/postgres}
+      REDIS_URL: ${REDIS_URL:-redis://default:hfvzvp2saihxz7pc@nestjsnextjs-reduis-cksyka:6379}
+      REDIS_PREFIX: zakaria2
+    ports:
+      - "3101:3101"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.g4dmaroc.xyz/api/v1}
+    container_name: g4d-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3100
+      WEB_PORT: 3100
+      HOSTNAME: 0.0.0.0
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.g4dmaroc.xyz/api/v1}
+    ports:
+      - "3100:3100"
+    depends_on:
+      - backend
+

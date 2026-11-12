@@ -1,0 +1,34 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# G4D — Dockerfile Production Frontend (Next.js 16 + React 19)
+# Domaine : https://app.g4dmaroc.xyz (Port interne : 3100)
+# ══════════════════════════════════════════════════════════════════════════════
+FROM node:24-alpine AS base
+RUN apk add --no-cache libc6-compat curl && corepack enable
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig.base.json ./
+COPY apps/web/project.json apps/web/tsconfig.json apps/web/next.config.mjs apps/web/postcss.config.mjs ./apps/web/
+COPY libs/ ./libs/
+
+RUN pnpm install --no-frozen-lockfile
+
+COPY apps/web ./apps/web
+
+ARG NEXT_PUBLIC_API_URL=https://api.g4dmaroc.xyz/api/v1
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN pnpm --dir apps/web exec next build
+
+ENV PORT=3100
+ENV WEB_PORT=3100
+ENV HOSTNAME=0.0.0.0
+
+EXPOSE 3100
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:${PORT:-3100}/ || exit 1
+
+CMD ["pnpm", "--dir", "apps/web", "exec", "next", "start", "-H", "0.0.0.0", "-p", "3100"]
+

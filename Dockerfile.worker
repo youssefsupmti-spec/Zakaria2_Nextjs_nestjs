@@ -1,0 +1,26 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# G4D — Dockerfile Production Worker Dédié (NestJS 12 + BullMQ / Redis)
+# ══════════════════════════════════════════════════════════════════════════════
+FROM node:24-alpine AS base
+RUN apk add --no-cache libc6-compat openssl && corepack enable
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig.base.json ./
+COPY apps/worker/project.json apps/worker/tsconfig.json ./apps/worker/
+COPY libs/ ./libs/
+
+RUN pnpm install --no-frozen-lockfile
+
+COPY apps/worker ./apps/worker
+
+RUN pnpm run db:generate && \
+    pnpm exec tsc -p apps/worker/tsconfig.json && \
+    mkdir -p node_modules/@zakaria && \
+    ln -sf /app/dist/apps/worker/libs/shared/contracts/src node_modules/@zakaria/shared-contracts && \
+    ln -sf /app/dist/apps/worker/libs/backend/config/src node_modules/@zakaria/backend-config && \
+    ln -sf /app/dist/apps/worker/libs/backend/database/src node_modules/@zakaria/backend-database
+
+ENV NODE_ENV=production
+
+CMD ["node", "dist/apps/worker/apps/worker/src/main.js"]
+

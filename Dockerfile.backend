@@ -1,0 +1,45 @@
+# ══════════════════════════════════════════════════════════════════════════════
+# G4D — Dockerfile Production Backend (NestJS 12 + Fastify 5 + Worker BullMQ)
+# Domaine : https://api.g4dmaroc.xyz (Port interne : 3101)
+# ══════════════════════════════════════════════════════════════════════════════
+FROM node:24-alpine AS base
+RUN apk add --no-cache libc6-compat openssl curl && corepack enable
+WORKDIR /app
+
+# 1. Installation des dépendances du monorepo
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml nx.json tsconfig.base.json ./
+COPY apps/api/project.json apps/api/tsconfig.json ./apps/api/
+COPY apps/worker/project.json apps/worker/tsconfig.json ./apps/worker/
+COPY libs/ ./libs/
+
+RUN pnpm install --no-frozen-lockfile
+
+# 2. Copie du code source Backend & génération Prisma + Build TypeScript
+COPY apps/api ./apps/api
+COPY apps/worker ./apps/worker
+
+RUN pnpm run db:generate && \
+    pnpm exec tsc -p apps/api/tsconfig.json && \
+    pnpm exec tsc -p apps/worker/tsconfig.json && \
+    mkdir -p node_modules/@zakaria && \
+    ln -sf /app/dist/apps/api/libs/shared/contracts/src node_modules/@zakaria/shared-contracts && \
+    ln -sf /app/dist/apps/api/libs/backend/config/src node_modules/@zakaria/backend-config && \
+    ln -sf /app/dist/apps/api/libs/backend/database/src node_modules/@zakaria/backend-database
+
+# Script de démarrage combiné (API Fastify + Worker BullMQ optionnel)
+RUN printf '#!/bin/sh\nset -e\nif [ "${RUN_WORKER:-true}" = "true" ]; then\n  echo "⚙️  Démarrage du Worker BullMQ G4D en arrière-plan..."\n  node dist/apps/worker/apps/worker/src/main.js &\nfi\necho "🚀 Démarrage de l'\''API G4D NestJS/Fastify sur le port ${API_PORT:-3101}..."\nexec node dist/apps/api/apps/api/src/main.js\n' > /app/docker-entrypoint-backend.sh && \
+    chmod +x /app/docker-entrypoint-backend.sh
+
+ENV NODE_ENV=production
+ENV API_HOST=0.0.0.0
+ENV API_PORT=3101
+ENV PORT=3101
+ENV RUN_WORKER=true
+
+EXPOSE 3101
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:${API_PORT:-3101}/api/v1/health || exit 1
+
+CMD ["/app/docker-entrypoint-backend.sh"]
+
