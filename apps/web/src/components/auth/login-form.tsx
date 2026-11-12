@@ -58,11 +58,25 @@ export function LoginForm() {
               ? 'border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C]'
               : 'border-[#BAE6FD] bg-[#F0F9FF] text-[#0E86C2]'
           }`}
+          style={{
+            marginBottom: '22px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '10px',
+            padding: '12px 16px',
+            fontSize: '13px',
+            fontWeight: 600,
+            border: `1.5px solid ${authFeedback.type === 'error' ? '#FECACA' : '#BAE6FD'}`,
+            background: authFeedback.type === 'error' ? '#FEF2F2' : '#F0F9FF',
+            color: authFeedback.type === 'error' ? '#B91C1C' : '#0E86C2',
+          }}
         >
           <svg
             className={`w-5 h-5 shrink-0 mt-px ${
               authFeedback.type === 'error' ? 'text-[#EF4444]' : 'text-[#1B9DD9]'
             }`}
+            width="20"
+            height="20"
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
@@ -77,45 +91,56 @@ export function LoginForm() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[18px]" noValidate>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="g4d-auth-form flex flex-col gap-[18px]"
+        noValidate
+      >
         {/* Adresse e-mail */}
-        <label className="flex flex-col gap-2">
-          <span className="text-[13px] font-bold text-[#334155]">Adresse e-mail</span>
+        <label className="g4d-auth-field flex flex-col gap-2">
+          <span className="g4d-auth-label-text text-[13px] font-bold text-[#334155]">
+            Adresse e-mail
+          </span>
           <input
             type="email"
             autoComplete="username"
             autoFocus
             placeholder="vous@entreprise.com"
-            className={`w-full h-[50px] px-4 text-[15px] font-medium text-[#0D263B] bg-[#F1F5F9] border-[1.5px] rounded-none outline-none transition-[border-color,background,box-shadow] duration-200 placeholder:text-[#94A3B8] focus:border-[#1B9DD9] focus:bg-white focus:[box-shadow:0_0_0_4px_rgba(27,157,217,0.12)] ${
-              errors.email ? 'border-red-500' : 'border-[#E5E9F0]'
+            className={`g4d-auth-input ${
+              errors.email ? 'g4d-auth-input--error border-red-500' : 'border-[#E5E9F0]'
             }`}
             {...register('email')}
           />
           {errors.email && (
-            <span className="text-[12.5px] font-medium text-red-500">
+            <span
+              className="text-[12.5px] font-medium text-red-500"
+              style={{ fontSize: '12.5px', fontWeight: 500, color: '#EF4444' }}
+            >
               {errors.email.message}
             </span>
           )}
         </label>
 
         {/* Mot de passe */}
-        <label className="flex flex-col gap-2">
-          <span className="flex items-center justify-between">
-            <span className="text-[13px] font-bold text-[#334155]">Mot de passe</span>
+        <label className="g4d-auth-field flex flex-col gap-2">
+          <span className="g4d-auth-label-row flex items-center justify-between">
+            <span className="g4d-auth-label-text text-[13px] font-bold text-[#334155]">
+              Mot de passe
+            </span>
             <a
               href="mailto:Contact@g4d.ma?subject=R%C3%A9initialisation%20mot%20de%20passe%20G4D"
-              className="text-[12.5px] font-bold text-[#1B9DD9] bg-transparent border-0 cursor-pointer p-0 hover:underline"
+              className="g4d-auth-forgot text-[12.5px] font-bold text-[#1B9DD9] bg-transparent border-0 cursor-pointer p-0 hover:underline"
             >
               Mot de passe oublié ?
             </a>
           </span>
-          <span className="relative block">
+          <span className="g4d-auth-input-wrap relative block">
             <input
               type={showPassword ? 'text' : 'password'}
               autoComplete="current-password"
               placeholder="••••••••"
-              className={`w-full h-[50px] pl-4 pr-12 text-[15px] font-medium text-[#0D263B] bg-[#F1F5F9] border-[1.5px] rounded-none outline-none transition-[border-color,background,box-shadow] duration-200 placeholder:text-[#94A3B8] focus:border-[#1B9DD9] focus:bg-white focus:[box-shadow:0_0_0_4px_rgba(27,157,217,0.12)] ${
-                errors.password ? 'border-red-500' : 'border-[#E5E9F0]'
+              className={`g4d-auth-input g4d-auth-input--pw ${
+                errors.password ? 'g4d-auth-input--error border-red-500' : 'border-[#E5E9F0]'
               }`}
               {...register('password')}
             />
@@ -124,11 +149,13 @@ export function LoginForm() {
               tabIndex={-1}
               aria-label="Afficher / masquer le mot de passe"
               onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute top-1/2 -translate-y-1/2 right-2 flex items-center justify-center w-9 h-9 p-0 bg-transparent border-0 rounded-[9px] cursor-pointer text-[#94A3B8] hover:text-[#1B9DD9]"
+              className="g4d-auth-pw-toggle"
             >
               {!showPassword ? (
                 <svg
                   className="w-5 h-5"
+                  width="20"
+                  height="20"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
@@ -143,6 +170,8 @@ export function LoginForm() {
               ) : (
                 <svg
                   className="w-5 h-5"
+                  width="20"
+                  height="20"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"
@@ -155,35 +184,43 @@ export function LoginForm() {
             </button>
           </span>
           {errors.password && (
-            <span className="text-[12.5px] font-medium text-red-500">
+            <span
+              className="text-[12.5px] font-medium text-red-500"
+              style={{ fontSize: '12.5px', fontWeight: 500, color: '#EF4444' }}
+            >
               {errors.password.message}
             </span>
           )}
         </label>
 
         {/* Rester connecté */}
-        <label className="flex items-center gap-[10px] cursor-pointer select-none -mt-[2px]">
+        <label className="g4d-auth-remember flex items-center gap-[10px] cursor-pointer select-none -mt-[2px]">
           <input
             type="checkbox"
-            className="w-[19px] h-[19px] m-0 border-[1.5px] border-[#CBD5E1] rounded-none bg-white cursor-pointer shrink-0 accent-[#1B9DD9]"
+            className="g4d-auth-checkbox w-[19px] h-[19px] m-0 border-[1.5px] border-[#CBD5E1] rounded-none bg-white cursor-pointer shrink-0 accent-[#1B9DD9]"
             {...register('rememberMe')}
           />
-          <span className="text-[14px] font-semibold text-[#475569]">Rester connecté</span>
+          <span
+            className="text-[14px] font-semibold text-[#475569]"
+            style={{ fontSize: '14px', fontWeight: 600, color: '#475569' }}
+          >
+            Rester connecté
+          </span>
         </label>
 
         {/* Bouton de connexion */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-[5px] h-[52px] flex items-center justify-center gap-[9px] text-[15.5px] font-extrabold tracking-[0.3px] text-white border-0 rounded-[13px] cursor-pointer [background:linear-gradient(135deg,#3FB4E8_0%,#1B9DD9_55%,#0E86C2_100%)] [box-shadow:0_12px_24px_-10px_rgba(27,157,217,0.55)] transition-[filter,box-shadow,transform] duration-150 hover:brightness-105 hover:-translate-y-px disabled:opacity-70 disabled:cursor-wait disabled:translate-y-0"
+          className="g4d-auth-submit"
         >
           {!isSubmitting ? (
-            <span className="inline-flex items-center gap-[9px]">
+            <span className="inline-flex items-center gap-[9px]" style={{ display: 'inline-flex', alignItems: 'center', gap: '9px' }}>
               Se connecter
               <span className="text-[18px] leading-none -translate-y-px">&rarr;</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-2">
+            <span className="inline-flex items-center gap-2" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
               <span className="w-[18px] h-[18px] border-2 border-white/40 border-t-white rounded-full animate-spin" />
               Connexion…
             </span>

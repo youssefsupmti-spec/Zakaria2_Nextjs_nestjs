@@ -203,18 +203,18 @@ export function Navbar({ preloaderHidden }: { preloaderHidden: boolean }) {
               </li>
             </ul>
             <div className="d-flex flex-column tw-gap-4 tw-mt-8">
-              <Link
+              <a
                 href="/login"
                 className="btn btn-main-two rounded-0 tw-py-4 text-center"
               >
                 Se connecter
-              </Link>
-              <Link
+              </a>
+              <a
                 href="/login"
                 className="btn btn-main rounded-0 tw-py-4 text-center"
               >
                 Devenir client
-              </Link>
+              </a>
             </div>
           </div>
         </div>
@@ -377,18 +377,18 @@ export function Navbar({ preloaderHidden }: { preloaderHidden: boolean }) {
 
               {/* CTA Buttons Desktop */}
               <div className="d-lg-flex d-none align-items-center tw-gap-4 tw-px-6">
-                <Link
+                <a
                   href="/login"
                   className="cursor-small fw-semibold text-main-two-600 hover-text-main-600 tw-duration-200"
                 >
                   Se connecter
-                </Link>
-                <Link
+                </a>
+                <a
                   href="/login"
                   className="cursor-small btn btn-main-two rounded-0 tw-py-305 tw-px-8"
                 >
                   Devenir client
-                </Link>
+                </a>
               </div>
 
               {/* Social Icons Desktop */}

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 import { FeatherIcon } from './feather-icon';
 import { ParcelTracker } from './parcel-tracker';
 
@@ -313,7 +312,7 @@ export function ServicesSection() {
                 </ul>
 
                 <div className="d-flex align-items-center tw-gap-56-px tw-mt-10 flex-wrap">
-                  <Link
+                  <a
                     href="/login"
                     className="cursor-small btn btn-main-two hover-style-two button--stroke d-inline-flex align-items-center justify-content-center tw-gap-5 group active--translate-y-2 rounded-0"
                     data-block="button"
@@ -326,7 +325,7 @@ export function ServicesSection() {
                     <span className="tw-w-7 tw-h-7 bg-main-three-600 text-white tw-text-sm tw-rounded d-flex justify-content-center align-items-center position-relative tw-duration-500">
                       <FeatherIcon name="arrow-right" />
                     </span>
-                  </Link>
+                  </a>
                   <a
                     href="#services"
                     className="cursor-small d-inline-flex align-items-center tw-gap-2 text-main-two-600 fw-semibold hover-text-main-600 group active--translate-y-2"
@@ -1573,7 +1572,7 @@ export function ServicesSection() {
             data-aos-duration="1000"
             data-aos-delay="300"
           >
-            <Link
+            <a
               href="/login"
               className="cursor-small btn btn-main-two hover-style-two button--stroke tw-py-405 d-inline-flex align-items-center justify-content-center tw-gap-5 group active--translate-y-2 rounded-0"
               data-block="button"
@@ -1583,7 +1582,7 @@ export function ServicesSection() {
               <span className="tw-w-7 tw-h-7 bg-main-three-600 text-white tw-text-sm tw-rounded d-flex justify-content-center align-items-center position-relative group-hover-bg-main-600 group-hover-text-white tw-duration-500">
                 <FeatherIcon name="arrow-right" />
               </span>
-            </Link>
+            </a>
           </div>
         </div>
       </section>

@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { LoginForm } from '@/components/auth/login-form';
 import { G4D_LOGO_TRIM_PATH } from '@/lib/brand';
+
+const CURRENT_YEAR = 2026;
 
 const CAROUSEL_SLIDES = [
   {
@@ -71,6 +72,9 @@ export default function LoginPage() {
   return (
     <div className="g4d-auth-root">
       <style>{`
+        .g4d-auth-root, .g4d-auth-root *, .g4d-auth-root *::before, .g4d-auth-root *::after {
+          box-sizing: border-box;
+        }
         .g4d-auth-root {
           --g4d-blue: #1B9DD9;
           --g4d-blue-light: #3FB4E8;
@@ -82,7 +86,8 @@ export default function LoginPage() {
           display: flex;
           background: #fff;
           color: #111827;
-          font-family: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+          font-family: "Inter Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+          line-height: 1.5;
         }
         .g4d-auth-aside {
           position: relative;
@@ -132,6 +137,7 @@ export default function LoginPage() {
           object-fit: contain;
           filter: drop-shadow(0 0 20px rgba(27, 157, 217, 0.4)) drop-shadow(0 0 50px rgba(27, 157, 217, 0.15));
           margin-bottom: 2.5rem;
+          display: block;
         }
         .g4d-badge {
           display: inline-flex;
@@ -186,7 +192,7 @@ export default function LoginPage() {
           font-weight: 800;
           line-height: 1.2;
           letter-spacing: -0.02em;
-          margin-bottom: 2rem;
+          margin: 0 0 2rem 0;
           font-size: clamp(1.8rem, 2.5vw, 2.3rem);
           text-transform: uppercase;
           background: linear-gradient(135deg, #FFFFFF 40%, rgba(63, 180, 232, 0.9) 100%);
@@ -234,8 +240,241 @@ export default function LoginPage() {
         .g4d-copyright p { color: rgba(255,255,255,.35); font-size: .66rem; letter-spacing: .03em; margin: 0; }
         .g4d-auth-main { flex: 1 1 auto; display: flex; flex-direction: column; background: #fff; }
         .g4d-main-inner { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; padding: 2.5rem 1.25rem; }
+
+        /* Blindage CSS autonome du panneau droit (immunisé contre tout conflit de layer) */
+        .g4d-auth-card {
+          width: 100%;
+          max-width: 440px;
+          padding: 40px 40px 34px;
+          border-radius: 22px;
+          background: #ffffff;
+          border: 1px solid #E5E9F0;
+          box-shadow: 0 1px 2px rgba(13, 38, 59, 0.04), 0 20px 48px -24px rgba(13, 38, 59, 0.18);
+        }
+        .g4d-auth-card-logo {
+          display: block;
+          height: 64px;
+          width: auto;
+          object-fit: contain;
+          margin: 0 auto 24px;
+        }
+        .g4d-auth-title {
+          margin: 0 0 7px 0;
+          text-align: center;
+          font-weight: 800;
+          font-size: 28px;
+          letter-spacing: -0.5px;
+          color: #0D263B;
+          line-height: 1.25;
+        }
+        .g4d-auth-subtitle {
+          margin: 0 0 30px 0;
+          text-align: center;
+          font-weight: 500;
+          font-size: 14.5px;
+          line-height: 1.5;
+          color: #64748B;
+        }
+        .g4d-auth-form {
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+        }
+        .g4d-auth-field {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin: 0;
+        }
+        .g4d-auth-label-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .g4d-auth-label-text {
+          font-size: 13px;
+          font-weight: 700;
+          color: #334155;
+        }
+        .g4d-auth-forgot {
+          font-size: 12.5px;
+          font-weight: 700;
+          color: #1B9DD9;
+          text-decoration: none;
+        }
+        .g4d-auth-forgot:hover {
+          text-decoration: underline;
+        }
+        .g4d-auth-input-wrap {
+          position: relative;
+          display: block;
+        }
+        .g4d-auth-input {
+          width: 100%;
+          height: 50px;
+          padding: 0 16px;
+          font-size: 15px;
+          font-weight: 500;
+          font-family: inherit;
+          color: #0D263B;
+          background: #F1F5F9;
+          border: 1.5px solid #E5E9F0;
+          border-radius: 0;
+          outline: none;
+          transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        .g4d-auth-input--pw {
+          padding-right: 48px;
+        }
+        .g4d-auth-input::placeholder {
+          color: #94A3B8;
+        }
+        .g4d-auth-input:focus {
+          border-color: #1B9DD9;
+          background: #ffffff;
+          box-shadow: 0 0 0 4px rgba(27, 157, 217, 0.12);
+        }
+        .g4d-auth-input--error {
+          border-color: #EF4444;
+        }
+        .g4d-auth-pw-toggle {
+          position: absolute;
+          top: 50%;
+          right: 8px;
+          transform: translateY(-50%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          padding: 0;
+          background: transparent;
+          border: 0;
+          border-radius: 9px;
+          cursor: pointer;
+          color: #94A3B8;
+        }
+        .g4d-auth-pw-toggle:hover {
+          color: #1B9DD9;
+        }
+        .g4d-auth-remember {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+          user-select: none;
+          margin: -2px 0 0 0;
+        }
+        .g4d-auth-checkbox {
+          width: 19px;
+          height: 19px;
+          margin: 0;
+          cursor: pointer;
+          accent-color: #1B9DD9;
+          flex-shrink: 0;
+        }
+        .g4d-auth-submit {
+          margin-top: 5px;
+          height: 52px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 9px;
+          font-size: 15.5px;
+          font-weight: 800;
+          font-family: inherit;
+          letter-spacing: 0.3px;
+          color: #ffffff;
+          border: 0;
+          border-radius: 13px;
+          cursor: pointer;
+          background: linear-gradient(135deg, #3FB4E8 0%, #1B9DD9 55%, #0E86C2 100%);
+          box-shadow: 0 12px 24px -10px rgba(27, 157, 217, 0.55);
+          transition: filter 0.15s, transform 0.15s;
+        }
+        .g4d-auth-submit:hover:not(:disabled) {
+          filter: brightness(1.05);
+          transform: translateY(-1px);
+        }
+        .g4d-auth-submit:disabled {
+          opacity: 0.7;
+          cursor: wait;
+        }
+        .g4d-auth-divider {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin: 22px 0 18px;
+        }
+        .g4d-auth-divider-line {
+          height: 1px;
+          flex: 1;
+          background: #EEF2F6;
+        }
+        .g4d-auth-divider-text {
+          font-size: 12px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          color: #94A3B8;
+        }
+        .g4d-auth-google-btn {
+          height: 50px;
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          font-size: 14.5px;
+          font-weight: 700;
+          color: #334155 !important;
+          background: #ffffff;
+          border: 1.5px solid #E5E9F0;
+          border-radius: 0;
+          text-decoration: none !important;
+          transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+        .g4d-auth-google-btn:hover {
+          border-color: #1B9DD9;
+          background: #F8FAFC;
+          box-shadow: 0 0 0 4px rgba(27, 157, 217, 0.10);
+        }
+        .g4d-auth-footer-block {
+          margin-top: 22px;
+          padding-top: 20px;
+          border-top: 1px solid #EEF2F6;
+          text-align: center;
+          font-size: 13.5px;
+          font-weight: 600;
+          color: #64748B;
+        }
+        .g4d-auth-support-block {
+          margin-top: 18px;
+          padding-top: 18px;
+          border-top: 1px solid #EEF2F6;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          font-size: 13.5px;
+          font-weight: 600;
+          color: #64748B;
+        }
+        .g4d-auth-link {
+          color: #1B9DD9 !important;
+          font-weight: 800;
+          text-decoration: none !important;
+          display: inline-flex;
+          align-items: center;
+          gap: 5px;
+        }
+        .g4d-auth-link:hover {
+          text-decoration: underline !important;
+        }
         @media (max-width: 991px) {
           .g4d-auth-aside { display: none; }
+          .g4d-auth-card { padding: 32px 24px 28px; }
         }
       `}</style>
 
@@ -272,9 +511,14 @@ export default function LoginPage() {
         />
 
         <div className="g4d-aside-content">
-          <Link href="/" aria-label="Accueil G4D">
-            <img src={G4D_LOGO_TRIM_PATH} alt="G4D Express" className="g4d-logo-img" />
-          </Link>
+          <a href="/" aria-label="Accueil G4D">
+            <img
+              src={G4D_LOGO_TRIM_PATH}
+              alt="G4D Express"
+              className="g4d-logo-img"
+              decoding="async"
+            />
+          </a>
 
           <div className="g4d-badge">
             <span className="g4d-pulse-dot" />
@@ -320,47 +564,48 @@ export default function LoginPage() {
         </div>
 
         <div className="g4d-copyright">
-          <p>© {new Date().getFullYear()} G4D — Tous droits réservés.</p>
+          <p>© {CURRENT_YEAR} G4D — Tous droits réservés.</p>
         </div>
       </aside>
 
       {/* ══ Panneau droit : formulaire (1:1 Zakaria2) ══ */}
       <main className="g4d-auth-main">
         <div className="g4d-main-inner">
-          <div className="w-full max-w-[440px] px-10 pt-10 pb-[34px] rounded-[22px] bg-white border border-[#E5E9F0] [box-shadow:0_1px_2px_rgba(13,38,59,0.04),0_20px_48px_-24px_rgba(13,38,59,0.18)]">
-            <Link href="/" aria-label="Accueil G4D">
+          <div className="g4d-auth-card w-full max-w-[440px] px-10 pt-10 pb-[34px] rounded-[22px] bg-white border border-[#E5E9F0]">
+            <a href="/" aria-label="Accueil G4D">
               <img
                 src={G4D_LOGO_TRIM_PATH}
                 alt="G4D Express"
-                className="block h-[64px] w-auto object-contain mx-auto mb-[24px]"
+                decoding="async"
+                className="g4d-auth-card-logo block h-[64px] w-auto object-contain mx-auto mb-[24px]"
               />
-            </Link>
+            </a>
 
-            <h1 className="m-0 mb-[7px] text-center font-extrabold text-[28px] tracking-[-0.5px] text-[#0D263B]">
+            <h1 className="g4d-auth-title m-0 mb-[7px] text-center font-extrabold text-[28px] tracking-[-0.5px] text-[#0D263B]">
               Connexion
             </h1>
-            <p className="mx-0 mt-0 mb-[30px] text-center font-medium text-[14.5px] leading-[1.5] text-[#64748B]">
+            <p className="g4d-auth-subtitle mx-0 mt-0 mb-[30px] text-center font-medium text-[14.5px] leading-[1.5] text-[#64748B]">
               Accédez à votre espace logistique G4D
             </p>
 
             <LoginForm />
 
             {/* Séparateur « ou » */}
-            <div className="flex items-center gap-3 mt-[22px] mb-[18px]">
-              <span className="h-px flex-1 bg-[#EEF2F6]" />
-              <span className="text-[12px] font-bold uppercase tracking-[0.08em] text-[#94A3B8]">
+            <div className="g4d-auth-divider flex items-center gap-3 mt-[22px] mb-[18px]">
+              <span className="g4d-auth-divider-line h-px flex-1 bg-[#EEF2F6]" />
+              <span className="g4d-auth-divider-text text-[12px] font-bold uppercase tracking-[0.08em] text-[#94A3B8]">
                 ou
               </span>
-              <span className="h-px flex-1 bg-[#EEF2F6]" />
+              <span className="g4d-auth-divider-line h-px flex-1 bg-[#EEF2F6]" />
             </div>
 
             {/* Connexion Google (OAuth) — logo Google officiel 4 couleurs */}
             <a
               href="#google-oauth"
               onClick={(e) => e.preventDefault()}
-              className="h-[50px] flex items-center justify-center gap-3 text-[14.5px] font-bold text-[#334155] bg-white border-[1.5px] border-[#E5E9F0] rounded-none no-underline transition-[border-color,background,box-shadow] duration-200 hover:border-[#1B9DD9] hover:bg-[#F8FAFC] hover:[box-shadow:0_0_0_4px_rgba(27,157,217,0.10)]"
+              className="g4d-auth-google-btn h-[50px] flex items-center justify-center gap-3 text-[14.5px] font-bold text-[#334155] bg-white border-[1.5px] border-[#E5E9F0] rounded-none no-underline"
             >
-              <svg className="w-[19px] h-[19px] shrink-0" viewBox="0 0 48 48" aria-hidden="true">
+              <svg className="w-[19px] h-[19px] shrink-0" width="19" height="19" viewBox="0 0 48 48" aria-hidden="true">
                 <path
                   fill="#FFC107"
                   d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"
@@ -382,25 +627,27 @@ export default function LoginPage() {
             </a>
 
             {/* Pas encore client ? → page d'inscription « Devenir client » */}
-            <div className="mt-[22px] pt-5 border-t border-[#EEF2F6] text-center text-[13.5px] font-semibold text-[#64748B]">
+            <div className="g4d-auth-footer-block mt-[22px] pt-5 border-t border-[#EEF2F6] text-center text-[13.5px] font-semibold text-[#64748B]">
               Vous n&apos;avez pas de compte&nbsp;?{' '}
-              <Link
+              <a
                 href="/#couverture"
-                className="text-[#1B9DD9] font-extrabold no-underline hover:underline"
+                className="g4d-auth-link text-[#1B9DD9] font-extrabold no-underline hover:underline"
               >
                 Créer un compte
-              </Link>
+              </a>
             </div>
 
             {/* Footer : aide / support */}
-            <div className="mt-[18px] pt-[18px] border-t border-[#EEF2F6] flex items-center justify-center gap-[6px] text-[13.5px] font-semibold text-[#64748B]">
+            <div className="g4d-auth-support-block mt-[18px] pt-[18px] border-t border-[#EEF2F6] flex items-center justify-center gap-[6px] text-[13.5px] font-semibold text-[#64748B]">
               <span>Besoin d&apos;aide&nbsp;?</span>
               <a
                 href="mailto:Contact@g4d.ma"
-                className="inline-flex items-center gap-[5px] text-[#1B9DD9] font-extrabold no-underline hover:underline"
+                className="g4d-auth-link inline-flex items-center gap-[5px] text-[#1B9DD9] font-extrabold no-underline hover:underline"
               >
                 <svg
                   className="w-[14px] h-[14px]"
+                  width="14"
+                  height="14"
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
                   fill="currentColor"

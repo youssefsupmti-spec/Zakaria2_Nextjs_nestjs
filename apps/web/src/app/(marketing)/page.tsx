@@ -15,31 +15,33 @@ export default function LandingPage() {
   useEffect(() => {
     let cleanupFn: (() => void) | undefined;
     let unmounted = false;
+    let pollTimer: ReturnType<typeof setInterval> | undefined;
 
-    const hideWhenStylesReady = () => {
-      if (unmounted) return;
+    const checkCssReady = (): boolean => {
       const bannerEl = document.querySelector('.banner');
-      const isCssApplied =
-        bannerEl &&
-        window.getComputedStyle(bannerEl).position === 'relative';
-
-      if (document.readyState === 'complete' || isCssApplied) {
-        setPreloaderHidden(true);
-      } else {
-        window.addEventListener(
-          'load',
-          () => {
-            if (!unmounted) setPreloaderHidden(true);
-          },
-          { once: true }
-        );
-      }
+      if (!bannerEl) return false;
+      const style = window.getComputedStyle(bannerEl);
+      return style.position === 'relative' && style.overflow === 'hidden';
     };
 
-    const timer = setTimeout(hideWhenStylesReady, 120);
+    if (checkCssReady()) {
+      setPreloaderHidden(true);
+    } else {
+      pollTimer = setInterval(() => {
+        if (unmounted) return;
+        if (checkCssReady()) {
+          setPreloaderHidden(true);
+          if (pollTimer) clearInterval(pollTimer);
+        }
+      }, 25);
+    }
+
     const maxFallbackTimer = setTimeout(() => {
-      if (!unmounted) setPreloaderHidden(true);
-    }, 1500);
+      if (!unmounted) {
+        setPreloaderHidden(true);
+        if (pollTimer) clearInterval(pollTimer);
+      }
+    }, 600);
 
     bootLandingInteractions(() => {
       if (!unmounted) {
@@ -55,7 +57,7 @@ export default function LandingPage() {
 
     return () => {
       unmounted = true;
-      clearTimeout(timer);
+      if (pollTimer) clearInterval(pollTimer);
       clearTimeout(maxFallbackTimer);
       if (cleanupFn) {
         cleanupFn();

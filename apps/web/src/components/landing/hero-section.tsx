@@ -1,49 +1,11 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import Link from 'next/link';
 import { FeatherIcon } from './feather-icon';
 
 export function HeroSection() {
   useEffect(() => {
     document.documentElement.style.setProperty('--g4d-banner-h', '820px');
-  }, []);
-
-  useEffect(() => {
-    const syncBannerHeight = () => {
-      const topBar = document.querySelector('.header-top-bg') as HTMLElement | null;
-      const header = document.querySelector('.header') as HTMLElement | null;
-      const rawOffset =
-        (topBar ? topBar.offsetHeight : 0) + (header ? header.offsetHeight : 0);
-      const safeOffset =
-        rawOffset >= 70 && rawOffset <= 180 ? rawOffset : 124;
-      const availH = Math.max(window.innerHeight - safeOffset, 520);
-      document.documentElement.style.setProperty(
-        '--g4d-banner-h',
-        `${availH}px`
-      );
-    };
-
-    syncBannerHeight();
-    const t1 = setTimeout(syncBannerHeight, 60);
-    const t2 = setTimeout(syncBannerHeight, 250);
-
-    let ro: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver(syncBannerHeight);
-      const topBar = document.querySelector('.header-top-bg');
-      const header = document.querySelector('.header');
-      if (topBar) ro.observe(topBar);
-      if (header) ro.observe(header);
-    }
-
-    window.addEventListener('resize', syncBannerHeight, { passive: true });
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      if (ro) ro.disconnect();
-      window.removeEventListener('resize', syncBannerHeight);
-    };
   }, []);
 
   return (
@@ -99,7 +61,7 @@ export function HeroSection() {
                             au client final, chaque étape est documentée.
                           </p>
                           <div className="d-flex tw-gap-11 flex-wrap">
-                            <Link
+                            <a
                               href="/login"
                               className="cursor-small btn btn-main-two hover-style-two button--stroke tw-py-405 d-inline-flex align-items-center justify-content-center tw-gap-5 group active--translate-y-2"
                               data-block="button"
@@ -111,7 +73,7 @@ export function HeroSection() {
                               <span className="tw-w-7 tw-h-7 bg-main-three-600 text-white tw-text-sm tw-rounded d-flex justify-content-center align-items-center position-relative group-hover-bg-main-600 group-hover-text-white tw-duration-500">
                                 <FeatherIcon name="arrow-right" />
                               </span>
-                            </Link>
+                            </a>
                             <a
                               href="#suivi"
                               className="cursor-small d-inline-flex align-items-center tw-gap-2 text-white fw-semibold hover-text-main-600 group active--translate-y-2"
@@ -182,7 +144,7 @@ export function HeroSection() {
                           la vente.
                         </p>
                         <div className="d-flex tw-gap-11 flex-wrap">
-                          <Link
+                          <a
                             href="/login"
                             className="cursor-small btn btn-main-two hover-style-two button--stroke tw-py-405 d-inline-flex align-items-center justify-content-center tw-gap-5 group active--translate-y-2"
                             data-block="button"
@@ -194,7 +156,7 @@ export function HeroSection() {
                             <span className="tw-w-7 tw-h-7 bg-main-three-600 text-white tw-text-sm tw-rounded d-flex justify-content-center align-items-center position-relative group-hover-bg-main-600 group-hover-text-white tw-duration-500">
                               <FeatherIcon name="check" />
                             </span>
-                          </Link>
+                          </a>
                           <a
                             href="#apercu"
                             className="cursor-small d-inline-flex align-items-center tw-gap-2 text-white fw-semibold hover-text-main-600 group active--translate-y-2"

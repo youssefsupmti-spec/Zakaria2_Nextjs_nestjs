@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 import { FeatherIcon } from './feather-icon';
 import { G4D_LOGO_PATH } from '@/lib/brand';
 
@@ -130,7 +129,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                 et communes accessibles. Un réseau qui s&apos;étend chaque mois.
               </p>
               <div className="tw-mt-10 d-flex flex-wrap align-items-center tw-gap-7">
-                <Link
+                <a
                   href="/login"
                   className="cursor-small btn btn-main-two rounded-0 tw-py-405 tw-px-12 d-inline-flex align-items-center tw-gap-4"
                   data-aos="fade-up"
@@ -139,7 +138,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                 >
                   <span>Rejoindre le réseau G4D</span>
                   <FeatherIcon name="arrow-right" />
-                </Link>
+                </a>
                 <a
                   href="mailto:Contact@g4d.ma"
                   className="cursor-small fw-bold text-main-600 d-inline-flex align-items-center tw-gap-3 hover--translate-x-05 tw-transition-all"
@@ -230,12 +229,12 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
               <p className="text-white opacity-75 cursor-small tw-mb-8">
                 Inscription gratuite. Sans engagement. Support inclus.
               </p>
-              <Link
+              <a
                 href="/login"
                 className="cursor-small btn btn-main rounded-0 tw-py-405 tw-px-10"
               >
                 Créer mon compte gratuitement
-              </Link>
+              </a>
             </div>
           </div>
         </div>
@@ -455,36 +454,36 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                 </h5>
                 <ul className="d-flex flex-column tw-gap-4">
                   <li>
-                    <Link
+                    <a
                       href="/login"
                       className="cursor-small hover--translate-x-2 position-relative text-neutral-500 hover-text-main-600 fw-semibold"
                     >
                       Espace client
-                    </Link>
+                    </a>
                   </li>
                   <li>
-                    <Link
+                    <a
                       href="/login"
                       className="cursor-small hover--translate-x-2 position-relative text-neutral-500 hover-text-main-600 fw-semibold"
                     >
                       S&apos;inscrire
-                    </Link>
+                    </a>
                   </li>
                   <li>
-                    <Link
+                    <a
                       href="/login"
                       className="cursor-small hover--translate-x-2 position-relative text-neutral-500 hover-text-main-600 fw-semibold"
                     >
                       Compte client
-                    </Link>
+                    </a>
                   </li>
                   <li>
-                    <Link
+                    <a
                       href="/login"
                       className="cursor-small hover--translate-x-2 position-relative text-neutral-500 hover-text-main-600 fw-semibold"
                     >
                       Devenir livreur
-                    </Link>
+                    </a>
                   </li>
                 </ul>
               </div>
@@ -528,12 +527,12 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                     </span>
                   </div>
                 </div>
-                <Link
+                <a
                   href="/login"
                   className="cursor-small hover--translate-x-2 tw-mt-6 d-block fw-semibold text-main-600 tw-text-2xl hover-text-main-600"
                 >
                   Démarrer gratuitement →
-                </Link>
+                </a>
               </div>
             </div>
           </div>

@@ -561,137 +561,181 @@ export async function bootLandingInteractions(
     }
   }
 
-  // ── 6. Chargement différé non-bloquant (Particles.js & Carte Leaflet) ─────
-  Promise.all([
-    loadScriptOnce('/assets/landing/js/particles.min.js'),
-    loadScriptOnce('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'),
-  ]).then(() => {
-    if (disposed) return;
-
-    // 6a. Particles.js (#g4d-particles-js)
-    if (
-      typeof win.particlesJS !== 'undefined' &&
-      document.getElementById('g4d-particles-js')
-    ) {
-      try {
-        win.particlesJS('g4d-particles-js', {
-          particles: {
-            number: { value: 65, density: { enable: true, value_area: 800 } },
-            color: { value: '#ffffff' },
-            shape: { type: 'circle', stroke: { width: 0, color: '#000000' } },
-            opacity: {
-              value: 0.45,
-              random: true,
-              anim: {
+  // ── 6. Chargement différé intelligent (IntersectionObserver : Particles.js & Carte Leaflet) ──
+  const initParticles = () => {
+    loadScriptOnce('/assets/landing/js/particles.min.js').then(() => {
+      if (disposed) return;
+      if (
+        typeof win.particlesJS !== 'undefined' &&
+        document.getElementById('g4d-particles-js')
+      ) {
+        try {
+          win.particlesJS('g4d-particles-js', {
+            particles: {
+              number: { value: 48, density: { enable: true, value_area: 800 } },
+              color: { value: '#ffffff' },
+              shape: { type: 'circle', stroke: { width: 0, color: '#000000' } },
+              opacity: {
+                value: 0.45,
+                random: true,
+                anim: {
+                  enable: true,
+                  speed: 0.8,
+                  opacity_min: 0.1,
+                  sync: false,
+                },
+              },
+              size: {
+                value: 3,
+                random: true,
+                anim: { enable: false, speed: 40, size_min: 0.1, sync: false },
+              },
+              line_linked: {
                 enable: true,
-                speed: 0.8,
-                opacity_min: 0.1,
-                sync: false,
+                distance: 150,
+                color: '#ffffff',
+                opacity: 0.28,
+                width: 1,
+              },
+              move: {
+                enable: true,
+                speed: 1.6,
+                direction: 'none',
+                random: false,
+                straight: false,
+                out_mode: 'out',
+                bounce: false,
               },
             },
-            size: {
-              value: 3,
-              random: true,
-              anim: { enable: false, speed: 40, size_min: 0.1, sync: false },
+            interactivity: {
+              detect_on: 'canvas',
+              events: {
+                onhover: { enable: true, mode: 'grab' },
+                onclick: { enable: false, mode: 'push' },
+                resize: true,
+              },
+              modes: {
+                grab: { distance: 140, line_linked: { opacity: 0.75 } },
+                push: { particles_nb: 2 },
+              },
             },
-            line_linked: {
-              enable: true,
-              distance: 150,
-              color: '#ffffff',
-              opacity: 0.28,
-              width: 1,
-            },
-            move: {
-              enable: true,
-              speed: 2,
-              direction: 'none',
-              random: false,
-              straight: false,
-              out_mode: 'out',
-              bounce: false,
-            },
-          },
-          interactivity: {
-            detect_on: 'canvas',
-            events: {
-              onhover: { enable: true, mode: 'grab' },
-              onclick: { enable: true, mode: 'push' },
-              resize: true,
-            },
-            modes: {
-              grab: { distance: 140, line_linked: { opacity: 0.75 } },
-              push: { particles_nb: 3 },
-            },
-          },
-          retina_detect: true,
-        });
-      } catch {
-        // ignore
-      }
-    }
-
-    // 6b. Carte Leaflet (#g4d-coverage-map)
-    if (win.L) {
-      const mapEl = document.getElementById('g4d-coverage-map') as any;
-      if (mapEl && !mapEl._leaflet_id) {
-        const L = win.L;
-        const map = L.map(mapEl, {
-          center: [29.5, -8.5],
-          zoom: 5,
-          minZoom: 5,
-          maxZoom: 11,
-          scrollWheelZoom: false,
-          zoomControl: true,
-        });
-
-        L.tileLayer(
-          'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-          {
-            attribution: '&copy; OpenStreetMap &copy; CARTO',
-            subdomains: 'abcd',
-            maxZoom: 19,
-          }
-        ).addTo(map);
-
-        HUBS.forEach((h) => {
-          const cls = h.primary
-            ? 'g4d-map-dot g4d-map-dot--hub'
-            : 'g4d-map-dot';
-          const sz = h.primary ? 18 : 11;
-          const icon = L.divIcon({
-            className: '',
-            html: `<div class="${cls}"></div>`,
-            iconSize: [sz, sz],
-            iconAnchor: [sz / 2, sz / 2],
-            popupAnchor: [0, -(sz / 2 + 4)],
+            retina_detect: true,
           });
-
-          L.marker([h.lat, h.lng], { icon })
-            .addTo(map)
-            .bindPopup(
-              `<div class="g4d-map-popup"><strong>${h.city}</strong><span>${
-                h.primary ? 'Hub régional G4D' : 'Ville desservie'
-              }</span></div>`
-            );
-        });
-
-        onMapReady();
-        setTimeout(() => map.invalidateSize(), 200);
-        cleanups.push(() => {
-          try {
-            map.remove();
-          } catch {
-            // ignore
-          }
-        });
-      } else {
-        onMapReady();
+        } catch {
+          // ignore
+        }
       }
+    });
+  };
+
+  const initCoverageMap = () => {
+    loadScriptOnce('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js').then(
+      () => {
+        if (disposed) return;
+        if (win.L) {
+          const mapEl = document.getElementById('g4d-coverage-map') as any;
+          if (mapEl && !mapEl._leaflet_id) {
+            const L = win.L;
+            const map = L.map(mapEl, {
+              center: [29.5, -8.5],
+              zoom: 5,
+              minZoom: 5,
+              maxZoom: 11,
+              scrollWheelZoom: false,
+              zoomControl: true,
+            });
+
+            L.tileLayer(
+              'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+              {
+                attribution: '&copy; OpenStreetMap &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 19,
+              }
+            ).addTo(map);
+
+            HUBS.forEach((h) => {
+              const cls = h.primary
+                ? 'g4d-map-dot g4d-map-dot--hub'
+                : 'g4d-map-dot';
+              const sz = h.primary ? 18 : 11;
+              const icon = L.divIcon({
+                className: '',
+                html: `<div class="${cls}"></div>`,
+                iconSize: [sz, sz],
+                iconAnchor: [sz / 2, sz / 2],
+                popupAnchor: [0, -(sz / 2 + 4)],
+              });
+
+              L.marker([h.lat, h.lng], { icon })
+                .addTo(map)
+                .bindPopup(
+                  `<div class="g4d-map-popup"><strong>${h.city}</strong><span>${
+                    h.primary ? 'Hub régional G4D' : 'Ville desservie'
+                  }</span></div>`
+                );
+            });
+
+            onMapReady();
+            setTimeout(() => map.invalidateSize(), 200);
+            cleanups.push(() => {
+              try {
+                map.remove();
+              } catch {
+                // ignore
+              }
+            });
+          } else {
+            onMapReady();
+          }
+        }
+      }
+    );
+  };
+
+  if (typeof IntersectionObserver !== 'undefined') {
+    const suiviEl = document.getElementById('suivi');
+    if (suiviEl) {
+      const obsParticles = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            obsParticles.disconnect();
+            initParticles();
+          }
+        },
+        { rootMargin: '500px 0px' }
+      );
+      obsParticles.observe(suiviEl);
+      cleanups.push(() => obsParticles.disconnect());
+    } else {
+      initParticles();
     }
-  });
+
+    const couvertureEl = document.getElementById('couverture');
+    if (couvertureEl) {
+      const obsMap = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            obsMap.disconnect();
+            initCoverageMap();
+          }
+        },
+        { rootMargin: '600px 0px' }
+      );
+      obsMap.observe(couvertureEl);
+      cleanups.push(() => obsMap.disconnect());
+    } else {
+      initCoverageMap();
+    }
+  } else {
+    initParticles();
+    initCoverageMap();
+  }
 
   return () => {
     disposed = true;
+    document.body.style.overflow = '';
+    document.body.style.paddingInlineEnd = '';
     cleanups.forEach((fn) => fn());
   };
 }
