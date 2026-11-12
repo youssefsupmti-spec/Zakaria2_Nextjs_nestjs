@@ -1,0 +1,2588 @@
+/*
+ * G4D Landing — Supplemental styles
+ * Main template CSS: public/assets/landing/css/main.css (Logistick)
+ * Tokens de référence : --g4d-blue #2996C8 | --g4d-blue-deeper #0B3D5C | --g4d-orange #F47B20
+ */
+
+/* ════════════════════════════════════════════════════════════════════════════
+   1. TOKENS — Source de vérité extraits du logo G4D
+      Bleu   = couleur principale  (lettres GD)
+      Orange = couleur secondaire  (éclair / speed lines)
+════════════════════════════════════════════════════════════════════════════ */
+:root {
+    --g4d-blue: #2996C8;
+    --g4d-blue-dark: #1A6E9A;
+    --g4d-blue-deeper: #0B3D5C;
+    --g4d-blue-deepest: #08293E;
+    --g4d-orange: #F47B20;
+    --g4d-orange-dark: #D45F00;
+    --g4d-bg: #F4F8FC;
+    --g4d-border: #D8E8F5;
+
+    --main-h: 199;
+    --main-s: 66%;
+    --main-l: 47%;
+    --main-two-h: 203;
+    --main-two-s: 79%;
+    --main-two-l: 20%;
+    --main-three-h: 26;
+    --main-three-s: 91%;
+    --main-three-l: 54%;
+
+    --heading-color: var(--g4d-blue-deeper);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   2. PRIMARY — G4D Blue #2996C8
+════════════════════════════════════════════════════════════════════════════ */
+.bg-main-600,
+.hover-bg-main-600:hover,
+.group-hover-item-bg-main-600 {
+    background-color: var(--g4d-blue) !important;
+}
+
+.text-main-600,
+.hover-text-main-600:hover {
+    color: var(--g4d-blue) !important;
+}
+
+.border-main-600,
+.border-start.border-main-600 {
+    border-color: var(--g4d-blue) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   3. CTA BUTTONS — Orange #F47B20
+════════════════════════════════════════════════════════════════════════════ */
+.btn-main {
+    background-color: var(--g4d-orange) !important;
+    border-color: var(--g4d-orange) !important;
+    color: #fff !important;
+}
+
+.btn-main:hover,
+.btn-main:focus {
+    background-color: var(--g4d-orange-dark) !important;
+    border-color: var(--g4d-orange-dark) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   4. DARK BACKGROUNDS — G4D Deep Blue #0B3D5C
+════════════════════════════════════════════════════════════════════════════ */
+.bg-main-two-600,
+.hover-bg-main-two-600:hover {
+    background-color: var(--g4d-blue-deeper) !important;
+}
+
+.bg-main-two-900 {
+    background-color: var(--g4d-blue-deepest) !important;
+}
+
+.text-main-two-600,
+.hover-text-main-two-600:hover {
+    color: var(--g4d-blue-deeper) !important;
+}
+
+.border-main-two-600 {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.btn-main-two {
+    background-color: var(--g4d-blue-deeper) !important;
+    border-color: var(--g4d-blue-deeper) !important;
+    color: #fff !important;
+}
+
+.btn-main-two:hover,
+.btn-main-two:focus {
+    background-color: var(--g4d-blue-dark) !important;
+    border-color: var(--g4d-blue-dark) !important;
+}
+
+.header-four-social {
+    background-color: var(--g4d-blue-deeper) !important;
+}
+
+.header-four-social li {
+    border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   5. ACCENT / ORANGE — main-three
+════════════════════════════════════════════════════════════════════════════ */
+.bg-main-three-600 {
+    background-color: var(--g4d-orange) !important;
+}
+
+.text-main-three-600 {
+    color: var(--g4d-orange) !important;
+}
+
+.border-main-three-600 {
+    border-color: var(--g4d-orange) !important;
+}
+
+.text-star {
+    color: var(--g4d-orange) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   6. HEADER — Logo mask + sticky shadow
+════════════════════════════════════════════════════════════════════════════ */
+.logo-mask-bg::before,
+.logo-mask-bg {
+    background-color: var(--g4d-blue-deeper) !important;
+}
+
+.header.fixed-header {
+    box-shadow: 0 2px 28px rgba(11, 61, 92, 0.14);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   7. HERO VIDEO + OVERLAY
+════════════════════════════════════════════════════════════════════════════ */
+.g4d-hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+.g4d-hero-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+        linear-gradient(100deg,
+            rgba(8, 41, 62, 0.94) 0%,
+            rgba(8, 41, 62, 0.80) 28%,
+            rgba(8, 41, 62, 0.42) 52%,
+            rgba(8, 41, 62, 0.12) 72%,
+            transparent 100%),
+        linear-gradient(to bottom,
+            rgba(8, 41, 62, 0.38) 0%,
+            rgba(8, 41, 62, 0.05) 35%,
+            rgba(8, 41, 62, 0.05) 65%,
+            rgba(8, 41, 62, 0.55) 100%);
+}
+
+.banner-item {
+    position: relative;
+    z-index: 2;
+}
+
+.banner video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   8. LEAFLET MAP
+════════════════════════════════════════════════════════════════════════════ */
+#g4d-coverage-map {
+    z-index: 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   9. LOGO SIZING
+════════════════════════════════════════════════════════════════════════════ */
+.g4d-logo {
+    height: 68px;
+    width: auto;
+    object-fit: contain;
+}
+
+.g4d-logo-sm {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+}
+
+.g4d-logo-white {
+    filter: drop-shadow(0 2px 12px rgba(255, 255, 255, 0.22));
+}
+
+.g4d-mockup-screen {
+    background: #f8fafc;
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   10. NAVIGATION & MISC
+════════════════════════════════════════════════════════════════════════════ */
+.livewire-section {
+    padding: 80px 0;
+}
+
+.nav-menu__item.activePage>a {
+    color: var(--g4d-blue) !important;
+}
+
+.car-base,
+.car-top {
+    background-color: var(--g4d-blue);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   11. PRELOADER BLOBS
+════════════════════════════════════════════════════════════════════════════ */
+#g4d-preloader::before {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    width: 55vw;
+    height: 55vw;
+    max-width: 640px;
+    max-height: 640px;
+    top: -18%;
+    left: -12%;
+    background: radial-gradient(circle, rgba(41, 150, 200, 0.13) 0%, transparent 68%);
+}
+
+#g4d-preloader::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    width: 45vw;
+    height: 45vw;
+    max-width: 520px;
+    max-height: 520px;
+    bottom: -14%;
+    right: -10%;
+    background: radial-gradient(circle, rgba(244, 123, 32, 0.12) 0%, transparent 68%);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   12. NOSCRIPT FALLBACK — SimpleBar list scrollability without JS
+════════════════════════════════════════════════════════════════════════════ */
+.g4d-agences__list {
+    overflow-y: auto !important;
+}
+
+/* ── Brand focus ring — G4D Blue primary ─────────────────────────────────── */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--g4d-blue, #2996C8) !important;
+    box-shadow: 0 0 0 0.25rem rgba(41, 150, 200, 0.22) !important;
+    outline: none;
+}
+
+/* ── Aperçu Plateforme section ───────────────────────────────────────────── */
+/* rgba deep blue : #0B3D5C = rgb(11, 61, 92)                               */
+/* rgba G4D blue  : #2996C8 = rgb(41, 150, 200)                             */
+.g4d-platform-screenshot {
+    border: 1px solid rgba(11, 61, 92, 0.12);
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 32px 80px rgba(11, 61, 92, 0.18), 0 8px 24px rgba(41, 150, 200, 0.14);
+    overflow: hidden;
+}
+
+.g4d-platform-badge {
+    box-shadow: 0 8px 32px rgba(11, 61, 92, 0.14);
+    min-width: 160px;
+}
+
+.g4d-platform-badge--dark {
+    box-shadow: 0 8px 32px rgba(11, 61, 92, 0.28);
+    min-width: 175px;
+}
+
+.g4d-platform-glow {
+    background: radial-gradient(ellipse 70% 50% at 50% 0%, rgba(41, 150, 200, 0.18) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* ── Browser chrome (Aperçu section) ────────────────────────────────────── */
+.g4d-browser-url {
+    max-width: 340px;
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.g4d-browser-bar {
+    height: 42px;
+}
+
+.g4d-browser-dot-red {
+    width: 12px;
+    height: 12px;
+    background: #FF5F57;
+}
+
+.g4d-browser-dot-amber {
+    width: 12px;
+    height: 12px;
+    background: #FFBD2E;
+}
+
+.g4d-browser-dot-green {
+    width: 12px;
+    height: 12px;
+    background: #28C840;
+}
+
+.g4d-browser-url-text {
+    font-size: 12px;
+}
+
+/* ── Feather Icons — global sizing (SVG behaves like font icon) ──────────── */
+svg.feather {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 2;
+}
+
+/* ── Section Icons — Features & About (Feather SVG) ─────────────────────── */
+.g4d-section-icon,
+.g4d-section-icon.feather {
+    width: 64px;
+    height: 64px;
+    display: block;
+    stroke: #2996C8;
+    stroke-width: 1.5;
+    fill: none;
+    transition: transform 0.3s ease;
+}
+
+.features-item:hover .g4d-section-icon {
+    transform: scale(1.1);
+}
+
+.g4d-section-icon-sm,
+.g4d-section-icon-sm.feather {
+    width: 48px;
+    height: 48px;
+    display: block;
+    flex-shrink: 0;
+    stroke: #2996C8;
+    stroke-width: 1.5;
+    fill: none;
+}
+
+/* ── Sidebar nav icons ───────────────────────────────────────────────────── */
+.g4d-dash__nav-item svg.feather {
+    width: 16px;
+    height: 16px;
+}
+
+/* ── Process steps — Feather icons inside blue circles ──────────────────── */
+.transport-way-item__icon svg.feather {
+    width: 43px;
+    height: 43px;
+    color: #fff;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 1.5;
+}
+
+.g4d-process-num {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    background: #fff;
+    color: #2996C8;
+    border-radius: 50%;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #2996C8;
+    line-height: 1;
+}
+
+/* ── Leaflet map z-index fix inside Bootstrap grid ───────────────────────── */
+#g4d-coverage-map .leaflet-pane,
+#g4d-coverage-map .leaflet-top,
+#g4d-coverage-map .leaflet-bottom {
+    z-index: 400;
+}
+
+/* ── Sidebar nav icons ───────────────────────────────────────────────────── */
+.g4d-dash__sidebar {
+    width: 42px;
+    background: #0B3D5C;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.g4d-dash__nav-item {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.40);
+    font-size: 15px;
+    cursor: default;
+}
+
+.g4d-dash__nav-item--active {
+    background: rgba(41, 150, 200, 0.25);
+    color: #2996C8;
+}
+
+/* ─ Content area (right of sidebar) ─ */
+.g4d-mockup-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+}
+
+/* ─ Topbar ─ */
+.g4d-mockup-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+/* ─ Count badge (blue pill) ─ */
+.g4d-mockup-badge-count {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2996C8;
+    background: rgba(41, 150, 200, 0.10);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+/* ─ "Nouveau" badge (orange pill) ─ */
+.g4d-mockup-badge-new {
+    font-size: 11px;
+    font-weight: 600;
+    color: #F47B20;
+    background: rgba(244, 123, 32, 0.10);
+    padding: 2px 8px;
+    border-radius: 20px;
+}
+
+/* ─ Search bar (slide 1) ─ */
+.g4d-mockup-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    color: #94a3b8;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+/* ─ Table (slide 1) ─ */
+.g4d-mockup-table {
+    font-size: 12px;
+    border-collapse: collapse;
+    flex: 1;
+}
+
+.g4d-mockup-table thead tr {
+    background: #f1f5f9;
+}
+
+.g4d-mockup-table th {
+    padding: 7px 12px;
+    font-weight: 600;
+    color: #64748b;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.g4d-mockup-table td {
+    padding: 7px 12px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    white-space: nowrap;
+}
+
+.g4d-mockup-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.g4d-mockup-table tbody tr:hover td {
+    background: rgba(41, 150, 200, 0.04);
+}
+
+/* ─ Status badges (shared across slides) ─ */
+.g4d-status {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+.g4d-status--success {
+    color: #15803d;
+    background: #dcfce7;
+}
+
+.g4d-status--warning {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+.g4d-status--info {
+    color: #1e40af;
+    background: #dbeafe;
+}
+
+.g4d-status--danger {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+/* ─ Table footer / pagination ─ */
+.g4d-mockup-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: #fff;
+    border-top: 1px solid #e2e8f0;
+    font-size: 11px;
+    color: #94a3b8;
+    flex-shrink: 0;
+}
+
+.g4d-mockup-page {
+    font-weight: 600;
+    color: #334155;
+}
+
+/* ─ Form (slide 2) ─ */
+.g4d-mockup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px 16px;
+    flex: 1;
+}
+
+.g4d-mockup-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.g4d-mockup-field label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 0;
+}
+
+.g4d-mockup-input {
+    font-size: 12px;
+    color: #334155;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 30px;
+}
+
+.g4d-mockup-input--filled {
+    background: #f8fafc;
+    color: #475569;
+}
+
+.g4d-mockup-textarea {
+    font-size: 11px;
+    color: #64748b;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 7px 10px;
+    line-height: 1.5;
+    min-height: 52px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ─ Form action buttons ─ */
+.g4d-mockup-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 2px;
+}
+
+.g4d-mockup-btn {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: default;
+    white-space: nowrap;
+}
+
+.g4d-mockup-btn--primary {
+    background: #2996C8;
+    color: #fff;
+    border: 1px solid #2996C8;
+}
+
+.g4d-mockup-btn--outline {
+    background: #fff;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+/* ─ Tracking info panel (slide 3) ─ */
+.g4d-mockup-tracking-info {
+    padding: 10px 16px;
+    background: #fff;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.g4d-mockup-label {
+    font-size: 10px;
+    color: #94a3b8;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.g4d-mockup-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+}
+
+/* ─ Progress bar ─ */
+.g4d-mockup-progress {
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.g4d-mockup-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2996C8 0%, #F47B20 100%);
+    border-radius: 4px;
+}
+
+/* ─ Timeline (slide 3) ─ */
+.g4d-mockup-timeline {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 16px;
+    flex: 1;
+}
+
+.g4d-timeline-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.g4d-timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 22px;
+    bottom: 0;
+    width: 2px;
+    background: #e2e8f0;
+}
+
+.g4d-timeline-item--done:not(:last-child)::after {
+    background: #2996C8;
+}
+
+.g4d-timeline-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    color: #94a3b8;
+}
+
+.g4d-timeline-dot--done {
+    background: #2996C8;
+    border-color: #2996C8;
+    color: #fff;
+}
+
+.g4d-timeline-content {
+    display: flex;
+    flex-direction: column;
+    padding-top: 2px;
+}
+
+.g4d-timeline-content strong {
+    font-size: 12px;
+    color: #334155;
+    font-weight: 600;
+}
+
+.g4d-timeline-content small {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.g4d-timeline-content--pending strong,
+.g4d-timeline-content--pending small {
+    color: #cbd5e1;
+}
+
+/* ─ Tab navigation buttons ─ */
+.g4d-apercu-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.g4d-apercu-tab:hover {
+    color: #2996C8;
+    background: rgba(41, 150, 200, 0.06);
+}
+
+.g4d-apercu-tab.active {
+    color: #2996C8;
+    background: rgba(41, 150, 200, 0.10);
+    border-color: rgba(41, 150, 200, 0.20);
+}
+
+/* ── Aperçu — Mockup chrome container (shadow au lieu du border-dashed) ──── */
+.g4d-apercu-chrome {
+    box-shadow: 0 10px 48px rgba(11, 61, 92, 0.11), 0 2px 10px rgba(11, 61, 92, 0.06);
+}
+
+/* ── Aperçu — Stat badges flottants ─────────────────────────────────────── */
+.g4d-apercu-badge {
+    position: absolute;
+    background: #fff;
+    border-radius: 12px;
+    padding: 9px 14px;
+    box-shadow: 0 4px 24px rgba(11, 61, 92, 0.12), 0 1px 4px rgba(11, 61, 92, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    z-index: 4;
+    border: 1px solid rgba(11, 61, 92, 0.07);
+}
+
+.g4d-apercu-badge--tl {
+    top: -18px;
+    left: -20px;
+    animation: g4d-float-badge 3.2s ease-in-out infinite;
+}
+
+.g4d-apercu-badge--tr {
+    top: 18%;
+    right: -22px;
+    animation: g4d-float-badge 3.8s ease-in-out infinite;
+    animation-delay: 0.9s;
+}
+
+.g4d-apercu-badge--bl {
+    bottom: 72px;
+    left: -22px;
+    animation: g4d-float-badge 3.5s ease-in-out infinite;
+    animation-delay: 1.8s;
+}
+
+@keyframes g4d-float-badge {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+.g4d-apercu-badge__icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.g4d-apercu-badge__label {
+    font-size: 10.5px;
+    color: #94a3b8;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.g4d-apercu-badge__value {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0B3D5C;
+    line-height: 1.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .g4d-apercu-badge {
+        animation: none !important;
+    }
+}
+
+/* ── Aperçu — Feature icon wrappers ─────────────────────────────────────── */
+.g4d-feat-icon-wrap {
+    width: 72px;
+    height: 72px;
+    background: rgba(41, 150, 200, 0.07);
+    border-radius: 18px;
+    border: 1px solid rgba(41, 150, 200, 0.13);
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.g4d-feat-icon-wrap .g4d-section-icon {
+    width: 38px;
+    height: 38px;
+}
+
+.animation-item:hover .g4d-feat-icon-wrap {
+    background: rgba(41, 150, 200, 0.13);
+    border-color: rgba(41, 150, 200, 0.25);
+}
+
+/* ── Position utilities manquants dans Bootstrap ─────────────────────────── */
+.tw-bottom-20 {
+    bottom: 20% !important;
+}
+
+/* ── Service section — height utilities non présentes dans main.css ──────── */
+.tw-h-240-px {
+    height: 240px;
+}
+
+/* ── Service tabs — bouton premium ──────────────────────────────────────── */
+.g4d-svc-tab {
+    transition: transform 0.22s ease, border-color 0.22s ease !important;
+    border: 1px solid transparent !important;
+}
+
+.g4d-svc-tab:hover {
+    transform: translateX(4px);
+    border-color: rgba(41, 150, 200, 0.18) !important;
+}
+
+.g4d-svc-tab.active {
+    background: linear-gradient(135deg, #2996C8 0%, #1A6E9A 100%) !important;
+    border-color: transparent !important;
+    transform: none !important;
+}
+
+/* ── Service tabs — icône ────────────────────────────────────────────────── */
+.g4d-svc-tab__icon {
+    font-size: 2.3rem;
+    flex-shrink: 0;
+    transition: stroke 0.22s ease;
+}
+
+.g4d-svc-tab.active .g4d-svc-tab__icon {
+    stroke: #fff !important;
+}
+
+/* ── Service tabs — sous-titre ───────────────────────────────────────────── */
+.g4d-svc-tab__sub {
+    font-size: 0.78rem;
+    color: #64748b;
+    line-height: 1.2;
+    margin-top: 1px;
+    transition: color 0.22s ease;
+}
+
+.g4d-svc-tab.active .g4d-svc-tab__sub {
+    color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.g4d-svc-tab.active span.fw-bold {
+    color: #fff !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PRICING CALCULATOR — Section Tarification (Logistick-compatible)
+   ─────────────────────────────────────────────────────────────────────────
+   Utilise les tokens natifs Logistick : --main-600, --main-two-600,
+   --neutral-100/200/400/600/700. CSS minimal — seulement ce que Logistick
+   ne peut pas couvrir avec ses classes utilitaires.
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Barre orange verticale (pattern titre de section Logistick) ────────── */
+.g4d-section-bar {
+    display: inline-block;
+    width: 4px;
+    height: 20px;
+    background: var(--main-600);
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+/* ── Badge total destinations ───────────────────────────────────────────── */
+.g4d-pc__total-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    background: hsl(var(--main-h) var(--main-s) var(--main-l) / 0.10);
+    color: var(--main-600);
+    border-radius: 50px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ── Stats bar — Logistick pill pattern (transport-way-item style) ────────── */
+.g4d-pc-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: hsl(var(--main-h) var(--main-s) var(--main-l) / 0.08);
+    border: 1px solid hsl(var(--main-h) var(--main-s) var(--main-l) / 0.18);
+    border-radius: 50px;
+    white-space: nowrap;
+}
+
+.g4d-pc-stat__icon {
+    color: var(--main-600);
+    font-size: 0.875rem;
+    flex-shrink: 0;
+}
+
+.g4d-pc-stat__num {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--main-600);
+    font-variant-numeric: tabular-nums;
+}
+
+.g4d-pc-stat__label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--neutral-700);
+}
+
+/* ── Badge compteur agences (à côté du titre sidebar) ───────────────────── */
+.g4d-pc-count-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 20px;
+    padding: 0 7px;
+    background: var(--main-600);
+    color: #fff;
+    border-radius: 50px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+/* ── Sidebar agences ──────────────────────────────────────────────────────── */
+.g4d-agences__sidebar {
+    overflow: hidden;
+}
+
+/* ── SimpleBar — Container ────────────────────────────────────────────────── */
+/*
+ * Doc SimpleBar : ne pas styler l'élément root avec overflow !important.
+ * SimpleBar doit pouvoir lire/modifier overflow. On définit uniquement max-height.
+ */
+.g4d-agences__list {
+    max-height: 380px;
+    /* overflow géré par SimpleBar — ne pas définir ici */
+}
+
+/* ── SimpleBar — Thème G4D (internes SimpleBar uniquement) ───────────────── */
+
+/* Piste verticale — 5px */
+.g4d-agences__list .simplebar-track.simplebar-vertical {
+    width: 5px;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+/* Fond de piste */
+.g4d-agences__list .simplebar-track {
+    background: var(--g4d-bg);
+    border-radius: 6px;
+}
+
+/*
+ * Thumb — ::before est la puce visible.
+ * SimpleBar gère opacity 0→1 via .simplebar-visible (autoHide).
+ */
+.g4d-agences__list .simplebar-scrollbar::before {
+    background: rgba(41, 150, 200, 0.40);
+    /* --g4d-blue */
+    border-radius: 6px;
+    transition: background 0.2s ease;
+    left: 1px;
+    right: 1px;
+}
+
+/* Hover puce → orange G4D */
+.g4d-agences__list .simplebar-scrollbar:hover::before {
+    background: rgba(244, 123, 32, 0.60);
+    /* --g4d-orange */
+}
+
+/* Masquer piste horizontale */
+.g4d-agences__list .simplebar-track.simplebar-horizontal {
+    display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .g4d-agences__list .simplebar-scrollbar::before {
+        transition: none;
+    }
+}
+
+/* ── Cartes agences — Logistick group-hover pattern ──────────────────────── */
+.g4d-agences__card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 15px;
+    border: 1px solid var(--neutral-100);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.3s linear, border-color 0.3s linear;
+    background: hsl(var(--white));
+}
+
+.g4d-agences__card:last-child {
+    margin-bottom: 0;
+}
+
+.g4d-agences__card:hover {
+    border-color: var(--main-600);
+    background: hsl(var(--main-h) var(--main-s) var(--main-l) / 0.04);
+}
+
+.g4d-agences__card--active {
+    background: var(--main-600);
+    border-color: var(--main-600);
+}
+
+.g4d-agences__card-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: hsl(var(--main-h) var(--main-s) var(--main-l) / 0.10);
+    color: var(--main-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: background 0.3s linear, color 0.3s linear;
+}
+
+.g4d-agences__card--active .g4d-agences__card-icon {
+    background: rgba(255, 255, 255, 0.20);
+    color: #fff;
+}
+
+.g4d-agences__card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.g4d-agences__card-name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--main-two-600);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color 0.3s linear;
+}
+
+.g4d-agences__card--active .g4d-agences__card-name {
+    color: #fff;
+}
+
+.g4d-agences__card-ville {
+    font-size: 0.75rem;
+    color: var(--neutral-600);
+    margin-top: 2px;
+    transition: color 0.3s linear;
+}
+
+.g4d-agences__card-ville i {
+    color: var(--main-600);
+    font-size: 10px;
+    margin-right: 3px;
+    transition: color 0.3s linear;
+}
+
+.g4d-agences__card--active .g4d-agences__card-ville {
+    color: rgba(255, 255, 255, 0.80);
+}
+
+.g4d-agences__card--active .g4d-agences__card-ville i {
+    color: rgba(255, 255, 255, 0.80);
+}
+
+.g4d-agences__card-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: opacity 0.3s linear;
+}
+
+.g4d-agences__card-dot--open {
+    background: #22c55e;
+}
+
+.g4d-agences__card-dot--closed {
+    background: #ef4444;
+}
+
+.g4d-agences__card--active .g4d-agences__card-dot {
+    opacity: 0.80;
+}
+
+.g4d-agences__card-arrow {
+    color: var(--neutral-400);
+    font-size: 11px;
+    flex-shrink: 0;
+    transition: color 0.3s linear, transform 0.3s linear;
+}
+
+.g4d-agences__card:hover .g4d-agences__card-arrow {
+    color: var(--main-600);
+    transform: translateX(2px);
+}
+
+.g4d-agences__card--active .g4d-agences__card-arrow {
+    color: rgba(255, 255, 255, 0.70);
+    transform: translateX(2px);
+}
+
+/* ── Carte tarifs — Logistick border card pattern ────────────────────────── */
+.g4d-tarifs-card {
+    border: 1px solid var(--neutral-100);
+    border-radius: 16px;
+    overflow: hidden;
+    background: hsl(var(--white));
+}
+
+/* Header navy — bg-main-two-600 Logistick */
+.g4d-tarifs-card__header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px;
+    background: var(--main-two-600);
+}
+
+.g4d-tarifs-card__header-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--main-600);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    flex-shrink: 0;
+}
+
+.g4d-tarifs-card__subtitle {
+    opacity: 0.70;
+}
+
+.g4d-tarifs-card__page-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.80rem;
+    font-weight: 600;
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+/* Zone search */
+.g4d-tarifs-card__search-zone {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--neutral-100);
+    background: var(--neutral-50);
+}
+
+.g4d-tarifs-search {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1.5px solid var(--neutral-100);
+}
+
+.g4d-tarifs-search__icon {
+    background: hsl(var(--white));
+    border: 0;
+    padding: 0 12px;
+    color: var(--neutral-500);
+}
+
+.g4d-tarifs-search__icon i {
+    font-size: 13px;
+}
+
+.g4d-tarifs-search__input {
+    background: hsl(var(--white));
+    font-size: 0.875rem;
+    color: var(--main-two-600);
+    box-shadow: none !important;
+    border: 0;
+}
+
+.g4d-tarifs-search__input:focus {
+    background: hsl(var(--white));
+}
+
+.g4d-tarifs-search__input::placeholder {
+    color: var(--neutral-600);
+}
+
+.g4d-tarifs-search__clear {
+    background: hsl(var(--white));
+    color: var(--neutral-500);
+    padding: 0 12px;
+    border: 0;
+    transition: color 0.2s linear;
+}
+
+.g4d-tarifs-search__clear:hover {
+    color: var(--main-600);
+}
+
+/* Zone tableau + overlay */
+.g4d-tarifs-card__table-zone {
+    position: relative;
+}
+
+.g4d-tarifs-card__table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Table */
+.g4d-tarifs-table {
+    width: 100%;
+    font-size: 0.875rem;
+    border-collapse: collapse;
+    margin-bottom: 0;
+}
+
+.g4d-tarifs-table__head tr {
+    background: var(--neutral-50);
+    border-bottom: 1px solid var(--neutral-100);
+}
+
+.g4d-tarifs-table__th {
+    padding: 11px 20px;
+    font-size: 0.70rem;
+    font-weight: 700;
+    color: var(--neutral-600);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.g4d-tarifs-table__th--end {
+    text-align: right;
+}
+
+.g4d-tarifs-table__tr {
+    border-bottom: 1px solid var(--neutral-100);
+    transition: background 0.15s linear;
+}
+
+.g4d-tarifs-table__tr:last-child {
+    border-bottom: none;
+}
+
+.g4d-tarifs-table__tr:hover {
+    background: hsl(var(--main-h) var(--main-s) var(--main-l) / 0.03);
+}
+
+.g4d-tarifs-table__td-city {
+    padding: 13px 20px;
+    font-weight: 500;
+    color: var(--main-two-600);
+}
+
+.g4d-tarifs-table__td-amount {
+    padding: 13px 20px;
+    vertical-align: middle;
+}
+
+.g4d-tarifs-table__td-amount--end {
+    text-align: right;
+}
+
+.g4d-tarifs-table__price {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.g4d-tarifs-table__price--livraison {
+    color: var(--main-600);
+}
+
+.g4d-tarifs-table__price--retour {
+    color: var(--main-two-600);
+}
+
+/* Overlay loader */
+.g4d-pc__loader {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(2px);
+}
+
+.g4d-pc__loader-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+/* État vide */
+.g4d-tarifs-card__empty {
+    padding: 48px 20px;
+    text-align: center;
+}
+
+.g4d-tarifs-card__empty-icon {
+    font-size: 36px;
+    color: var(--neutral-300);
+    margin-bottom: 14px;
+}
+
+/* Alerte (aucun tarif configuré) */
+.g4d-tarifs-card__alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 20px;
+    background: hsl(46 100% 97%);
+    border-top: 1px solid hsl(46 100% 88%);
+}
+
+.g4d-tarifs-card__alert-icon {
+    font-size: 18px;
+    color: hsl(38 92% 50%);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* ── Pagination ───────────────────────────────────────────────────────────── */
+.g4d-pc__pag {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.g4d-pc__pag-info {
+    font-size: 0.8125rem;
+    color: var(--neutral-700);
+}
+
+.g4d-pc__pag-info strong {
+    color: var(--main-600);
+    font-weight: 600;
+}
+
+.g4d-pc__pag-btns {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Prev / Next — bouton circulaire, style flèche Logistick */
+.g4d-pc__pag-nav {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid var(--neutral-200);
+    background: hsl(var(--white));
+    color: var(--neutral-950);
+    font-size: 0.875rem;
+    transition: background 0.3s linear, border-color 0.3s linear, color 0.3s linear;
+}
+
+.g4d-pc__pag-nav:not(:disabled):hover {
+    background: var(--main-600);
+    border-color: var(--main-600);
+    color: hsl(var(--white));
+}
+
+.g4d-pc__pag-nav:disabled,
+.g4d-pc__pag-nav[disabled] {
+    opacity: 0.35;
+    cursor: not-allowed;
+}
+
+/* Numéros de page */
+.g4d-pc__pag-page {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    border: 1px solid var(--neutral-200);
+    background: hsl(var(--white));
+    color: var(--neutral-950);
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background 0.3s linear, border-color 0.3s linear, color 0.3s linear;
+}
+
+.g4d-pc__pag-page:not(.g4d-pc__pag-page--active):hover {
+    border-color: var(--main-600);
+    color: var(--main-600);
+}
+
+.g4d-pc__pag-page--active {
+    background: var(--main-600) !important;
+    border-color: var(--main-600) !important;
+    color: hsl(var(--white)) !important;
+    font-weight: 600;
+}
+
+.g4d-pc__pag-ellipsis {
+    font-size: 0.875rem;
+    color: var(--neutral-400);
+    padding: 0 4px;
+    line-height: 38px;
+}
+
+.g4d-pc__spinner {
+    width: 14px;
+    height: 14px;
+    border-width: 2px;
+    color: inherit;
+}
+
+/* ── Séparateur vertical — desktop lg+ ──────────────────────────────────── */
+@media (min-width: 992px) {
+    .g4d-pricing-sep {
+        border-right: 1px solid var(--neutral-100);
+    }
+}
+
+/* ── Mobile ───────────────────────────────────────────────────────────────── */
+@media (max-width: 767.98px) {
+    .g4d-pc__pag-info {
+        display: none;
+    }
+
+    .g4d-pc__pag {
+        justify-content: center;
+    }
+
+    .g4d-tarifs-table__td-city,
+    .g4d-tarifs-table__td-amount {
+        padding: 10px 12px;
+    }
+
+    .g4d-tarifs-table__th {
+        padding: 9px 12px;
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PRICING MAP — Carte Leaflet agences (Logistick-compatible)
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Label section carte — Logistick splitTextStyleTwo pattern ───────────── */
+/*    Italic + underline + couleur main (pattern : "Titre en italic souligné") */
+.g4d-map-section-label {
+    display: inline-block;
+    font-style: italic;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--main-600);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: hsl(var(--main-h) var(--main-s) var(--main-l) / 0.50);
+    letter-spacing: 0.02em;
+}
+
+/* ── CTA footer info panel ────────────────────────────────────────────────── */
+.g4d-map-info-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--neutral-100);
+    background: hsl(var(--white));
+    flex-shrink: 0;
+}
+
+/* ── Conteneur carte — Logistick border card ──────────────────────────────── */
+.g4d-pricing-map-card {
+    border: 1px solid var(--neutral-100);
+    border-radius: 16px;
+    overflow: hidden;
+    background: hsl(var(--white));
+}
+
+/* ── Élément Leaflet ─────────────────────────────────────────────────────── */
+.g4d-pricing-map-el {
+    height: 430px;
+    width: 100%;
+    z-index: 0;
+}
+
+/* ── Panneau info gauche ──────────────────────────────────────────────────── */
+.g4d-map-info-panel {
+    height: 430px;
+    overflow: hidden;
+    /* body gère le scroll via overflow-y:auto */
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--neutral-100);
+}
+
+/* Header navy — même style que g4d-tarifs-card__header */
+.g4d-map-info-header {
+    padding: 20px 22px;
+    background: var(--main-two-600);
+    flex-shrink: 0;
+}
+
+/* Badge statut */
+.g4d-map-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    white-space: nowrap;
+    letter-spacing: 0.03em;
+}
+
+.g4d-map-status-badge--open {
+    background: rgba(34, 197, 94, 0.20);
+    color: #86efac;
+}
+
+.g4d-map-status-badge--closed {
+    background: rgba(239, 68, 68, 0.20);
+    color: #fca5a5;
+}
+
+/* Dot statut */
+.g4d-map-status-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.g4d-map-status-dot--open {
+    background: #22c55e;
+}
+
+.g4d-map-status-dot--closed {
+    background: #ef4444;
+}
+
+/* Corps info — scrollable, footer pinned en bas */
+.g4d-map-info-body {
+    padding: 0;
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Rangées info */
+.g4d-map-info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--neutral-100);
+}
+
+.g4d-map-info-row:last-child {
+    border-bottom: none;
+}
+
+/* Icône de rangée */
+.g4d-map-info-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: hsl(var(--main-h) var(--main-s) var(--main-l) / 0.10);
+    color: var(--main-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.g4d-map-info-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--neutral-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+}
+
+.g4d-map-info-value {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--main-two-600);
+    line-height: 1.4;
+}
+
+/* ── Tableau horaires ─────────────────────────────────────────────────────── */
+.g4d-map-schedule {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.g4d-map-schedule__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.g4d-map-schedule__day {
+    font-size: 0.8125rem;
+    color: var(--main-two-600);
+    font-weight: 500;
+}
+
+.g4d-map-schedule__hours {
+    font-size: 0.8125rem;
+    color: var(--main-600);
+    font-weight: 600;
+}
+
+.g4d-map-schedule__row--closed .g4d-map-schedule__day {
+    color: var(--neutral-500);
+}
+
+.g4d-map-schedule__hours--closed {
+    color: var(--neutral-400) !important;
+    font-weight: 400;
+}
+
+/* ── Placeholder (aucune agence) ─────────────────────────────────────────── */
+.g4d-map-placeholder-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: hsl(var(--main-h) var(--main-s) var(--main-l) / 0.10);
+    color: var(--main-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+}
+
+/* ── Contrôle zoom Leaflet — taille réduite ──────────────────────────────── */
+.g4d-pricing-map-el .leaflet-control-zoom a {
+    width: 24px !important;
+    height: 24px !important;
+    line-height: 22px !important;
+    font-size: 14px !important;
+}
+
+.g4d-pricing-map-el .leaflet-control-zoom {
+    border-radius: 6px !important;
+    overflow: hidden;
+}
+
+/* ── Marker pin building — style Logistick ───────────────────────────────── */
+.g4d-pricing-pin {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--main-two-600);
+    border: 2px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    transition: transform 0.2s linear, background 0.2s linear;
+}
+
+.g4d-pricing-pin:hover {
+    transform: scale(1.18);
+}
+
+.g4d-pricing-pin--active {
+    background: var(--main-600);
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
+    border-width: 2px;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 991.98px) {
+    .g4d-pricing-map-el {
+        height: 300px;
+    }
+
+    .g4d-map-info-panel {
+        height: auto;
+        border-left: none;
+        border-top: 1px solid var(--neutral-100);
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   COVERAGE MAP — Section Couverture Nationale (Logistick-compatible)
+   ─────────────────────────────────────────────────────────────────────────
+   Carte Leaflet interactive + cartes responsables agences (2×2 grid)
+   Tokens : --main-600 (orange), --main-two-600 (navy), --neutral-*
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Wrapper carte — rounded border card Logistick ───────────────────────── */
+.g4d-coverage-map-wrap {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid var(--neutral-100);
+    background: hsl(var(--white));
+}
+
+/* ── Élément Leaflet ─────────────────────────────────────────────────────── */
+.g4d-coverage-map-el {
+    height: 480px;
+    width: 100%;
+    z-index: 0;
+}
+
+/* ── Contrôle zoom — taille réduite (cohérent avec pricing map) ──────────── */
+.g4d-coverage-map-el .leaflet-control-zoom a {
+    width: 24px !important;
+    height: 24px !important;
+    line-height: 22px !important;
+    font-size: 14px !important;
+}
+
+.g4d-coverage-map-el .leaflet-control-zoom {
+    border-radius: 6px !important;
+    overflow: hidden;
+}
+
+/* ── Marker pin building — Logistick style ───────────────────────────────── */
+.g4d-coverage-pin {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--main-two-600);
+    border: 2px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(11, 31, 53, 0.30);
+    transition: transform 0.2s linear, background 0.2s linear;
+}
+
+.g4d-coverage-pin:hover {
+    transform: scale(1.18);
+}
+
+.g4d-coverage-pin--active {
+    background: var(--main-600);
+    width: 38px;
+    height: 38px;
+    font-size: 15px;
+    border-width: 2px;
+    box-shadow: 0 4px 14px rgba(244, 123, 32, 0.40);
+}
+
+/* ── team-item Logistick — dot statut position (override for absolute dot) ── */
+.team-item .g4d-agences__card-dot {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+}
+
+/* ── G4D HUP Slider — slide width fixe 350px (slidesPerView:'auto')
+      Swiper calcule lui-même le nombre de slides visibles selon la largeur
+      du conteneur. Sur mobile, la slide prend la quasi-totalité de l'écran. ── */
+.g4d-hup-slider .swiper-slide {
+    width: 350px;
+}
+
+@media (max-width: 575.98px) {
+    .g4d-hup-slider .swiper-slide {
+        width: calc(100vw - 48px);
+    }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .g4d-hup-slider .swiper-slide {
+        width: 300px;
+    }
+}
+
+/* ── G4D HUP Navigation buttons — style Logistick (pattern index-2/index-4)
+      .g4d-hup-prev : cercle outline (fond neutre, hover → bleu principal)
+      .g4d-hup-next : cercle plein  (fond bleu principal, hover → bleu profond)
+      Swiper ajoute .swiper-button-disabled quand plus de slides à parcourir. ── */
+.g4d-hup-prev,
+.g4d-hup-next {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    font-size: 0.875rem;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    flex-shrink: 0;
+    border: none;
+    cursor: pointer;
+}
+
+.g4d-hup-prev {
+    background: var(--g4d-bg, #F4F8FC);
+    color: var(--g4d-blue-deeper, #0B3D5C);
+    border: 1.5px solid var(--g4d-border, #D8E8F5);
+}
+
+.g4d-hup-prev:hover {
+    background: var(--g4d-blue, #2996C8);
+    color: #fff;
+    border-color: var(--g4d-blue, #2996C8);
+}
+
+.g4d-hup-next {
+    background: var(--g4d-blue, #2996C8);
+    color: #fff;
+}
+
+.g4d-hup-next:hover {
+    background: var(--g4d-blue-deeper, #0B3D5C);
+}
+
+.g4d-hup-prev.swiper-button-disabled,
+.g4d-hup-next.swiper-button-disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 991.98px) {
+    .g4d-coverage-map-el {
+        height: 320px;
+    }
+}
+
+/* ── Banner pagination — fix positionnement & largeur ───────────────────── */
+/*
+ * Structure identique à l'original Logistick : container.w-0 > position-relative.w-0
+ * placé INSIDE .banner-slider (conteneur Swiper).
+ * "w-0" n'est pas défini dans main.css → pas d'effet sur la largeur.
+ * Les bullets sont inline-block (Swiper), ils s'enchaînent naturellement.
+ * On corrige uniquement : position, largeur et opacité.
+ */
+.banner-pagination.swiper-pagination {
+    bottom: 0 !important;
+    left: 0 !important;
+    width: auto !important;
+    /* s'adapte au contenu des bullets */
+    text-align: start !important;
+}
+
+.banner-pagination.swiper-pagination .swiper-pagination-bullet {
+    opacity: 1 !important;
+    /* Swiper masque par défaut les bullets inactifs */
+}
+
+/* ── Adaptation 100% hauteur écran PC (Hero Banner + Header = 100dvh exact) ─ */
+@media (min-width: 992px) {
+    .banner {
+        height: var(--g4d-banner-h, calc(100dvh - 124px)) !important;
+        min-height: 520px !important;
+        max-height: none !important;
+    }
+/* ── Adaptation 100% hauteur écran PC (Hero Banner + Header = 820px) ──────── */
+:root {
+    --g4d-banner-h: 820px;
+}
+
+@media (min-width: 992px) {
+    .banner {
+        height: var(--g4d-banner-h, 820px) !important;
+        min-height: 520px !important;
+        max-height: none !important;
+    }
+
+    .banner-slider,
+    .banner-slider .swiper-wrapper,
+    .banner-slider .swiper-slide {
+        height: var(--g4d-banner-h, 820px) !important;
+        min-height: 520px !important;
+    }
+
+    .banner-item {
+        height: var(--g4d-banner-h, 820px) !important;
+        min-height: 520px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        padding-top: clamp(28px, 4.5vh, 72px) !important;
+        padding-bottom: clamp(72px, 9.5vh, 104px) !important;
+    }
+
+    .banner-item > .tw-container-1540-px {
+        width: 100% !important;
+        margin-top: auto !important;
+        margin-bottom: auto !important;
+    }
+
+    .banner-item .splitTextStyleTwo.tw-mb-5 {
+        display: inline-block !important;
+        margin-bottom: clamp(0.5rem, 1.2vh, 1rem) !important;
+    }
+
+    .banner-item h1.tw-text-80-px {
+        font-size: clamp(2.4rem, min(4vw, 6vh), 4.25rem) !important;
+        line-height: 1.12 !important;
+    }
+
+    .banner-item p.tw-mt-6.tw-mb-10 {
+        margin-top: clamp(0.75rem, 1.6vh, 1.25rem) !important;
+        margin-bottom: clamp(1rem, 2.2vh, 1.75rem) !important;
+        font-size: clamp(0.95rem, 1.8vh, 1.125rem) !important;
+    }
+
+    .banner-item .bg-blur-one {
+        margin-top: clamp(0.5rem, 1.2vh, 1.25rem) !important;
+        padding-top: clamp(0.9rem, 2vh, 1.75rem) !important;
+        padding-bottom: clamp(0.9rem, 2vh, 1.75rem) !important;
+    }
+
+    .banner-pagination.swiper-pagination .swiper-pagination-bullet {
+        padding-top: clamp(14px, 2vh, 22px) !important;
+        padding-bottom: clamp(14px, 2vh, 22px) !important;
+    }
+}
+
+
+    .banner-slider,
+    .banner-slider .swiper-wrapper,
+    .banner-slider .swiper-slide {
+        height: var(--g4d-banner-h, calc(100dvh - 124px)) !important;
+        min-height: 520px !important;
+    }
+
+    .banner-item {
+        height: var(--g4d-banner-h, calc(100dvh - 124px)) !important;
+        min-height: 520px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-start !important;
+        padding-top: clamp(28px, 4.5vh, 72px) !important;
+        padding-bottom: clamp(72px, 9.5vh, 104px) !important;
+    }
+
+    .banner-item > .tw-container-1540-px {
+        width: 100% !important;
+        margin-top: auto !important;
+        margin-bottom: auto !important;
+    }
+
+    .banner-item .splitTextStyleTwo.tw-mb-5 {
+        display: inline-block !important;
+        margin-bottom: clamp(0.5rem, 1.2vh, 1rem) !important;
+    }
+
+    .banner-item h1.tw-text-80-px {
+        font-size: clamp(2.4rem, min(4vw, 6vh), 4.25rem) !important;
+        line-height: 1.12 !important;
+    }
+
+    .banner-item p.tw-mt-6.tw-mb-10 {
+        margin-top: clamp(0.75rem, 1.6vh, 1.25rem) !important;
+        margin-bottom: clamp(1rem, 2.2vh, 1.75rem) !important;
+        font-size: clamp(0.95rem, 1.8vh, 1.125rem) !important;
+    }
+
+    .banner-item .bg-blur-one {
+        margin-top: clamp(0.5rem, 1.2vh, 1.25rem) !important;
+        padding-top: clamp(0.9rem, 2vh, 1.75rem) !important;
+        padding-bottom: clamp(0.9rem, 2vh, 1.75rem) !important;
+    }
+
+    .banner-pagination.swiper-pagination .swiper-pagination-bullet {
+        padding-top: clamp(14px, 2vh, 22px) !important;
+        padding-bottom: clamp(14px, 2vh, 22px) !important;
+    }
+}
+
+
+/* ── G4D Tracker Modal — Alpine x-transition helpers ────────────────────── */
+/* Backdrop */
+.g4d-modal-backdrop-enter {
+    transition: opacity .2s ease-out;
+}
+
+.g4d-modal-backdrop-leave {
+    transition: opacity .15s ease-in;
+}
+
+.g4d-modal-from-opacity {
+    opacity: 0 !important;
+}
+
+.g4d-modal-to-opacity {
+    opacity: 1 !important;
+}
+
+/* Dialog card */
+.g4d-modal-dialog-enter {
+    transition: opacity .2s ease-out, transform .2s ease-out;
+}
+
+.g4d-modal-dialog-leave {
+    transition: opacity .15s ease-in, transform .15s ease-in;
+}
+
+.g4d-modal-from-scale {
+    opacity: 0 !important;
+    transform: scale(.96) !important;
+}
+
+.g4d-modal-to-scale {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+}
+
+/* Overlay wrapper — display:flex ICI (pas inline) pour que Alpine puisse
+   toggler el.style.display entre 'none' et '' sans perdre le flex centering */
+.g4d-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1055;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+/* ── G4D Landing Preloader ───────────────────────────────────────────────── */
+
+html.g4d-no-scroll,
+html.g4d-no-scroll body {
+    overflow: hidden !important;
+}
+
+#g4d-preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    overflow: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ── Blobs décoratifs — bleu G4D (haut-gauche) + orange G4D (bas-droite) ── */
+#g4d-preloader::before,
+#g4d-preloader::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+#g4d-preloader::before {
+    width: 55vw;
+    height: 55vw;
+    max-width: 640px;
+    max-height: 640px;
+    top: -18%;
+    left: -12%;
+    background: radial-gradient(circle, rgba(41, 150, 200, 0.10) 0%, transparent 70%);
+}
+
+#g4d-preloader::after {
+    width: 45vw;
+    height: 45vw;
+    max-width: 520px;
+    max-height: 520px;
+    bottom: -14%;
+    right: -10%;
+    background: radial-gradient(circle, rgba(244, 123, 32, 0.09) 0%, transparent 70%);
+}
+
+#g4d-preloader.g4d-preloader--hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    display: none;
+}
+
+.g4d-preloader__logo-wrap {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.g4d-preloader__lines {
+    position: absolute;
+    right: calc(100% + 14px);
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    animation: g4d-lines-fly 1.8s ease-in-out infinite;
+}
+
+.g4d-preloader__line {
+    height: 4px;
+    border-radius: 99px;
+    background: linear-gradient(90deg, transparent, #F47B20);
+}
+
+.g4d-preloader__line:nth-child(1) {
+    width: 44px;
+    opacity: 0.90;
+}
+
+.g4d-preloader__line:nth-child(2) {
+    width: 30px;
+    opacity: 0.60;
+}
+
+.g4d-preloader__line:nth-child(3) {
+    width: 18px;
+    opacity: 0.35;
+}
+
+.g4d-preloader__logo {
+    display: block;
+    width: clamp(100px, 14vw, 148px);
+    height: auto;
+    opacity: 0;
+    animation:
+        g4d-logo-in 0.6s ease 0.1s forwards,
+        g4d-pulse 2.5s ease-in-out 0.8s infinite;
+}
+
+.g4d-preloader__bar-wrap {
+    position: relative;
+    z-index: 1;
+    margin-top: 28px;
+    width: clamp(100px, 14vw, 148px);
+    height: 2px;
+    background: #e8edf2;
+    overflow: hidden;
+}
+
+.g4d-preloader__bar {
+    height: 100%;
+    width: 0%;
+    background: #2996C8;
+    animation: g4d-bar-fill 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.g4d-preloader__tagline {
+    position: relative;
+    z-index: 1;
+    margin-top: 14px;
+    font-family: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #a0aab4;
+    opacity: 0;
+    animation: g4d-logo-in 0.5s ease 0.3s forwards;
+}
+
+@keyframes g4d-logo-in {
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes g4d-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.035);
+    }
+}
+
+@keyframes g4d-bar-fill {
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes g4d-lines-fly {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%) translateX(12px);
+    }
+
+    15% {
+        opacity: 1;
+    }
+
+    85% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-50%) translateX(-8px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .g4d-preloader__logo,
+    .g4d-preloader__lines,
+    .g4d-preloader__bar {
+        animation-duration: 0.01ms !important;
+    }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SUIVI COLIS — Track section shapes & animations
+   Remplace track-order-bg.png — fond navy #0B1F35 + décor logistique
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Base : fond bleu thème G4D (var --g4d-blue-deeper = #0B3D5C) ──────── */
+.g4d-track-section {
+    background: var(--g4d-blue-deeper) !important;
+}
+
+/* ── Conteneur des shapes (overflow:visible — le parent clip via overflow:hidden) */
+.g4d-track-shapes {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ── 1. Grille de points — texture subtile ───────────────────────────────── */
+.g4d-track-dots {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle,
+            rgba(255, 255, 255, 0.068) 1.5px,
+            transparent 1.5px);
+    background-size: 28px 28px;
+    background-position: 0 0;
+}
+
+/* ── 2. Lueurs ambiantes (glows) ─────────────────────────────────────────── */
+.g4d-track-glow {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Glow orange — côté droit */
+.g4d-track-glow--right {
+    width: 560px;
+    height: 560px;
+    top: 50%;
+    right: -120px;
+    transform: translateY(-50%);
+    background: radial-gradient(circle,
+            rgba(255, 124, 48, 0.22) 0%,
+            rgba(255, 124, 48, 0.07) 42%,
+            transparent 70%);
+}
+
+/* Glow bleu — coin bas-gauche */
+.g4d-track-glow--left {
+    width: 440px;
+    height: 440px;
+    bottom: -120px;
+    left: -90px;
+    background: radial-gradient(circle,
+            rgba(50, 163, 227, 0.20) 0%,
+            rgba(50, 163, 227, 0.06) 45%,
+            transparent 70%);
+}
+
+/* ── 3. Fond particles.js animé ──────────────────────────────────────────── */
+.g4d-track-particles {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    /* pointer-events: none hérité du parent — detect_on:'window' gère la souris via window events */
+}
+
+/* Le canvas injecté par particles.js doit couvrir tout le conteneur */
+.g4d-track-particles canvas {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ── 4. Radar pulsant — coin bas-droite ──────────────────────────────────── */
+.g4d-track-pulse-wrap {
+    position: absolute;
+    right: 7%;
+    bottom: 28px;
+    width: 10px;
+    height: 10px;
+}
+
+/* Point central du radar */
+.g4d-track-pulse-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 124, 48, 0.72);
+    border-radius: 50%;
+    animation: g4d-radar-core 2.6s ease-in-out infinite;
+    z-index: 1;
+}
+
+@keyframes g4d-radar-core {
+
+    0%,
+    100% {
+        opacity: 0.65;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.45);
+    }
+}
+
+/* Anneaux concentriques */
+.g4d-track-pulse {
+    position: absolute;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.12);
+    animation: g4d-pulse-ring var(--g4d-p-dur, 3.5s) ease-out infinite;
+    animation-delay: var(--g4d-p-del, 0s);
+}
+
+.g4d-track-pulse--1 {
+    width: 80px;
+    height: 80px;
+    border: 1.5px solid rgba(255, 124, 48, 0.52);
+    --g4d-p-dur: 3.5s;
+    --g4d-p-del: 0s;
+}
+
+.g4d-track-pulse--2 {
+    width: 148px;
+    height: 148px;
+    border: 1px solid rgba(255, 124, 48, 0.26);
+    --g4d-p-dur: 3.5s;
+    --g4d-p-del: 0.85s;
+}
+
+.g4d-track-pulse--3 {
+    width: 216px;
+    height: 216px;
+    border: 1px solid rgba(255, 124, 48, 0.11);
+    --g4d-p-dur: 3.5s;
+    --g4d-p-del: 1.70s;
+}
+
+@keyframes g4d-pulse-ring {
+    0% {
+        transform: translate(-50%, -50%) scale(0.12);
+        opacity: 0.85;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
+}
+
+/* ── Accessibilité : respect prefers-reduced-motion ──────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+
+    .g4d-track-pulse,
+    .g4d-track-pulse-wrap::before {
+        animation: none !important;
+        opacity: 0.35;
+    }
+
+    .g4d-track-particles canvas {
+        opacity: 0.15 !important;
+    }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   SCROLL-TO-TOP — .progress-wrap G4D brand override
+   main.js du template gère : active-progress (visibilité) +
+   stroke-dashoffset (progression au scroll) — on override couleurs seulement
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Default : fond bleu G4D, sans ombre ─────────────────────────────────── */
+.progress-wrap {
+    background: var(--g4d-blue) !important;
+    box-shadow: none !important;
+}
+
+/* ── Hover : fond orange G4D, sans ombre ─────────────────────────────────── */
+.progress-wrap:hover {
+    background: var(--g4d-orange) !important;
+    box-shadow: none !important;
+}
+
+/* ── Chevron CSS pur centré (z-index:2 — au-dessus du SVG) ──────────────── */
+.progress-wrap::after {
+    content: '' !important;
+    position: absolute !important;
+    z-index: 2 !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 8px !important;
+    height: 8px !important;
+    border-top: 2px solid #fff !important;
+    border-right: 2px solid #fff !important;
+    border-radius: 0 1px 0 0 !important;
+    transform: translate(-50%, -20%) rotate(-45deg) !important;
+    pointer-events: none !important;
+}
+
+/* ── Cercle SVG : orange sur bleu (default) — blanc sur orange (hover) ────── */
+.progress-wrap svg.progress-circle path {
+    stroke: var(--g4d-orange) !important;
+    stroke-width: 3px !important;
+    fill: none !important;
+}
+
+.progress-wrap:hover svg.progress-circle path {
+    stroke: rgba(255, 255, 255, 0.90) !important;
+}
+
+/* ── SVG positionné derrière le chevron ──────────────────────────────────── */
+.progress-wrap svg.progress-circle {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+}

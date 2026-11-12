@@ -1,0 +1,118 @@
+.request-quote-inner {
+	.nav-pills {
+		background: #161922;
+		.nav-item {
+			width: 50%;
+			.nav-link {
+				width: 100%;
+				height: 80px;
+				padding: 0;
+				border-radius: 0;
+				font-weight: 700;
+				font-size: 16px;
+                    background: #161922;
+			}
+			.nav-link.active {
+				background: var(--main-600);
+			}
+		}
+	}
+	.tab-content {
+		.tab-pane {
+			padding: 46px 50px 50px;
+               @media #{$lg} {
+                    padding: 46px 20px 50px;
+               }
+               @media #{$md,$xs} {
+                    padding: 46px 20px 50px;
+               }
+			.single-check-list {
+				margin: 0 0 40px 0;
+				padding: 0;
+				li {
+					display: inline-block;
+					+ {
+						li {
+                                   margin-inline-start: 30px;
+                                   @media #{$xl} {
+                                        margin-inline-start: 23px;
+                                   }
+                                   @media #{$lg} {
+                                        margin-block-start: 20px;
+                                        margin-inline-start: 3px;
+                                   }
+                                   @media #{$md} {
+                                        margin-block-start: 20px;
+                                        margin-inline-start: 22px;
+                                   }
+                                   @media #{$xs} {
+                                        margin-inline-start: 0;
+                                        width: 47%;                                      
+                                   }
+						}
+					}
+				}
+			}
+		}
+	}
+     .quote-wrap {
+          margin-inline-start: 0;
+          margin-block-start: 30px;
+     }
+}
+   
+
+.form-check.single-check-wrap {
+     padding-inline-start: 0;
+     & input {
+          display: none;
+          &:checked{
+               & ~ label {
+                    &::after{
+                         background-color: var(--main-600);
+                         border-color: var(--main-600);
+                    }
+                    &::before{
+                         visibility: visible;
+                         opacity: 1;
+                    }
+               }
+          }
+     }
+     & label {
+          font-size: 16px;
+          color: hsl(var(--black));
+          position: relative;
+          padding-inline-start: 26px;
+          z-index: 1;
+          font-weight: 400;
+          &::after{
+               position: absolute;
+               content: "";
+               inset-block-start: 5px;
+               inset-inline-start: 0;
+               width: 16px;
+               height: 16px;
+               line-height: 16px;
+               text-align: center;
+               border: 1px solid rgba(6, 7, 40, 0.2);
+               z-index: -1;
+               transition: 0.3s;
+               border-radius: 3px;
+          }
+          &::before{
+               position: absolute;
+               content: "\E182";
+               inset-block-start: 6px;
+               inset-inline-start: 3px;
+               font-size: 10px;
+               text-align: center;
+               visibility: hidden;
+               opacity: 0;
+               color: hsl(var(--white));
+               transition: 0.3s;
+               font-family: "Phosphor";
+          }
+     }
+}
+   

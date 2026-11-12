@@ -1,0 +1,18 @@
+.chooseus-five {
+     &-icon span::after {
+          position: absolute;
+          content: "";
+          inset-block-start: -5px;
+          inset-inline-start: -5px;
+          background: hsl(var(--white));
+          height: 53px;
+          border-radius: 50%;
+          width: 53px;
+          z-index: -1;
+     }
+     &-wrap {
+          @media #{$md} {
+               flex-wrap: wrap;
+          }
+     }
+}

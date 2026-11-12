@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Table technique de vérification du démarrage et de la connectivité BDD (Sprint 01)
+model AppBootCheck {
+  id          String   @id @default(cuid())
+  environment String   @db.VarChar(32)
+  service     String   @db.VarChar(64)
+  checkedAt   DateTime @default(now()) @map("checked_at")
+
+  @@index([checkedAt])
+  @@map("app_boot_checks")
+}
+

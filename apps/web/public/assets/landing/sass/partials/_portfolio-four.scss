@@ -1,0 +1,25 @@
+.portfolio-four {
+     &-active {
+          & .swiper-slide.swiper-slide-active {
+               & .portfolio-four-wrap {
+                    -webkit-transform: scale(1.7);
+                    transform: scale(1.7);
+                    @media #{$lg} {
+                         -webkit-transform: scale(1.5);
+                         transform: scale(1.5);
+                    }
+                    @media #{$xs} {
+                         -webkit-transform: scale(1);
+                         transform: scale(1);
+                    }
+               }
+               &  .portfolio-four-content {
+                    opacity: 1 !important;
+               }
+          }
+          & .swiper-slide.swiper-slide-next {
+               z-index: -1;
+          }
+     }
+}
+   

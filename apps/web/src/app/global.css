@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+/* ============================================================================
+ * POLICES LOCALES AUTO-HÉBERGÉES (ZÉRO GOOGLE FONTS — RÈGLE PROPRIÉTAIRE G4D)
+ * Inter Variable (Latin + Chiffres tabulaires) & Droid Arabic Kufi (Arabe)
+ * ========================================================================== */
+@font-face {
+  font-family: 'Inter Variable';
+  src: url('/fonts/InterVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Droid Arabic Kufi';
+  src: url('/fonts/DroidKufi-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Droid Arabic Kufi';
+  src: url('/fonts/DroidKufi-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* Identité Visuelle Officielle G4D — Group For Delivery (Zakaria2) */
+  --g4d-blue: #1B9DD9;
+  --g4d-blue-light: #3FB4E8;
+  --g4d-blue-dark: #0E86C2;
+  --g4d-orange: #F9A03F;
+  --g4d-orange-dark: #E08A2B;
+  --g4d-navy: #0F172A;
+  --g4d-navy-deep: #0c1e2c;
+
+  --background: #ffffff;
+  --foreground: #0f172a;
+}
+
+@theme inline {
+  --color-g4d-blue: var(--g4d-blue);
+  --color-g4d-blue-light: var(--g4d-blue-light);
+  --color-g4d-blue-dark: var(--g4d-blue-dark);
+  --color-g4d-orange: var(--g4d-orange);
+  --color-g4d-orange-dark: var(--g4d-orange-dark);
+  --color-g4d-navy: var(--g4d-navy);
+  --color-g4d-navy-deep: var(--g4d-navy-deep);
+
+  --font-sans: 'Inter Variable', 'Droid Arabic Kufi', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family: var(--font-sans);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Chiffres tabulaires pour les montants CRBT, codes de suivi et compteurs */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Animations fluides pour la Landing Page G4D */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 5s ease-in-out infinite;
+}

@@ -1,0 +1,17 @@
+/* ======================== Header Middle Css Start ========================== */
+.header-four {
+     &-social {
+          @media #{$xl} {
+               width: 170px;
+          }
+          @media #{$lg} {
+               display: none !important;
+          }
+     }
+     &-right {
+          @media #{$lg} {
+               margin-right: 30px;
+          }
+     }
+}
+/* ======================== Header Middle Css End ========================== */

@@ -1,0 +1,40 @@
+name: zakaria2-next-dev
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: zakaria2-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_dev_password
+      POSTGRES_DB: zakaria2_next_dev
+    ports:
+      - '127.0.0.1:55432:5432'
+    volumes:
+      - zakaria2_pg18_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d zakaria2_next_dev']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:8-alpine
+    container_name: zakaria2-redis-dev
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction']
+    ports:
+      - '127.0.0.1:56379:6379'
+    volumes:
+      - zakaria2_redis8_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'PING']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  zakaria2_pg18_data:
+  zakaria2_redis8_data:
+

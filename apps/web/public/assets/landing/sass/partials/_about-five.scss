@@ -1,0 +1,25 @@
+.about-five {
+     &-thumb {
+          @media #{$md} {
+               margin-block-start: 30px;
+          }
+     }
+     &-wrap {
+          @media #{$xs} {
+               flex-wrap: wrap;
+               gap: 40px;
+          }
+     }
+     &-shape {
+          &-1 {
+               inset-block-start: 100px;
+          }
+          &-3 {
+               inset-block-end: 100px;
+               inset-inline-start: 30px !important;
+          }
+     }
+}
+
+
+

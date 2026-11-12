@@ -1,0 +1,27 @@
+.call-to-action-four {
+     &-wrapper {
+          @media #{$xs} {
+               margin-inline-start: 0;
+               padding: 40px 20px;
+          }
+     }
+     &-shape {
+          @media #{$x4l,$x3l,$xxl} {
+               width: 53%;
+          }
+          @media #{$xl} {
+               width: 54%;
+          }
+          @media #{$lg} {
+               width: 47%;
+          }
+          @media #{$md} {
+               width: 48%;
+          }
+          @media #{$xs} {
+               position: static !important;
+               margin-top: 30px;
+          }
+     }
+}
+

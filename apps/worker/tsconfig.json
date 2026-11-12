@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../dist/apps/worker",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "ES2022"
+  },
+  "include": [
+    "src/**/*.ts",
+    "../../libs/shared/contracts/src/**/*.ts",
+    "../../libs/backend/config/src/**/*.ts",
+    "../../libs/backend/database/src/**/*.ts"
+  ]
+}
+

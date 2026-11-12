@@ -1,0 +1,8 @@
+node_modules
+dist
+.next
+.nx
+coverage
+pnpm-lock.yaml
+libs/backend/database/src/generated
+

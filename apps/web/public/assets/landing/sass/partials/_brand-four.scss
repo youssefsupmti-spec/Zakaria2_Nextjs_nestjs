@@ -1,0 +1,33 @@
+
+.brand-four {
+     &-thumb {
+          & img {
+               cursor: pointer;
+               filter: brightness(0) invert(0);
+               transition: .4s;
+               margin-block-end: 30px;
+               &:hover {
+                    filter: inherit;
+               }
+          }
+     }
+     &-item {
+          @media #{$xxl,$xl,$lg,$md,$xs} {
+               text-align: center;
+          }
+     }
+     &-active {
+          & .swiper-slide-active {
+               & .brand-four-thumb {
+                    & img {
+                         filter: inherit;
+                    }
+               }
+          }
+     }
+}
+   
+
+
+   
+   

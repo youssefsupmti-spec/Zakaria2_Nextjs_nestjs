@@ -1,0 +1,44 @@
+.about-four {
+     &-details {
+          background: url(../images/shapes/about-four-details-shape.png);
+          background-size: auto;
+          background-size: cover;
+          background-position: center;
+          padding: 45px 30px;
+          inset-block-start: 85px;
+          inset-inline-end: -15px;
+          & h2 {
+               font-size: 64px;
+          }
+          &.about-five {
+               top: auto;
+               right: auto;
+               inset-block-end: -86px;
+               inset-inline-start: 11px;
+          }
+     }
+     &-wrapper {
+          @media #{$xl} {
+               padding-inline-start: 0 !important;
+          }
+          @media #{$lg} {
+               margin-block-end: 30px;
+          }
+          @media #{$md,$xs} {
+               margin-block-start: 100px;
+          }
+     }
+     &-shape-1 {
+          inset-block-start: 20px;
+          inset-inline-end: -5px;
+     }
+     &-shape-2 {
+          inset-block-end: -55px;
+          inset-inline-start: -40px;
+     }
+     &-shape-3 {
+          inset-block-end: -65px;
+          inset-inline-end: 0;
+     }
+
+}
