@@ -53,13 +53,12 @@ export function AppSidebar() {
   const { state, isMobile, setOpenMobile } = useSidebar();
   const ctx = user.accessContext;
 
+  const isNetworkRoute = pathname.startsWith('/agences') || pathname.startsWith('/partenaires');
+  const isAdminRoute = pathname.startsWith('/users') || pathname.startsWith('/roles');
+
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [networkExpanded, setNetworkExpanded] = useState(
-    pathname.startsWith('/agences') || pathname.startsWith('/partenaires'),
-  );
-  const [adminExpanded, setAdminExpanded] = useState(
-    pathname.startsWith('/users') || pathname.startsWith('/roles'),
-  );
+  const [networkExpanded, setNetworkExpanded] = useState(isNetworkRoute);
+  const [adminExpanded, setAdminExpanded] = useState(isAdminRoute);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -114,21 +113,21 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      {/* Haut de sidebar : Logo image simple G4D, grand et clair, sans bouton */}
-      <SidebarHeader className="items-center justify-center px-4 py-4 group-data-[collapsible=icon]:px-1.5 group-data-[collapsible=icon]:py-3">
+      {/* Zone dédiée au logo G4D sans déformation */}
+      <SidebarHeader className="h-16 items-center justify-center px-4 group-data-[collapsible=icon]:h-14 group-data-[collapsible=icon]:px-2">
         <img
           src={G4D_LOGO_TRIM_PATH}
           alt="G4D Express"
-          className="h-14 w-auto max-w-[195px] object-contain drop-shadow-[0_2px_8px_rgba(27,157,217,0.16)] transition-all duration-200 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8"
+          className="h-11 w-auto max-w-[175px] object-contain transition-all duration-200 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7"
         />
       </SidebarHeader>
 
-      <SidebarSeparator />
+      <SidebarSeparator className="mx-3 bg-sidebar-border/80" />
 
-      {/* Contenu principal : Menus & Sous-menus adaptés à G4D avec icônes */}
-      <SidebarContent className="pt-1">
+      {/* Navigation principale & sous-menus */}
+      <SidebarContent className="px-1 pt-2">
         <SidebarGroup>
-          <SidebarGroupLabel>Pilotage &amp; Réseau</SidebarGroupLabel>
+          <SidebarGroupLabel>Pilotage &amp; réseau</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuLink
@@ -172,18 +171,21 @@ export function AppSidebar() {
               ) : (
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    isActive={
-                      !networkExpanded &&
-                      (pathname.startsWith('/agences') || pathname.startsWith('/partenaires'))
-                    }
+                    isActive={!networkExpanded && isNetworkRoute}
+                    aria-expanded={networkExpanded}
                     onClick={() => setNetworkExpanded((prev) => !prev)}
+                    className={cn(
+                      networkExpanded &&
+                        isNetworkRoute &&
+                        'font-semibold text-slate-900 [&>svg:first-child]:text-[var(--g4d-blue)]',
+                    )}
                   >
                     <Building2 />
                     <span>Réseau Logistique</span>
                     <ChevronRight
                       className={cn(
-                        'ml-auto size-4 transition-transform duration-200',
-                        networkExpanded && 'rotate-90',
+                        'ml-auto size-3.5 text-slate-400 transition-transform duration-150',
+                        networkExpanded && 'rotate-90 text-[var(--g4d-blue)]',
                       )}
                     />
                   </SidebarMenuButton>
@@ -219,7 +221,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Gouvernance &amp; Sécurité</SidebarGroupLabel>
+          <SidebarGroupLabel>Gouvernance &amp; sécurité</SidebarGroupLabel>
           <SidebarMenu>
             {canManageTeam &&
               (isCollapsed ? (
@@ -248,18 +250,21 @@ export function AppSidebar() {
               ) : (
                 <SidebarMenuItem>
                   <SidebarMenuButton
-                    isActive={
-                      !adminExpanded &&
-                      (pathname.startsWith('/users') || pathname.startsWith('/roles'))
-                    }
+                    isActive={!adminExpanded && isAdminRoute}
+                    aria-expanded={adminExpanded}
                     onClick={() => setAdminExpanded((prev) => !prev)}
+                    className={cn(
+                      adminExpanded &&
+                        isAdminRoute &&
+                        'font-semibold text-slate-900 [&>svg:first-child]:text-[var(--g4d-blue)]',
+                    )}
                   >
                     <Users />
                     <span>Accès &amp; Équipe</span>
                     <ChevronRight
                       className={cn(
-                        'ml-auto size-4 transition-transform duration-200',
-                        adminExpanded && 'rotate-90',
+                        'ml-auto size-3.5 text-slate-400 transition-transform duration-150',
+                        adminExpanded && 'rotate-90 text-[var(--g4d-blue)]',
                       )}
                     />
                   </SidebarMenuButton>
@@ -302,8 +307,8 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Pied de sidebar : NavUser épuré */}
-      <SidebarFooter className="border-t border-sidebar-border/80 bg-white/40">
+      {/* Footer / Profil utilisateur compact et moderne */}
+      <SidebarFooter className="border-t border-sidebar-border/80 p-2.5">
         <div ref={userMenuRef} className="relative">
           <SidebarMenu>
             <SidebarMenuItem>
@@ -311,20 +316,24 @@ export function AppSidebar() {
                 size="lg"
                 variant="outline"
                 tooltip={`${user.nomComplet} — Mon compte`}
+                aria-expanded={userMenuOpen}
                 onClick={() => setUserMenuOpen((prev) => !prev)}
+                className="px-2 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:shadow-none group-data-[collapsible=icon]:ring-0"
               >
-                <div className="relative flex size-8 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-[#1B9DD9] to-[#0E86C2] text-xs font-bold text-white shadow-2xs">
+                <div className="relative flex size-8 shrink-0 items-center justify-center rounded-md bg-[var(--g4d-blue)]/12 text-xs font-bold text-[var(--g4d-blue-dark)] ring-1 ring-[var(--g4d-blue)]/25">
                   {getUserInitials(user.nomComplet)}
                   <span
                     className="absolute -right-0.5 -bottom-0.5 size-2 rounded-full border border-white bg-emerald-500"
                     aria-hidden="true"
                   />
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold text-slate-900">{user.nomComplet}</span>
-                  <span className="truncate text-xs text-slate-500">{user.email}</span>
+                <div className="grid flex-1 text-left leading-tight">
+                  <span className="truncate text-[13px] font-semibold text-slate-900">
+                    {user.nomComplet}
+                  </span>
+                  <span className="truncate text-[11px] text-slate-500">{user.email}</span>
                 </div>
-                <ChevronsUpDown className="ml-auto size-4 text-slate-400" />
+                <ChevronsUpDown className="ml-auto size-3.5 text-slate-400" />
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -332,18 +341,18 @@ export function AppSidebar() {
           {userMenuOpen && (
             <div
               className={cn(
-                'z-50 min-w-56 rounded-md border border-[#D3E7F5] bg-white p-1 shadow-lg',
+                'z-50 min-w-56 rounded-md border border-sidebar-border bg-white p-1 shadow-lg',
                 isCollapsed
                   ? 'fixed bottom-3 left-14'
                   : 'absolute bottom-full left-0 mb-1.5 w-full',
               )}
             >
               <div className="flex items-center gap-2.5 border-b border-slate-100 px-2.5 py-2">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-[#1B9DD9] to-[#0E86C2] text-xs font-bold text-white">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-[var(--g4d-blue)]/12 text-xs font-bold text-[var(--g4d-blue-dark)] ring-1 ring-[var(--g4d-blue)]/25">
                   {getUserInitials(user.nomComplet)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-bold text-slate-900">{user.nomComplet}</p>
+                  <p className="truncate text-xs font-semibold text-slate-900">{user.nomComplet}</p>
                   <p className="truncate text-[11px] text-slate-500">{user.email}</p>
                   <p className="text-[10px] font-medium text-slate-400">
                     Titulaire #{user.titulaireId} · ID #{user.id}
@@ -358,16 +367,16 @@ export function AppSidebar() {
                     setUserMenuOpen(false);
                     if (isMobile) setOpenMobile(false);
                   }}
-                  className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-[#0B6E99]"
+                  className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[var(--g4d-blue-dark)]"
                 >
-                  <KeyRound className="size-3.5 text-[#1B9DD9]" />
+                  <KeyRound className="size-3.5 text-[var(--g4d-blue)]" />
                   <span>Sessions &amp; Appareils</span>
                 </Link>
                 <a
                   href="/"
-                  className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-[#0B6E99]"
+                  className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[var(--g4d-blue-dark)]"
                 >
-                  <Globe className="size-3.5 text-[#1B9DD9]" />
+                  <Globe className="size-3.5 text-[var(--g4d-blue)]" />
                   <span>Vitrine publique G4D</span>
                 </a>
               </div>
@@ -377,7 +386,7 @@ export function AppSidebar() {
                   type="button"
                   disabled={loggingOut}
                   onClick={handleLogout}
-                  className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60"
+                  className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60"
                 >
                   <LogOut className="size-3.5" />
                   <span>{loggingOut ? 'Déconnexion…' : 'Se déconnecter'}</span>

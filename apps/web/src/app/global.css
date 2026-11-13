@@ -75,14 +75,16 @@
   --input: #e2e8f0;
   --ring: #1b9dd9;
 
-  --sidebar: #f2f8fd;
+  --sidebar-gradient-from: #eef6fc;
+  --sidebar: #f3f9fd;
+  --sidebar-gradient-to: #e6f2fa;
   --sidebar-foreground: #0f172a;
-  --sidebar-primary: #1b9dd9;
+  --sidebar-primary: var(--g4d-blue);
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #e3f1fc;
-  --sidebar-accent-foreground: #0c4a6e;
-  --sidebar-border: #d5e6f4;
-  --sidebar-ring: #1b9dd9;
+  --sidebar-accent: #ffffff;
+  --sidebar-accent-foreground: var(--g4d-blue-dark);
+  --sidebar-border: #d5e6f3;
+  --sidebar-ring: var(--g4d-blue);
 
   --text-dark: #0f172a;
   --gray-text: #64748b;
