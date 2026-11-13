@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Building2,
-  Check,
   ChevronRight,
   ChevronsUpDown,
   Globe,
@@ -12,7 +11,9 @@ import {
   KeyRound,
   LayoutDashboard,
   LogOut,
+  MapPin,
   ShieldCheck,
+  UserCog,
   Users,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -46,41 +47,32 @@ function getUserInitials(name: string): string {
   return `${parts[0][0] ?? ''}${parts[parts.length - 1][0] ?? ''}`.toUpperCase();
 }
 
-export function AppSidebar({
-  selectedAgenceId,
-  onSelectAgence,
-}: {
-  selectedAgenceId: number | null;
-  onSelectAgence: (id: number | null) => void;
-}) {
+export function AppSidebar() {
   const { user } = useAuth();
   const pathname = usePathname();
   const { state, isMobile, setOpenMobile } = useSidebar();
   const ctx = user.accessContext;
 
-  const [teamMenuOpen, setTeamMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [networkExpanded, setNetworkExpanded] = useState(
+    pathname.startsWith('/agences') || pathname.startsWith('/partenaires'),
+  );
   const [adminExpanded, setAdminExpanded] = useState(
     pathname.startsWith('/users') || pathname.startsWith('/roles'),
   );
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const teamMenuRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (teamMenuRef.current && !teamMenuRef.current.contains(target)) {
-        setTeamMenuOpen(false);
-      }
       if (userMenuRef.current && !userMenuRef.current.contains(target)) {
         setUserMenuOpen(false);
       }
     };
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setTeamMenuOpen(false);
         setUserMenuOpen(false);
       }
     };
@@ -100,15 +92,12 @@ export function AppSidebar({
     isPlatformAdmin ||
     (ctx?.agenceMemberships.length ?? 0) > 0 ||
     (ctx?.partenaireMemberships.length ?? 0) > 0;
+  const hasNetworkAccess = hasAgenceAccess || hasPartenaireAccess;
   const canManageTeam =
     isPlatformAdmin ||
     (ctx?.managedAgenceIds.length ?? 0) > 0 ||
     user.parentId === null ||
     Boolean(ctx?.partenaireMemberships.some((p) => p.role === 'admin_partenaire'));
-
-  const memberships = ctx?.agenceMemberships ?? [];
-  const activeMembership =
-    memberships.find((m) => m.agenceId === selectedAgenceId) ?? memberships[0] ?? null;
 
   const isCollapsed = state === 'collapsed' && !isMobile;
 
@@ -125,86 +114,21 @@ export function AppSidebar({
 
   return (
     <Sidebar collapsible="icon">
-      {/* SidebarHeader — TeamSwitcher G4D style sidebar-07 */}
-      <SidebarHeader>
-        <div ref={teamMenuRef} className="relative">
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                size="lg"
-                tooltip={
-                  activeMembership ? `${activeMembership.agenceNom} (G4D)` : 'Portail G4D Express'
-                }
-                onClick={() => {
-                  if (memberships.length > 0) {
-                    setTeamMenuOpen((prev) => !prev);
-                  }
-                }}
-                className="data-[state=open]:bg-sidebar-accent"
-              >
-                <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-md border border-sky-100 bg-sky-50/70 p-1">
-                  <img
-                    src={G4D_LOGO_TRIM_PATH}
-                    alt="G4D Express"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-bold text-slate-900">G4D Express</span>
-                  <span className="truncate text-xs font-medium text-slate-500">
-                    {activeMembership
-                      ? `[${activeMembership.agenceCode}] ${activeMembership.agenceNom}`
-                      : `Portée : ${ctx?.primaryScope ?? 'client'}`}
-                  </span>
-                </div>
-                {memberships.length > 0 && (
-                  <ChevronsUpDown className="ml-auto size-4 text-slate-400" />
-                )}
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-
-          {teamMenuOpen && memberships.length > 0 && (
-            <div
-              className={cn(
-                'z-50 min-w-56 rounded-md border border-slate-200 bg-white p-1 shadow-md',
-                isCollapsed ? 'fixed top-3 left-14' : 'absolute top-full left-0 mt-1 w-full',
-              )}
-            >
-              <div className="px-2 py-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                Agences rattachées
-              </div>
-              {memberships.map((m) => {
-                const selected = m.agenceId === activeMembership?.agenceId;
-                return (
-                  <button
-                    key={m.agenceId}
-                    type="button"
-                    onClick={() => {
-                      onSelectAgence(m.agenceId);
-                      setTeamMenuOpen(false);
-                    }}
-                    className="flex w-full cursor-pointer items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-xs font-medium text-slate-700 hover:bg-slate-100"
-                  >
-                    <span className="truncate">
-                      <span className="font-bold text-slate-900">[{m.agenceCode}]</span>{' '}
-                      {m.agenceNom}
-                    </span>
-                    {selected && <Check className="size-3.5 shrink-0 text-[#1B9DD9]" />}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
+      {/* Haut de sidebar : Logo image simple G4D, grand et clair, sans bouton */}
+      <SidebarHeader className="items-center justify-center px-4 py-4 group-data-[collapsible=icon]:px-1.5 group-data-[collapsible=icon]:py-3">
+        <img
+          src={G4D_LOGO_TRIM_PATH}
+          alt="G4D Express"
+          className="h-14 w-auto max-w-[195px] object-contain drop-shadow-[0_2px_8px_rgba(27,157,217,0.16)] transition-all duration-200 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8"
+        />
       </SidebarHeader>
 
       <SidebarSeparator />
 
-      {/* SidebarContent — Navigation principale & Administration */}
-      <SidebarContent>
+      {/* Contenu principal : Menus & Sous-menus adaptés à G4D avec icônes */}
+      <SidebarContent className="pt-1">
         <SidebarGroup>
-          <SidebarGroupLabel>Plateforme</SidebarGroupLabel>
+          <SidebarGroupLabel>Pilotage &amp; Réseau</SidebarGroupLabel>
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuLink
@@ -217,130 +141,184 @@ export function AppSidebar({
               </SidebarMenuLink>
             </SidebarMenuItem>
 
-            {hasAgenceAccess && (
-              <SidebarMenuItem>
-                <SidebarMenuLink
-                  href="/agences"
-                  isActive={pathname.startsWith('/agences')}
-                  tooltip="Agences & Zones"
-                >
-                  <Building2 />
-                  <span>Agences & Zones</span>
-                </SidebarMenuLink>
-              </SidebarMenuItem>
-            )}
-
-            {hasPartenaireAccess && (
-              <SidebarMenuItem>
-                <SidebarMenuLink
-                  href="/partenaires"
-                  isActive={pathname.startsWith('/partenaires')}
-                  tooltip="Partenaires & API"
-                >
-                  <Handshake />
-                  <span>Partenaires & API</span>
-                </SidebarMenuLink>
-              </SidebarMenuItem>
-            )}
+            {hasNetworkAccess &&
+              (isCollapsed ? (
+                <>
+                  {hasAgenceAccess && (
+                    <SidebarMenuItem>
+                      <SidebarMenuLink
+                        href="/agences"
+                        isActive={pathname.startsWith('/agences')}
+                        tooltip="Agences & Zones"
+                      >
+                        <MapPin />
+                        <span>Agences &amp; Zones</span>
+                      </SidebarMenuLink>
+                    </SidebarMenuItem>
+                  )}
+                  {hasPartenaireAccess && (
+                    <SidebarMenuItem>
+                      <SidebarMenuLink
+                        href="/partenaires"
+                        isActive={pathname.startsWith('/partenaires')}
+                        tooltip="Partenaires & API"
+                      >
+                        <Handshake />
+                        <span>Partenaires &amp; API</span>
+                      </SidebarMenuLink>
+                    </SidebarMenuItem>
+                  )}
+                </>
+              ) : (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={
+                      !networkExpanded &&
+                      (pathname.startsWith('/agences') || pathname.startsWith('/partenaires'))
+                    }
+                    onClick={() => setNetworkExpanded((prev) => !prev)}
+                  >
+                    <Building2 />
+                    <span>Réseau Logistique</span>
+                    <ChevronRight
+                      className={cn(
+                        'ml-auto size-4 transition-transform duration-200',
+                        networkExpanded && 'rotate-90',
+                      )}
+                    />
+                  </SidebarMenuButton>
+                  {networkExpanded && (
+                    <SidebarMenuSub>
+                      {hasAgenceAccess && (
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            href="/agences"
+                            isActive={pathname.startsWith('/agences')}
+                          >
+                            <MapPin />
+                            <span>Agences &amp; Zones</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )}
+                      {hasPartenaireAccess && (
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            href="/partenaires"
+                            isActive={pathname.startsWith('/partenaires')}
+                          >
+                            <Handshake />
+                            <span>Partenaires &amp; API</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )}
+                    </SidebarMenuSub>
+                  )}
+                </SidebarMenuItem>
+              ))}
           </SidebarMenu>
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Administration & Sécurité</SidebarGroupLabel>
+          <SidebarGroupLabel>Gouvernance &amp; Sécurité</SidebarGroupLabel>
           <SidebarMenu>
-            {canManageTeam && (
-              <SidebarMenuItem>
-                {isCollapsed ? (
-                  <>
+            {canManageTeam &&
+              (isCollapsed ? (
+                <>
+                  <SidebarMenuItem>
                     <SidebarMenuLink
                       href="/users"
                       isActive={pathname.startsWith('/users')}
-                      tooltip="Utilisateurs"
+                      tooltip="Utilisateurs & Comptes"
                     >
-                      <Users />
-                      <span>Utilisateurs</span>
+                      <UserCog />
+                      <span>Utilisateurs &amp; Comptes</span>
                     </SidebarMenuLink>
-                  </>
-                ) : (
-                  <>
-                    <SidebarMenuButton
-                      isActive={pathname.startsWith('/users') || pathname.startsWith('/roles')}
-                      onClick={() => setAdminExpanded((prev) => !prev)}
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuLink
+                      href="/roles"
+                      isActive={pathname.startsWith('/roles')}
+                      tooltip="Rôles & Permissions"
                     >
-                      <Users />
-                      <span>Accès & Équipe</span>
-                      <ChevronRight
-                        className={cn(
-                          'ml-auto transition-transform duration-200',
-                          adminExpanded && 'rotate-90',
-                        )}
-                      />
-                    </SidebarMenuButton>
-                    {adminExpanded && (
-                      <SidebarMenuSub>
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton
-                            href="/users"
-                            isActive={pathname.startsWith('/users')}
-                          >
-                            <span>Utilisateurs</span>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                        <SidebarMenuSubItem>
-                          <SidebarMenuSubButton
-                            href="/roles"
-                            isActive={pathname.startsWith('/roles')}
-                          >
-                            <span>Rôles & Permissions</span>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      </SidebarMenuSub>
-                    )}
-                  </>
-                )}
-              </SidebarMenuItem>
-            )}
-
-            {canManageTeam && isCollapsed && (
-              <SidebarMenuItem>
-                <SidebarMenuLink
-                  href="/roles"
-                  isActive={pathname.startsWith('/roles')}
-                  tooltip="Rôles & Permissions"
-                >
-                  <ShieldCheck />
-                  <span>Rôles & Permissions</span>
-                </SidebarMenuLink>
-              </SidebarMenuItem>
-            )}
+                      <ShieldCheck />
+                      <span>Rôles &amp; Permissions</span>
+                    </SidebarMenuLink>
+                  </SidebarMenuItem>
+                </>
+              ) : (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={
+                      !adminExpanded &&
+                      (pathname.startsWith('/users') || pathname.startsWith('/roles'))
+                    }
+                    onClick={() => setAdminExpanded((prev) => !prev)}
+                  >
+                    <Users />
+                    <span>Accès &amp; Équipe</span>
+                    <ChevronRight
+                      className={cn(
+                        'ml-auto size-4 transition-transform duration-200',
+                        adminExpanded && 'rotate-90',
+                      )}
+                    />
+                  </SidebarMenuButton>
+                  {adminExpanded && (
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          href="/users"
+                          isActive={pathname.startsWith('/users')}
+                        >
+                          <UserCog />
+                          <span>Utilisateurs &amp; Comptes</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                      <SidebarMenuSubItem>
+                        <SidebarMenuSubButton
+                          href="/roles"
+                          isActive={pathname.startsWith('/roles')}
+                        >
+                          <ShieldCheck />
+                          <span>Rôles &amp; Permissions</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  )}
+                </SidebarMenuItem>
+              ))}
 
             <SidebarMenuItem>
               <SidebarMenuLink
                 href="/account/sessions"
                 isActive={pathname.startsWith('/account/sessions')}
-                tooltip="Sessions actives"
+                tooltip="Sessions & Appareils"
               >
                 <KeyRound />
-                <span>Sessions actives</span>
+                <span>Sessions &amp; Appareils</span>
               </SidebarMenuLink>
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
 
-      {/* SidebarFooter — NavUser style sidebar-07 */}
-      <SidebarFooter>
+      {/* Pied de sidebar : NavUser épuré */}
+      <SidebarFooter className="border-t border-sidebar-border/80 bg-white/40">
         <div ref={userMenuRef} className="relative">
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
                 size="lg"
+                variant="outline"
                 tooltip={`${user.nomComplet} — Mon compte`}
                 onClick={() => setUserMenuOpen((prev) => !prev)}
-                className="data-[state=open]:bg-sidebar-accent"
               >
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-[#0F172A] text-xs font-bold text-white">
+                <div className="relative flex size-8 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-[#1B9DD9] to-[#0E86C2] text-xs font-bold text-white shadow-2xs">
                   {getUserInitials(user.nomComplet)}
+                  <span
+                    className="absolute -right-0.5 -bottom-0.5 size-2 rounded-full border border-white bg-emerald-500"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold text-slate-900">{user.nomComplet}</span>
@@ -354,14 +332,14 @@ export function AppSidebar({
           {userMenuOpen && (
             <div
               className={cn(
-                'z-50 min-w-56 rounded-md border border-slate-200 bg-white p-1 shadow-lg',
+                'z-50 min-w-56 rounded-md border border-[#D3E7F5] bg-white p-1 shadow-lg',
                 isCollapsed
                   ? 'fixed bottom-3 left-14'
                   : 'absolute bottom-full left-0 mb-1.5 w-full',
               )}
             >
               <div className="flex items-center gap-2.5 border-b border-slate-100 px-2.5 py-2">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-[#1B9DD9] text-xs font-bold text-white">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-[#1B9DD9] to-[#0E86C2] text-xs font-bold text-white">
                   {getUserInitials(user.nomComplet)}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -380,16 +358,16 @@ export function AppSidebar({
                     setUserMenuOpen(false);
                     if (isMobile) setOpenMobile(false);
                   }}
-                  className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                  className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-[#0B6E99]"
                 >
-                  <KeyRound className="size-3.5 text-slate-500" />
-                  <span>Sessions actives</span>
+                  <KeyRound className="size-3.5 text-[#1B9DD9]" />
+                  <span>Sessions &amp; Appareils</span>
                 </Link>
                 <a
                   href="/"
-                  className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100"
+                  className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-sky-50 hover:text-[#0B6E99]"
                 >
-                  <Globe className="size-3.5 text-slate-500" />
+                  <Globe className="size-3.5 text-[#1B9DD9]" />
                   <span>Vitrine publique G4D</span>
                 </a>
               </div>

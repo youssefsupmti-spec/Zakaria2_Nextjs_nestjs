@@ -17,12 +17,12 @@ const MARKETING_STYLE_PATTERNS = [
 ];
 
 const ROUTE_TITLES: Record<string, { section: string; page: string }> = {
-  '/dashboard': { section: 'Plateforme', page: 'Tableau de bord' },
-  '/agences': { section: 'Plateforme', page: 'Agences & Zones' },
-  '/partenaires': { section: 'Plateforme', page: 'Partenaires & API' },
-  '/users': { section: 'Administration', page: 'Utilisateurs' },
-  '/roles': { section: 'Administration', page: 'Rôles & Permissions' },
-  '/account/sessions': { section: 'Mon compte', page: 'Sessions actives' },
+  '/dashboard': { section: 'Pilotage & Réseau', page: 'Tableau de bord' },
+  '/agences': { section: 'Réseau Logistique', page: 'Agences & Zones' },
+  '/partenaires': { section: 'Réseau Logistique', page: 'Partenaires & API' },
+  '/users': { section: 'Accès & Équipe', page: 'Utilisateurs & Comptes' },
+  '/roles': { section: 'Accès & Équipe', page: 'Rôles & Permissions' },
+  '/account/sessions': { section: 'Gouvernance & Sécurité', page: 'Sessions & Appareils' },
 };
 
 function resolveBreadcrumb(pathname: string): { section: string; page: string } {
@@ -100,7 +100,7 @@ export function AppShell({
 
   return (
     <SidebarProvider defaultOpen={defaultSidebarOpen}>
-      <AppSidebar selectedAgenceId={selectedAgenceId} onSelectAgence={setSelectedAgenceId} />
+      <AppSidebar />
 
       <SidebarInset>
         <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 backdrop-blur-xs">
@@ -115,6 +115,25 @@ export function AppShell({
           </div>
 
           <div className="flex items-center gap-2.5">
+            {(ctx?.agenceMemberships.length ?? 0) > 0 && (
+              <div className="hidden items-center gap-1.5 md:flex">
+                <label htmlFor="agency-switcher" className="text-xs font-medium text-slate-500">
+                  Agence :
+                </label>
+                <select
+                  id="agency-switcher"
+                  value={selectedAgenceId ?? ''}
+                  onChange={(e) => setSelectedAgenceId(Number(e.target.value) || null)}
+                  className="h-8 rounded-md border border-slate-200 bg-slate-50 px-2.5 text-xs font-semibold text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B9DD9]/30"
+                >
+                  {ctx?.agenceMemberships.map((m) => (
+                    <option key={m.agenceId} value={m.agenceId}>
+                      [{m.agenceCode}] {m.agenceNom} ({m.role})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
             <Badge variant="success" className="hidden sm:inline-flex">
               Connecté ({ctx?.primaryScope ?? 'client'})
             </Badge>
