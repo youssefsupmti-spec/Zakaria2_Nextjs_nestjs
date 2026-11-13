@@ -67,6 +67,18 @@ export function G4dLogo({
     return content;
   }
 
+  if (href === '/') {
+    return (
+      <a
+        href="/"
+        aria-label="Accueil G4D — Group For Delivery"
+        className="inline-flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B9DD9] rounded-lg"
+      >
+        {content}
+      </a>
+    );
+  }
+
   return (
     <Link
       href={href}

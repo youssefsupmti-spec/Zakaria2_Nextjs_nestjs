@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, KeyRound, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Truck } from 'lucide-react';
 import { G4dLogo } from '@/components/brand/g4d-logo';
 
 const CURRENT_YEAR = 2026;
@@ -167,121 +167,31 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
         }
       `}</style>
 
-      {/* Panneau Gauche : Cockpit Logistique (5 colonnes Desktop) */}
-      <aside className="hidden lg:flex lg:col-span-5 relative flex-col justify-between overflow-hidden bg-[#06152d] text-white p-8 xl:p-11">
+      {/* Panneau Gauche : Visuel G4D pur sans texte ni logo superposé (6 colonnes Desktop) */}
+      <aside className="hidden lg:block lg:col-span-6 relative overflow-hidden bg-[#06152d]">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/brand/Gemini_Generated_Image_a6v3mga6v3mga6v3.jpg')" }}
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-b from-[#06152d]/75 via-transparent to-[#06152d]/90"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(6,21,45,0.92)_0%,rgba(6,21,45,0.62)_45%,transparent_75%)]"
         />
         <div
           aria-hidden="true"
           className="absolute inset-x-0 bottom-0 h-[3px] z-20"
           style={{ background: 'linear-gradient(90deg, #F9A03F 0%, #1B9DD9 100%)' }}
         />
-
-        {/* Étage 1 : Haut — Badge Réseau temps réel uniquement */}
-        <div className="relative z-10 flex items-center justify-end">
-          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 border border-emerald-400/30 px-3 py-1 text-xs font-semibold text-emerald-200 whitespace-nowrap backdrop-blur-sm">
-            <span
-              className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"
-              aria-hidden="true"
-            />
-            Réseau actif · 564 villes
-          </span>
-        </div>
-
-        {/* Étage 2 : Bloc Marque & Titre positionné haut à gauche (au-dessus de Marrakech) */}
-        <div className="relative z-10 mt-4 xl:mt-6 space-y-4">
-          <div>
-            <G4dLogo
-              variant="light"
-              priority
-              imageClassName="h-16 xl:h-20 max-h-20 w-auto shadow-none filter-none bg-transparent border-0"
-            />
-          </div>
-
-          <div className="space-y-3">
-            <span className="inline-flex items-center rounded-full border border-sky-400/30 bg-sky-500/15 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-sky-200">
-              PLATEFORME LOGISTIQUE SAAS
-            </span>
-            <h2 className="text-3xl xl:text-[34px] font-extrabold tracking-tight leading-[1.15] text-white">
-              Livraison rapide, traçable &amp; fiable
-            </h2>
-            <p className="text-sm xl:text-[15px] leading-relaxed text-slate-200/95 max-w-md">
-              Pilotez vos expéditions, vos ramassages multi-agences et vos reversements CRBT depuis
-              un cockpit logistique unifié.
-            </p>
-          </div>
-        </div>
-
-        {/* Étage 3 : Carte Glassmorphism en bas + Copyright */}
-        <div className="relative z-10 mt-auto pt-6 space-y-5">
-          <div className="bg-[#081d38]/65 backdrop-blur-md border border-white/15 rounded-2xl p-5 shadow-2xl">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-sm font-bold text-white">Gestion Complète &amp; Multi-Agence</p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-300/80">
-                  Routage inter-agences automatisé, suivi en direct et rapprochement financier
-                  sécurisé.
-                </p>
-              </div>
-              <span className="inline-flex shrink-0 items-center rounded-lg bg-sky-400/15 border border-sky-400/25 px-2.5 py-1 text-[11px] font-semibold text-sky-200">
-                Temps réel
-              </span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3 pt-4 mt-4 border-t border-white/10">
-              <div>
-                <div className="text-lg font-extrabold tracking-tight text-white tabular-nums">
-                  24h/48h
-                </div>
-                <div className="text-[11px] font-medium text-slate-300/80">Délai moyen</div>
-              </div>
-              <div>
-                <div className="text-lg font-extrabold tracking-tight text-sky-300 tabular-nums">
-                  100%
-                </div>
-                <div className="text-[11px] font-medium text-slate-300/80">Traçabilité</div>
-              </div>
-              <div>
-                <div className="text-lg font-extrabold tracking-tight text-amber-300 tabular-nums">
-                  J+1
-                </div>
-                <div className="text-[11px] font-medium text-slate-300/80">Reversement</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between gap-4 pt-4 border-t border-white/10 text-xs text-slate-300/80">
-            <p className="m-0">&copy; {CURRENT_YEAR} G4D Express &mdash; Tous droits réservés</p>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.08] border border-white/15 px-2.5 py-1 text-[11px] font-medium text-slate-100 whitespace-nowrap">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" aria-hidden="true" />
-              Protection Argon2id &amp; TLS
-            </span>
-          </div>
-        </div>
       </aside>
 
-      {/* Panneau Droit : Formulaire épuré sans boîte sur fond blanc (7 colonnes Desktop) */}
-      <main className="col-span-1 lg:col-span-7 flex flex-col justify-between min-h-screen bg-white px-6 py-6 sm:px-12 lg:px-16">
+      {/* Panneau Droit : Formulaire SaaS minimaliste & professionnel sur fond blanc (6 colonnes Desktop) */}
+      <main className="col-span-1 lg:col-span-6 flex flex-col justify-between min-h-screen bg-white px-4 py-4 sm:px-10 sm:py-6 lg:px-14">
         {/* Barre supérieure discrète */}
         <header className="flex flex-wrap items-center justify-between gap-3 w-full">
-          <Link
+          <a
             href="/"
             className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded-md px-1 py-0.5"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Retour à l&apos;accueil
-          </Link>
+          </a>
 
           <div className="text-sm text-slate-500">
             Nouveau vendeur ?{' '}
@@ -296,19 +206,17 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
         </header>
 
         {/* Conteneur central respirant directement sur le fond blanc */}
-        <div className="w-full max-w-[420px] mx-auto my-auto py-8">
-          {/* Logo affiché sur mobile uniquement */}
-          <div className="flex items-center justify-between gap-3 lg:hidden mb-7">
-            <G4dLogo variant="default" priority />
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 whitespace-nowrap">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
-              564 villes
+        <div className="w-full max-w-[420px] mx-auto my-auto py-5 sm:py-8">
+          <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-7">
+            <G4dLogo
+              variant="default"
+              priority
+              imageClassName="h-24 sm:h-28 max-h-28 w-auto shadow-none filter-none"
+            />
+            <span className="mt-3 inline-flex items-center gap-2 rounded-full bg-sky-50/90 border border-sky-100/90 px-4 py-1.5 text-xs font-bold text-[#0c4a6e] shadow-[0_1px_2px_rgba(2,132,199,0.06)]">
+              <Truck className="h-3.5 w-3.5 text-[#f97316]" aria-hidden="true" />
+              Le Meilleur dans le Domaine
             </span>
-          </div>
-
-          {/* Icône d'accès élégante sur Desktop uniquement */}
-          <div className="hidden lg:inline-flex h-11 w-11 items-center justify-center rounded-xl bg-sky-50 border border-sky-100 text-sky-600 mb-5">
-            <KeyRound className="h-5 w-5" aria-hidden="true" />
           </div>
 
           <h1 className="text-2xl sm:text-[28px] font-extrabold tracking-tight text-slate-900 m-0">
@@ -333,7 +241,7 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
             </a>
           </div>
           <div className="flex items-center gap-2 text-slate-400">
-            <span className="lg:hidden">&copy; {CURRENT_YEAR} G4D Express &middot;</span>
+            <span>&copy; {CURRENT_YEAR} G4D Express &middot;</span>
             <span>Accès sécurisé Argon2id &amp; TLS</span>
           </div>
         </footer>
