@@ -102,7 +102,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       {/* Zone dédiée au logo G4D centré avec halo subtil sur le dégradé bleu */}
-      <SidebarHeader className="relative h-20 items-center justify-center px-4 group-data-[collapsible=icon]:h-14 group-data-[collapsible=icon]:px-2">
+      <SidebarHeader className="relative h-20 items-center justify-center px-4 group-data-[collapsible=icon]:h-16 group-data-[collapsible=icon]:px-1.5">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-4 inset-y-2 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_72%)] group-data-[collapsible=icon]:inset-1"
@@ -110,14 +110,14 @@ export function AppSidebar() {
         <img
           src={G4D_LOGO_TRIM_PATH}
           alt="G4D Express"
-          className="relative h-15 w-auto max-w-[175px] object-contain drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] drop-shadow-[0_4px_12px_rgba(0,0,0,0.22)] transition-all duration-200 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7"
+          className="relative h-15 w-auto max-w-[175px] object-contain drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] drop-shadow-[0_4px_12px_rgba(0,0,0,0.22)] transition-all duration-200 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-auto group-data-[collapsible=icon]:max-w-[46px]"
         />
       </SidebarHeader>
 
-      <SidebarSeparator className="mx-4 bg-white/10" />
+      <SidebarSeparator className="mx-4 bg-white/10 group-data-[collapsible=icon]:mx-2.5" />
 
       {/* Navigation principale & sous-menus */}
-      <SidebarContent className="px-1.5 pt-1">
+      <SidebarContent className="px-1.5 pt-1 group-data-[collapsible=icon]:px-0">
         <SidebarGroup>
           <SidebarGroupLabel>Pilotage &amp; réseau</SidebarGroupLabel>
           <SidebarMenu>
@@ -224,7 +224,7 @@ export function AppSidebar() {
           </SidebarMenu>
         </SidebarGroup>
 
-        <SidebarSeparator className="mx-4 my-0.5 bg-white/10 group-data-[collapsible=icon]:hidden" />
+        <SidebarSeparator className="mx-4 my-0.5 bg-white/10 group-data-[collapsible=icon]:mx-2.5 group-data-[collapsible=icon]:my-1" />
 
         <SidebarGroup>
           <SidebarGroupLabel>Gouvernance &amp; sécurité</SidebarGroupLabel>
@@ -336,7 +336,7 @@ export function AppSidebar() {
                 tooltip={`${user.nomComplet} — Mon compte`}
                 aria-expanded={userMenuOpen}
                 onClick={() => setUserMenuOpen((prev) => !prev)}
-                className="rounded-[11px] border border-white/14 bg-white/[0.08] px-2.5 py-2 text-left transition-all duration-200 hover:border-white/22 hover:bg-white/[0.13] group-data-[collapsible=icon]:border-transparent group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:px-0"
+                className="rounded-[6px] border border-white/14 bg-white/[0.08] px-2.5 py-2 text-left transition-all duration-200 hover:border-white/22 hover:bg-white/[0.13] group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:overflow-visible! group-data-[collapsible=icon]:border-transparent group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:p-0! group-data-[collapsible=icon]:ring-0!"
               >
                 <div className="relative flex size-9 shrink-0 items-center justify-center rounded-[9px] bg-white/16 text-xs font-bold text-white ring-1 ring-white/25">
                   {getUserInitials(user.nomComplet)}
@@ -369,7 +369,7 @@ export function AppSidebar() {
             <div
               className={cn(
                 'z-50 min-w-56 rounded-[11px] border border-slate-200/90 bg-white p-1.5 text-slate-900 shadow-xl',
-                isCollapsed ? 'fixed bottom-3 left-14' : 'absolute bottom-full left-0 mb-2 w-full',
+                isCollapsed ? 'fixed bottom-3 left-16' : 'absolute bottom-full left-0 mb-2 w-full',
               )}
             >
               <div className="flex items-center gap-2.5 border-b border-slate-100 px-2.5 py-2">

@@ -59,6 +59,9 @@ describe('Contrats Front/Back & Client API G4D (Lot 2.5 / Sprint 02-B)', () => {
 
   it('pré-enregistre les icônes Iconify Solar Linear de la Sidebar et du bouton SidebarToggle', () => {
     const requiredSolarIcons = [
+      'solar:panel-left-close-linear',
+      'solar:panel-left-open-linear',
+      'solar:panel-left-linear',
       'solar:sidebar-minimalistic-linear',
       'solar:sidebar-linear',
       'solar:widget-2-linear',

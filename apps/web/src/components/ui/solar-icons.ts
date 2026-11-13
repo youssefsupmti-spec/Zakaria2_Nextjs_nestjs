@@ -54,6 +54,15 @@ const G4D_SOLAR_ICONS: IconifyJSON = {
     'panel-text-right-linear': {
       body: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M10 21H14C17.7712 21 19.6569 21 20.8284 19.8284C22 18.6569 22 16.7712 22 13V11C22 7.22876 22 5.34315 20.8284 4.17157C19.6569 3 17.7712 3 14 3H10C6.22876 3 4.34315 3 3.17157 4.17157C2 5.34315 2 7.22876 2 11V13C2 16.7712 2 18.6569 3.17157 19.8284C4.34315 21 6.22876 21 10 21Z"/><path d="M5.5 10H11.5"/><path d="M6.5 14H10.5"/><path d="M15 21L15 3"/></g>',
     },
+    'panel-left-linear': {
+      body: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M14 21H10C6.22876 21 4.34315 21 3.17157 19.8284C2 18.6569 2 16.7712 2 13V11C2 7.22876 2 5.34315 3.17157 4.17157C4.34315 3 6.22876 3 10 3H14C17.7712 3 19.6569 3 20.8284 4.17157C22 5.34315 22 7.22876 22 11V13C22 16.7712 22 18.6569 20.8284 19.8284C19.6569 21 17.7712 21 14 21Z"/><path d="M9 21L9 3"/></g>',
+    },
+    'panel-left-close-linear': {
+      body: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path d="M14 21H10C6.22876 21 4.34315 21 3.17157 19.8284C2 18.6569 2 16.7712 2 13V11C2 7.22876 2 5.34315 3.17157 4.17157C4.34315 3 6.22876 3 10 3H14C17.7712 3 19.6569 3 20.8284 4.17157C22 5.34315 22 7.22876 22 11V13C22 16.7712 22 18.6569 20.8284 19.8284C19.6569 21 17.7712 21 14 21Z"/><path d="M9 21L9 3"/><path stroke-linejoin="round" d="M16.7832 9L14.2118 12L16.7832 15"/></g>',
+    },
+    'panel-left-open-linear': {
+      body: '<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5"><path stroke-linejoin="round" d="M14.2109 15L16.7824 12L14.2109 9"/><path d="M14 3L10 3C6.22877 3 4.34315 3 3.17158 4.17157C2 5.34314 2 7.22876 2 11L2 13C2 16.7712 2 18.6569 3.17157 19.8284C4.34315 21 6.22876 21 10 21L14 21C17.7712 21 19.6569 21 20.8284 19.8284C22 18.6569 22 16.7712 22 13L22 11C22 7.22876 22 5.34315 20.8284 4.17157C19.6569 3 17.7712 3 14 3Z"/><path d="M9 3L9 21"/></g>',
+    },
   },
   aliases: {
     'sidebar-minimalistic-linear': {
