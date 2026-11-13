@@ -11,8 +11,15 @@ const nextConfig = {
   transpilePackages: ['@zakaria/shared-contracts'],
   images: {
     formats: ['image/avif', 'image/webp'],
+    localPatterns: [
+      {
+        pathname: '/assets/**',
+      },
+      {
+        pathname: '/images/**',
+      },
+    ],
   },
 };
 
 export default nextConfig;
-

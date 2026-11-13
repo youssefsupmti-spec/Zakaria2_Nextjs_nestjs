@@ -61,4 +61,3 @@ export async function requireServerAuthSession(): Promise<ServerAuthSession> {
   }
   return session;
 }
-

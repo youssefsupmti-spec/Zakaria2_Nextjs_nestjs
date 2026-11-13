@@ -36,10 +36,7 @@ export function HeroSection() {
                 aria-hidden="true"
               >
                 <source src="/assets/vedio/hero-vedio.mp4" type="video/mp4" />
-                <img
-                  src="/assets/landing/images/thumbs/banner-img1.png"
-                  alt="G4D Livraison"
-                />
+                <img src="/assets/landing/images/thumbs/banner-img1.png" alt="G4D Livraison" />
               </video>
               <div className="g4d-hero-overlay" aria-hidden="true"></div>
 
@@ -56,9 +53,9 @@ export function HeroSection() {
                             Livraison nationale rapide &amp; traçable
                           </h1>
                           <p className="text-white tw-text-lg tw-mt-6 tw-mb-10 opacity-75 max-w-600-px cursor-small">
-                            G4D connecte vos commandes e-commerce à un réseau de
-                            livraison structuré, tracé et validé terrain. Du HUP
-                            au client final, chaque étape est documentée.
+                            G4D connecte vos commandes e-commerce à un réseau de livraison
+                            structuré, tracé et validé terrain. Du HUP au client final, chaque étape
+                            est documentée.
                           </p>
                           <div className="d-flex tw-gap-11 flex-wrap">
                             <a
@@ -67,9 +64,7 @@ export function HeroSection() {
                               data-block="button"
                             >
                               <span className="button__flair"></span>
-                              <span className="button__label">
-                                Démarrer gratuitement
-                              </span>
+                              <span className="button__label">Démarrer gratuitement</span>
                               <span className="tw-w-7 tw-h-7 bg-main-three-600 text-white tw-text-sm tw-rounded d-flex justify-content-center align-items-center position-relative group-hover-bg-main-600 group-hover-text-white tw-duration-500">
                                 <FeatherIcon name="arrow-right" />
                               </span>
@@ -97,17 +92,11 @@ export function HeroSection() {
                           <span>Données sécurisées</span>
                         </div>
                         <div className="d-flex align-items-center tw-gap-2 text-white cursor-small">
-                          <FeatherIcon
-                            name="trending-up"
-                            className="text-main-600"
-                          />
+                          <FeatherIcon name="trending-up" className="text-main-600" />
                           <span>Suivi temps réel</span>
                         </div>
                         <div className="d-flex align-items-center tw-gap-2 text-white cursor-small">
-                          <FeatherIcon
-                            name="map-pin"
-                            className="text-main-600"
-                          />
+                          <FeatherIcon name="map-pin" className="text-main-600" />
                           <span>472+ villes couvertes</span>
                         </div>
                       </div>
@@ -138,10 +127,9 @@ export function HeroSection() {
                           Gérez vos expéditions en toute simplicité
                         </h1>
                         <p className="text-white tw-text-lg tw-mt-6 tw-mb-10 opacity-75 max-w-600-px cursor-small">
-                          Tableau de bord intuitif, suivi temps réel, retours
-                          automatisés et remboursement J+1. G4D simplifie la
-                          logistique pour que vous puissiez vous concentrer sur
-                          la vente.
+                          Tableau de bord intuitif, suivi temps réel, retours automatisés et
+                          remboursement J+1. G4D simplifie la logistique pour que vous puissiez vous
+                          concentrer sur la vente.
                         </p>
                         <div className="d-flex tw-gap-11 flex-wrap">
                           <a
@@ -150,9 +138,7 @@ export function HeroSection() {
                             data-block="button"
                           >
                             <span className="button__flair"></span>
-                            <span className="button__label">
-                              Créer mon compte
-                            </span>
+                            <span className="button__label">Créer mon compte</span>
                             <span className="tw-w-7 tw-h-7 bg-main-three-600 text-white tw-text-sm tw-rounded d-flex justify-content-center align-items-center position-relative group-hover-bg-main-600 group-hover-text-white tw-duration-500">
                               <FeatherIcon name="check" />
                             </span>
@@ -195,9 +181,8 @@ export function HeroSection() {
                           Une équipe à votre écoute, chaque jour
                         </h1>
                         <p className="text-white tw-text-lg tw-mt-6 tw-mb-10 opacity-75 max-w-600-px cursor-small">
-                          Nos conseillers G4D répondent à chaque demande
-                          rapidement et efficacement. Questions sur une
-                          livraison, réclamation ou partenariat — nous sommes là
+                          Nos conseillers G4D répondent à chaque demande rapidement et efficacement.
+                          Questions sur une livraison, réclamation ou partenariat — nous sommes là
                           pour vous.
                         </p>
                         <div className="d-flex tw-gap-11 flex-wrap">
@@ -207,9 +192,7 @@ export function HeroSection() {
                             data-block="button"
                           >
                             <span className="button__flair"></span>
-                            <span className="button__label">
-                              Nous contacter
-                            </span>
+                            <span className="button__label">Nous contacter</span>
                             <span className="tw-w-7 tw-h-7 bg-main-three-600 text-white tw-text-sm tw-rounded d-flex justify-content-center align-items-center position-relative group-hover-bg-main-600 group-hover-text-white tw-duration-500">
                               <FeatherIcon name="mail" />
                             </span>
@@ -274,12 +257,10 @@ export function HeroSection() {
                   }}
                 />
               </span>
-              <h5 className="tw-mb-7 cursor-big splitTextStyleTwo">
-                Fiabilité
-              </h5>
+              <h5 className="tw-mb-7 cursor-big splitTextStyleTwo">Fiabilité</h5>
               <p className="text-neutral-1000 cursor-small">
-                Nous nous engageons à garantir à vos clients la réception de
-                leurs colis en parfait état.
+                Nous nous engageons à garantir à vos clients la réception de leurs colis en parfait
+                état.
               </p>
             </div>
           </div>
@@ -304,9 +285,7 @@ export function HeroSection() {
                   }}
                 />
               </span>
-              <h5 className="tw-mb-7 cursor-big splitTextStyleTwo">
-                Traçabilité
-              </h5>
+              <h5 className="tw-mb-7 cursor-big splitTextStyleTwo">Traçabilité</h5>
               <p className="text-neutral-1000 cursor-small">
                 Suivez vos colis en temps réel sur notre plateforme.
               </p>
@@ -335,8 +314,7 @@ export function HeroSection() {
               </span>
               <h5 className="tw-mb-7 cursor-big splitTextStyleTwo">Rapidité</h5>
               <p className="text-neutral-1000 cursor-small">
-                Nous assurons les meilleurs délais de livraison et de
-                contre-remboursement.
+                Nous assurons les meilleurs délais de livraison et de contre-remboursement.
               </p>
             </div>
           </div>
@@ -361,9 +339,7 @@ export function HeroSection() {
                   }}
                 />
               </span>
-              <h5 className="tw-mb-7 cursor-big splitTextStyleTwo">
-                Praticité
-              </h5>
+              <h5 className="tw-mb-7 cursor-big splitTextStyleTwo">Praticité</h5>
               <p className="text-neutral-1000 cursor-small">
                 Nous récupérons vos colis directement chez vous.
               </p>

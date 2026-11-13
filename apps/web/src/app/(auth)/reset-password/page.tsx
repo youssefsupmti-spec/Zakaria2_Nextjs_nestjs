@@ -22,11 +22,7 @@ export default async function ResetPasswordPage({
         </div>
       }
     >
-      <ResetPasswordForm
-        initialEmail={params.email ?? ''}
-        initialToken={params.token ?? ''}
-      />
+      <ResetPasswordForm initialEmail={params.email ?? ''} initialToken={params.token ?? ''} />
     </G4dAuthShell>
   );
 }
-

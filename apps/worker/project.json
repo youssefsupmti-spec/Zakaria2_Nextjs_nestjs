@@ -14,7 +14,7 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsx watch apps/worker/src/main.ts"
+        "command": "tsx --tsconfig tsconfig.base.json watch apps/worker/src/main.ts"
       }
     },
     "typecheck": {
@@ -25,4 +25,3 @@
     }
   }
 }
-

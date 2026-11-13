@@ -1,4 +1,29 @@
 services:
+  redis-cache:
+    image: redis:8-alpine
+    container_name: g4d-redis-cache
+    restart: unless-stopped
+    command:
+      ['redis-server', '--maxmemory', '256mb', '--maxmemory-policy', 'allkeys-lru', '--save', '']
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'PING']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  redis-queue:
+    image: redis:8-alpine
+    container_name: g4d-redis-queue
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction']
+    volumes:
+      - g4d_redis_queue_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'PING']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
   backend:
     build:
       context: .
@@ -10,13 +35,36 @@ services:
       PORT: 3101
       API_PORT: 3101
       API_HOST: 0.0.0.0
-      RUN_WORKER: "true"
-      CORS_ORIGINS: "https://app.g4dmaroc.xyz,https://api.g4dmaroc.xyz,http://localhost:3100"
-      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:cbln6b6dcoghkpva@nestjsnextjs-database-mujw4w:5432/postgres}
-      REDIS_URL: ${REDIS_URL:-redis://default:hfvzvp2saihxz7pc@nestjsnextjs-reduis-cksyka:6379}
-      REDIS_PREFIX: zakaria2
+      RUN_WORKER: 'true'
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://app.g4dmaroc.xyz,https://api.g4dmaroc.xyz}
+      APP_PUBLIC_URL: ${APP_PUBLIC_URL:-https://app.g4dmaroc.xyz}
+      API_INTERNAL_URL: ${API_INTERNAL_URL:-http://127.0.0.1:3101}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL obligatoire}
+      REDIS_CACHE_URL: ${REDIS_CACHE_URL:-redis://redis-cache:6379}
+      REDIS_QUEUE_URL: ${REDIS_QUEUE_URL:-redis://redis-queue:6379}
+      REDIS_URL: ${REDIS_URL:-redis://redis-queue:6379}
+      REDIS_PREFIX: ${REDIS_PREFIX:-zakaria2}
+      AUTH_COOKIE_NAME: ${AUTH_COOKIE_NAME:-__Host-g4d.session}
+      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET obligatoire}
+      CSRF_SECRET: ${CSRF_SECRET:-}
+      API_SECRET_PEPPER: ${API_SECRET_PEPPER:-}
+      STORAGE_LOCAL_PATH: ${STORAGE_LOCAL_PATH:-/app/storage/uploads}
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED:-false}
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_SECURE: ${MAIL_SECURE:-false}
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASS: ${MAIL_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-G4D Delivery <no-reply@g4dmaroc.xyz>}
+    volumes:
+      - g4d_uploads:/app/storage/uploads
     ports:
-      - "3101:3101"
+      - '3101:3101'
+    depends_on:
+      redis-cache:
+        condition: service_healthy
+      redis-queue:
+        condition: service_healthy
 
   frontend:
     build:
@@ -32,8 +80,12 @@ services:
       WEB_PORT: 3100
       HOSTNAME: 0.0.0.0
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.g4dmaroc.xyz/api/v1}
+      API_INTERNAL_URL: ${API_INTERNAL_URL:-http://backend:3101}
     ports:
-      - "3100:3100"
+      - '3100:3100'
     depends_on:
       - backend
 
+volumes:
+  g4d_redis_queue_data:
+  g4d_uploads:

@@ -46,8 +46,7 @@ async function proxyToBackend(
   }
 
   const method = request.method.toUpperCase();
-  const body =
-    method === 'GET' || method === 'HEAD' ? undefined : await request.arrayBuffer();
+  const body = method === 'GET' || method === 'HEAD' ? undefined : await request.arrayBuffer();
 
   try {
     const upstreamResponse = await fetch(targetUrl, {
@@ -98,4 +97,3 @@ export const POST = proxyToBackend;
 export const PUT = proxyToBackend;
 export const PATCH = proxyToBackend;
 export const DELETE = proxyToBackend;
-

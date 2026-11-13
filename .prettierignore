@@ -5,4 +5,9 @@ dist
 coverage
 pnpm-lock.yaml
 libs/backend/database/src/generated
+apps/web/public/assets/landing/**
+apps/web/next-env.d.ts
+apps/api/openapi.json
+apps/web/src/lib/api-openapi.d.ts
+storage/
 

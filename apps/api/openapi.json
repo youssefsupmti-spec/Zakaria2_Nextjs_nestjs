@@ -1,0 +1,560 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "operationId": "HealthController_checkHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Vérification santé PostgreSQL, Redis Cache & Redis Queue",
+        "tags": [
+          "Santé"
+        ]
+      }
+    },
+    "/api/v1/security/csrf": {
+      "get": {
+        "operationId": "SecurityController_issueCsrfToken",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Émet ou rafraîchit le jeton CSRF double-submit (g4d.csrf + X-CSRF-Token)",
+        "tags": [
+          "Sécurité"
+        ]
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Authentification"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Authentification"
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Profil connecté, permissions et contexte multi-organisation",
+        "tags": [
+          "Authentification"
+        ]
+      }
+    },
+    "/api/v1/auth/sessions": {
+      "get": {
+        "operationId": "AuthController_listSessions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Liste les sessions actives de l’utilisateur connecté",
+        "tags": [
+          "Authentification"
+        ]
+      }
+    },
+    "/api/v1/auth/sessions/{id}": {
+      "delete": {
+        "operationId": "AuthController_revokeSession",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Révoque une session active appartenant à l’utilisateur connecté",
+        "tags": [
+          "Authentification"
+        ]
+      }
+    },
+    "/api/v1/auth/forgot-password": {
+      "post": {
+        "operationId": "AuthController_forgotPassword",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Authentification"
+        ]
+      }
+    },
+    "/api/v1/auth/reset-password": {
+      "post": {
+        "operationId": "AuthController_resetPassword",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Authentification"
+        ]
+      }
+    },
+    "/api/v1/agences/zones": {
+      "get": {
+        "operationId": "AgencesController_listZones",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Liste les zones logistiques actives",
+        "tags": [
+          "Agences & Zones"
+        ]
+      },
+      "post": {
+        "operationId": "AgencesController_createZone",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Crée une zone logistique (admin plateforme)",
+        "tags": [
+          "Agences & Zones"
+        ]
+      }
+    },
+    "/api/v1/agences": {
+      "get": {
+        "operationId": "AgencesController_listAgences",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Liste les agences accessibles à l’utilisateur connecté",
+        "tags": [
+          "Agences & Zones"
+        ]
+      },
+      "post": {
+        "operationId": "AgencesController_createAgence",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Crée une agence physique G4D (admin plateforme)",
+        "tags": [
+          "Agences & Zones"
+        ]
+      }
+    },
+    "/api/v1/agences/{id}": {
+      "patch": {
+        "operationId": "AgencesController_updateAgence",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Met à jour une agence (admin plateforme ou manager D-04)",
+        "tags": [
+          "Agences & Zones"
+        ]
+      }
+    },
+    "/api/v1/agences/{id}/zones": {
+      "put": {
+        "operationId": "AgencesController_upsertZone",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Définit la couverture livraison/ramassage d’une zone par agence",
+        "tags": [
+          "Agences & Zones"
+        ]
+      }
+    },
+    "/api/v1/agences/{id}/membres": {
+      "get": {
+        "operationId": "AgencesController_listMembres",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Liste les membres affectés à une agence",
+        "tags": [
+          "Agences & Zones"
+        ]
+      },
+      "post": {
+        "operationId": "AgencesController_assignMembre",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Affecte un utilisateur à une agence avec un rôle dédié",
+        "tags": [
+          "Agences & Zones"
+        ]
+      }
+    },
+    "/api/v1/agences/{id}/membres/{membreId}/zones": {
+      "put": {
+        "operationId": "AgencesController_assignMembreZone",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Affecte une zone livraison/ramassage à un membre d’agence",
+        "tags": [
+          "Agences & Zones"
+        ]
+      }
+    },
+    "/api/v1/partenaires": {
+      "get": {
+        "operationId": "PartenairesController_listPartenaires",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Liste les partenaires B2B accessibles selon la portée utilisateur",
+        "tags": [
+          "Partenaires B2B & Clés API"
+        ]
+      },
+      "post": {
+        "operationId": "PartenairesController_createPartenaire",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Crée une société partenaire B2B (admin plateforme)",
+        "tags": [
+          "Partenaires B2B & Clés API"
+        ]
+      }
+    },
+    "/api/v1/partenaires/{id}": {
+      "patch": {
+        "operationId": "PartenairesController_updatePartenaire",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Met à jour une société partenaire B2B",
+        "tags": [
+          "Partenaires B2B & Clés API"
+        ]
+      }
+    },
+    "/api/v1/partenaires/{id}/agences": {
+      "post": {
+        "operationId": "PartenairesController_assignAgence",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Lie une agence locale à un partenaire par contrat",
+        "tags": [
+          "Partenaires B2B & Clés API"
+        ]
+      }
+    },
+    "/api/v1/partenaires/zones": {
+      "post": {
+        "operationId": "PartenairesController_assignZone",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Délègue une zone sur un contrat agence-partenaire",
+        "tags": [
+          "Partenaires B2B & Clés API"
+        ]
+      }
+    },
+    "/api/v1/partenaires/{id}/coursiers": {
+      "post": {
+        "operationId": "PartenairesController_addCoursier",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Ajoute un coursier rattaché à un partenaire",
+        "tags": [
+          "Partenaires B2B & Clés API"
+        ]
+      }
+    },
+    "/api/v1/partenaires/{id}/membres": {
+      "post": {
+        "operationId": "PartenairesController_assignMembre",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Rattache un utilisateur portail à un espace partenaire",
+        "tags": [
+          "Partenaires B2B & Clés API"
+        ]
+      }
+    },
+    "/api/v1/partenaires/{id}/connexions": {
+      "put": {
+        "operationId": "PartenairesController_upsertConnexion",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Enregistre une connexion API sortante chiffrée (AES-256-GCM)",
+        "tags": [
+          "Partenaires B2B & Clés API"
+        ]
+      }
+    },
+    "/api/v1/partenaires/api-keys": {
+      "post": {
+        "operationId": "PartenairesController_createApiKey",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Émet une clé API B2B (HMAC-SHA256, interdit sous-comptes D-09)",
+        "tags": [
+          "Partenaires B2B & Clés API"
+        ]
+      }
+    },
+    "/api/v1/partenaires/api-keys/{keyId}": {
+      "delete": {
+        "operationId": "PartenairesController_revokeApiKey",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Révoque une clé API B2B",
+        "tags": [
+          "Partenaires B2B & Clés API"
+        ]
+      }
+    },
+    "/api/v1/roles/permissions": {
+      "get": {
+        "operationId": "RolesController_listPermissions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Catalogue des permissions attribuables par l’acteur (anti-escalade)",
+        "tags": [
+          "Rôles & Permissions RBAC"
+        ]
+      }
+    },
+    "/api/v1/roles": {
+      "get": {
+        "operationId": "RolesController_listRoles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Liste les rôles accessibles selon la portée multi-organisation",
+        "tags": [
+          "Rôles & Permissions RBAC"
+        ]
+      },
+      "post": {
+        "operationId": "RolesController_createRole",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Crée un rôle personnalisé borné avec contrôle anti-escalade",
+        "tags": [
+          "Rôles & Permissions RBAC"
+        ]
+      }
+    },
+    "/api/v1/roles/{id}": {
+      "patch": {
+        "operationId": "RolesController_updateRole",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Met à jour un rôle personnalisé et invalide les caches Redis",
+        "tags": [
+          "Rôles & Permissions RBAC"
+        ]
+      },
+      "delete": {
+        "operationId": "RolesController_deleteRole",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Supprime un rôle personnalisé non système et non utilisé",
+        "tags": [
+          "Rôles & Permissions RBAC"
+        ]
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "operationId": "UsersController_listUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Liste les utilisateurs accessibles selon la portée multi-organisation",
+        "tags": [
+          "Utilisateurs & Sous-comptes"
+        ]
+      },
+      "post": {
+        "operationId": "UsersController_createUser",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Crée un utilisateur / sous-compte / livreur local (D-08)",
+        "tags": [
+          "Utilisateurs & Sous-comptes"
+        ]
+      }
+    },
+    "/api/v1/users/{id}": {
+      "patch": {
+        "operationId": "UsersController_updateUser",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Met à jour un utilisateur et son rôle (anti-escalade)",
+        "tags": [
+          "Utilisateurs & Sous-comptes"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/status": {
+      "patch": {
+        "operationId": "UsersController_setStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Active/désactive un compte avec cascade sous-comptes D-06",
+        "tags": [
+          "Utilisateurs & Sous-comptes"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "G4D Delivery — API Plateforme",
+    "description": "API NestJS/Fastify G4D (Authentification sessions opaques, Multi-Agences, Partenaires B2B, RBAC borné, Stockage local).",
+    "version": "0.2.5-sprint02b",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "g4d.session"
+      }
+    },
+    "schemas": {}
+  }
+}

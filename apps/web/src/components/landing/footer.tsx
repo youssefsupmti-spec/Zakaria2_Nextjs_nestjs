@@ -106,10 +106,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
       {/* ══════════════════════════════════════════════════════════════════════
            COUVERTURE — Map Leaflet (#g4d-coverage-map)
       ══════════════════════════════════════════════════════════════════════ */}
-      <section
-        className="get-in-touch py-140 position-relative overflow-hidden"
-        id="couverture"
-      >
+      <section className="get-in-touch py-140 position-relative overflow-hidden" id="couverture">
         <div className="container">
           <div className="row gy-5 align-items-center">
             <div
@@ -125,8 +122,8 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                 Notre réseau couvre tout le Maroc
               </h1>
               <p className="cursor-small text-neutral-900 tw-ps-205 border-start border-main-600 border-3">
-                Des zones de livraison stratégiquement organisées. 472+ villes
-                et communes accessibles. Un réseau qui s&apos;étend chaque mois.
+                Des zones de livraison stratégiquement organisées. 472+ villes et communes
+                accessibles. Un réseau qui s&apos;étend chaque mois.
               </p>
               <div className="tw-mt-10 d-flex flex-wrap align-items-center tw-gap-7">
                 <a
@@ -172,9 +169,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                     }}
                   >
                     <div className="spinner-border text-main-600" role="status">
-                      <span className="visually-hidden">
-                        Chargement de la carte…
-                      </span>
+                      <span className="visually-hidden">Chargement de la carte…</span>
                     </div>
                   </div>
                 )}
@@ -218,21 +213,13 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
             </div>
             <div className="text-center animation-item bg-main-two-600 tw-py-12 tw-px-6 flex-grow-1 d-flex flex-column justify-content-center align-items-center">
               <span className="cursor-big tw-mb-6">
-                <img
-                  src="/assets/landing/images/icons/conact-us-icon1.svg"
-                  alt=""
-                />
+                <img src="/assets/landing/images/icons/conact-us-icon1.svg" alt="" />
               </span>
-              <h2 className="splitTextStyleOne text-white tw-mb-8 cursor-big">
-                Prêt à démarrer ?
-              </h2>
+              <h2 className="splitTextStyleOne text-white tw-mb-8 cursor-big">Prêt à démarrer ?</h2>
               <p className="text-white opacity-75 cursor-small tw-mb-8">
                 Inscription gratuite. Sans engagement. Support inclus.
               </p>
-              <a
-                href="/login"
-                className="cursor-small btn btn-main rounded-0 tw-py-405 tw-px-10"
-              >
+              <a href="/login" className="cursor-small btn btn-main rounded-0 tw-py-405 tw-px-10">
                 Créer mon compte gratuitement
               </a>
             </div>
@@ -251,8 +238,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                 className="position-absolute top-0 start-0 w-100 h-100"
                 aria-hidden="true"
                 style={{
-                  background:
-                    'linear-gradient(to right,transparent 35%,var(--g4d-blue) 100%)',
+                  background: 'linear-gradient(to right,transparent 35%,var(--g4d-blue) 100%)',
                 }}
               ></div>
             </div>
@@ -261,10 +247,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
               style={{ minWidth: '240px' }}
             >
               <span className="cursor-big tw-mb-6">
-                <img
-                  src="/assets/landing/images/icons/conact-us-icon2.svg"
-                  alt=""
-                />
+                <img src="/assets/landing/images/icons/conact-us-icon2.svg" alt="" />
               </span>
               <h2 className="splitTextStyleOne text-white tw-mb-8 cursor-big">
                 Contacter notre équipe
@@ -274,10 +257,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                 className="cursor-small fw-bold text-white d-inline-flex align-items-center tw-gap-5 hover-text-main-two-600"
               >
                 Contact@g4d.ma
-                <img
-                  src="/assets/landing/images/icons/arrow-right.svg"
-                  alt=""
-                />
+                <img src="/assets/landing/images/icons/arrow-right.svg" alt="" />
               </a>
             </div>
           </div>
@@ -297,8 +277,8 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
               data-aos-duration="1000"
               data-aos-delay="200"
             >
-              Livraison nationale <span className="text-main-600">fiable</span>,
-              tracée &amp; validée terrain
+              Livraison nationale <span className="text-main-600">fiable</span>, tracée &amp;
+              validée terrain
             </h3>
             <div
               className="d-flex align-items-center tw-gap-40-px tw-p-2 max-w-520-px bg-white-01 rounded-pill"
@@ -307,10 +287,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
               data-aos-delay="400"
             >
               <span className="tw-w-85-px tw-h-85-px bg-white rounded-circle d-flex justify-content-center align-items-center cursor-big flex-shrink-0">
-                <img
-                  src="/assets/landing/images/icons/message-icon.svg"
-                  alt=""
-                />
+                <img src="/assets/landing/images/icons/message-icon.svg" alt="" />
               </span>
               <h6 className="text-white tw-pe-10 fw-medium cursor-small">
                 Nous contacter sur{' '}
@@ -387,9 +364,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                 data-aos-duration="1000"
                 data-aos-delay="200"
               >
-                <h5 className="text-white tw-mb-6 cursor-big splitTextStyleTwo">
-                  Plateforme
-                </h5>
+                <h5 className="text-white tw-mb-6 cursor-big splitTextStyleTwo">Plateforme</h5>
                 <ul className="d-flex flex-column tw-gap-4">
                   <li>
                     <a
@@ -449,9 +424,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                 data-aos-duration="1000"
                 data-aos-delay="300"
               >
-                <h5 className="text-white tw-mb-6 cursor-big splitTextStyleTwo">
-                  Accès Rapide
-                </h5>
+                <h5 className="text-white tw-mb-6 cursor-big splitTextStyleTwo">Accès Rapide</h5>
                 <ul className="d-flex flex-column tw-gap-4">
                   <li>
                     <a
@@ -564,4 +537,3 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
     </>
   );
 }
-

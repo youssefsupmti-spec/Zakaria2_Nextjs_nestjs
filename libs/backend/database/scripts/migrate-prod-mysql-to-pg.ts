@@ -51,7 +51,10 @@ function parseCliArgs(argv: string[]): CliOptions {
         throw new Error(`Format invalide pour --email-override (${spec}), attendu id:nouvel_email`);
       }
       const userId = Number(spec.slice(0, sepIdx));
-      const newEmail = spec.slice(sepIdx + 1).trim().toLowerCase();
+      const newEmail = spec
+        .slice(sepIdx + 1)
+        .trim()
+        .toLowerCase();
       if (!Number.isInteger(userId) || userId <= 0 || !newEmail.includes('@')) {
         throw new Error(`Paramètre --email-override invalide : ${spec}`);
       }
@@ -97,7 +100,9 @@ function asNullableDate(value: unknown): Date | null {
 function asBoolean(value: unknown): boolean {
   if (typeof value === 'boolean') return value;
   if (typeof value === 'number') return value !== 0;
-  const s = String(value ?? '').trim().toLowerCase();
+  const s = String(value ?? '')
+    .trim()
+    .toLowerCase();
   return s === '1' || s === 'true' || s === 'yes';
 }
 
@@ -302,7 +307,7 @@ async function main(): Promise<void> {
       const rawEmail = asString(u['email']).trim();
       const effectiveEmail = (options.emailOverrides.get(id) ?? rawEmail).trim().toLowerCase();
       const deletedAt = options.softDeletedUserIds.has(id)
-        ? asNullableDate(u['deleted_at']) ?? new Date()
+        ? (asNullableDate(u['deleted_at']) ?? new Date())
         : asNullableDate(u['deleted_at']);
       const active = options.disabledUserIds.has(id) ? false : asBoolean(u['active']);
 
@@ -345,10 +350,12 @@ async function main(): Promise<void> {
             passwordResetTokens: resetTokenRows.length,
             authenticationLogs: authLogRows.length,
           },
-          appliedEmailOverrides: Array.from(options.emailOverrides.entries()).map(([id, email]) => ({
-            id,
-            email,
-          })),
+          appliedEmailOverrides: Array.from(options.emailOverrides.entries()).map(
+            ([id, email]) => ({
+              id,
+              email,
+            }),
+          ),
           disabledUserIds: Array.from(options.disabledUserIds.values()),
           softDeletedUserIds: Array.from(options.softDeletedUserIds.values()),
           remainingActiveDuplicates: duplicateGroups,
@@ -495,7 +502,7 @@ async function main(): Promise<void> {
           if (rawVilleId && !safeVilleId) orphanVilleCount++;
 
           const deletedAt = options.softDeletedUserIds.has(id)
-            ? asNullableDate(u['deleted_at']) ?? now
+            ? (asNullableDate(u['deleted_at']) ?? now)
             : asNullableDate(u['deleted_at']);
           const active = options.disabledUserIds.has(id) ? false : asBoolean(u['active']);
 
@@ -650,12 +657,7 @@ async function main(): Promise<void> {
           pgClient,
           `INSERT INTO "password_reset_tokens" ("email", "token", "expires_at", "created_at") VALUES`,
           4,
-          Array.from(dedupTokens.values()).map((t) => [
-            t.email,
-            t.token,
-            t.expiresAt,
-            t.createdAt,
-          ]),
+          Array.from(dedupTokens.values()).map((t) => [t.email, t.token, t.expiresAt, t.createdAt]),
           `ON CONFLICT ("email") DO UPDATE SET
             "token" = EXCLUDED."token",
             "expires_at" = EXCLUDED."expires_at",
@@ -753,4 +755,3 @@ main().catch((error) => {
   console.error('[ETL G4D] Échec de la migration :', error);
   process.exit(1);
 });
-

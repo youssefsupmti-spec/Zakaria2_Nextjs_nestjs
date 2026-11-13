@@ -1,26 +1,34 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { loadBackendEnv } from '@zakaria/backend-config';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { AuthContext, RequestMeta } from './auth.types';
 import { AuthService } from './auth.service';
 import { CurrentAuth } from './decorators/auth.decorators';
 import { SessionAuthGuard } from './guards/session-auth.guard';
+import { SessionService } from './session.service';
 
+@ApiTags('Authentification')
 @Controller('auth')
 export class AuthController {
   private readonly env = loadBackendEnv();
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly sessionService: SessionService,
+  ) {}
 
   private extractMeta(request: FastifyRequest): RequestMeta {
     const forwardedFor = request.headers['x-forwarded-for'];
@@ -74,10 +82,7 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(
-    @Req() request: FastifyRequest,
-    @Res({ passthrough: true }) reply: FastifyReply,
-  ) {
+  async logout(@Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
     const meta = this.extractMeta(request);
     const rawToken =
       request.cookies?.[this.env.AUTH_COOKIE_NAME] ??
@@ -105,12 +110,30 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(SessionAuthGuard)
+  @ApiOperation({ summary: 'Profil connecté, permissions et contexte multi-organisation' })
   me(@CurrentAuth() auth: AuthContext) {
     return {
       user: auth.user,
       sessionExpiresAt: auth.expiresAt.toISOString(),
       sessionDuration: auth.durationCode,
     };
+  }
+
+  @Get('sessions')
+  @UseGuards(SessionAuthGuard)
+  @ApiOperation({ summary: 'Liste les sessions actives de l’utilisateur connecté' })
+  async listSessions(@CurrentAuth() auth: AuthContext) {
+    const sessions = await this.sessionService.listActiveSessions(auth.user.id, auth.sessionId);
+    return { sessions };
+  }
+
+  @Delete('sessions/:id')
+  @UseGuards(SessionAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Révoque une session active appartenant à l’utilisateur connecté' })
+  async revokeSession(@CurrentAuth() auth: AuthContext, @Param('id') sessionId: string) {
+    await this.sessionService.revokeOwnSession(auth.user.id, sessionId);
+    return { ok: true };
   }
 
   @Post('forgot-password')
@@ -125,4 +148,3 @@ export class AuthController {
     return this.authService.resetPassword(body, this.extractMeta(request));
   }
 }
-

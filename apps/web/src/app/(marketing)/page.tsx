@@ -79,8 +79,7 @@ export default function LandingPage() {
         id="tarification"
         data-background-image="/assets/landing/images/shapes/thrree-sections-bg.png"
         style={{
-          backgroundImage:
-            'url(/assets/landing/images/shapes/thrree-sections-bg.png)',
+          backgroundImage: 'url(/assets/landing/images/shapes/thrree-sections-bg.png)',
         }}
       >
         <div className="container">
@@ -92,12 +91,10 @@ export default function LandingPage() {
             <span className="splitTextStyleTwo cursor-small tw-text-xl fw-bold fst-italic text-decoration-underline text-main-600 tw-mb-305">
               Transparence totale
             </span>
-            <h1 className="splitTextStyleOne cursor-big tw-mb-8">
-              Consultez votre tarif en ligne
-            </h1>
+            <h1 className="splitTextStyleOne cursor-big tw-mb-8">Consultez votre tarif en ligne</h1>
             <p className="text-neutral-1000 cursor-small">
-              Recherchez votre ville de destination. Votre tarif s&apos;affiche
-              instantanément, sans appel commercial.
+              Recherchez votre ville de destination. Votre tarif s&apos;affiche instantanément, sans
+              appel commercial.
             </p>
           </div>
 

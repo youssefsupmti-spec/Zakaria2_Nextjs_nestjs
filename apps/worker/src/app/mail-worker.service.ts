@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Worker, type Job } from 'bullmq';
 import nodemailer, { type Transporter } from 'nodemailer';
-import { loadBackendEnv } from '@zakaria/backend-config';
+import { getBullMqConnectionOptions, loadBackendEnv } from '@zakaria/backend-config';
 import {
   MAIL_JOB_PASSWORD_RESET,
   MAIL_QUEUE_NAME,
@@ -25,19 +25,25 @@ export class MailWorkerService implements OnModuleInit, OnModuleDestroy {
   private worker: Worker<PasswordResetMailJobPayload> | null = null;
 
   onModuleInit(): void {
-    this.transporter = nodemailer.createTransport({
-      host: this.env.MAIL_HOST,
-      port: this.env.MAIL_PORT,
-      secure: this.env.MAIL_SECURE,
-      ...(this.env.MAIL_USER && this.env.MAIL_PASS
-        ? {
-            auth: {
-              user: this.env.MAIL_USER,
-              pass: this.env.MAIL_PASS,
-            },
-          }
-        : {}),
-    });
+    if (this.env.SMTP_CONFIGURED) {
+      this.transporter = nodemailer.createTransport({
+        host: this.env.MAIL_HOST,
+        port: this.env.MAIL_PORT,
+        secure: this.env.MAIL_SECURE,
+        ...(this.env.MAIL_USER && this.env.MAIL_PASS
+          ? {
+              auth: {
+                user: this.env.MAIL_USER,
+                pass: this.env.MAIL_PASS,
+              },
+            }
+          : {}),
+      });
+    } else {
+      this.logger.error(
+        'Configuration SMTP absente ou invalide en production (MAIL_HOST/MAIL_USER/MAIL_PASS requis hors Mailpit).',
+      );
+    }
 
     this.worker = new Worker<PasswordResetMailJobPayload>(
       MAIL_QUEUE_NAME,
@@ -45,13 +51,7 @@ export class MailWorkerService implements OnModuleInit, OnModuleDestroy {
       {
         prefix: this.env.REDIS_PREFIX,
         concurrency: 3,
-        connection: {
-          host: this.env.REDIS_HOST,
-          port: this.env.REDIS_PORT,
-          username: this.env.REDIS_USERNAME,
-          password: this.env.REDIS_PASSWORD,
-          maxRetriesPerRequest: null,
-        },
+        connection: getBullMqConnectionOptions(this.env),
       },
     );
 
@@ -66,7 +66,9 @@ export class MailWorkerService implements OnModuleInit, OnModuleDestroy {
     });
 
     this.logger.log(
-      `Worker messagerie BullMQ prêt (queue='${MAIL_QUEUE_NAME}', SMTP='${this.env.MAIL_HOST}:${this.env.MAIL_PORT}').`,
+      this.env.SMTP_CONFIGURED
+        ? `Worker messagerie BullMQ prêt (queue='${MAIL_QUEUE_NAME}', SMTP='${this.env.MAIL_HOST}:${this.env.MAIL_PORT}').`
+        : `Worker messagerie BullMQ démarré SANS transporteur SMTP valide (vérifier MAIL_*).`,
     );
   }
 
@@ -77,7 +79,9 @@ export class MailWorkerService implements OnModuleInit, OnModuleDestroy {
     }
 
     if (!this.transporter) {
-      throw new Error('Transporteur SMTP non initialisé.');
+      throw new Error(
+        'Transporteur SMTP non configuré (variables MAIL_* manquantes ou mailpit interdit en production).',
+      );
     }
 
     const { email, nomComplet, resetUrl, expiresMinutes } = job.data;
@@ -159,4 +163,3 @@ export class MailWorkerService implements OnModuleInit, OnModuleDestroy {
     }
   }
 }
-

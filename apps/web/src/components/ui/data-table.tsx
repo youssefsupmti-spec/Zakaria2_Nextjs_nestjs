@@ -1,0 +1,158 @@
+'use client';
+
+import { flexRender, type RowData } from '@tanstack/react-table';
+import {
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useLegacyTable,
+  type LegacyColumnDef,
+} from '@tanstack/react-table/legacy';
+import { ArrowUpDown, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from './button';
+import { Input } from './input';
+
+interface DataTableProps<TData extends RowData> {
+  data: TData[];
+  columns: LegacyColumnDef<TData, unknown>[];
+  searchPlaceholder?: string;
+  emptyMessage?: string;
+  pageSize?: number;
+}
+
+export function DataTable<TData extends RowData>({
+  data,
+  columns,
+  searchPlaceholder = 'Rechercher…',
+  emptyMessage = 'Aucune donnée trouvée.',
+  pageSize = 10,
+}: DataTableProps<TData>) {
+  const [globalFilter, setGlobalFilter] = useState('');
+
+  const table = useLegacyTable({
+    data,
+    columns,
+    state: {
+      globalFilter,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize,
+      },
+    },
+  });
+
+  const rows = table.getRowModel().rows;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="relative w-full max-w-sm">
+          <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Input
+            value={globalFilter}
+            onChange={(event) => setGlobalFilter(event.target.value)}
+            placeholder={searchPlaceholder}
+            className="h-10 pl-10"
+          />
+        </div>
+        <p className="text-xs font-medium text-slate-500">
+          {table.getFilteredRowModel().rows.length} résultat(s)
+        </p>
+      </div>
+
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-xs">
+        <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
+          <thead className="bg-slate-50">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const canSort = header.column.getCanSort();
+                  return (
+                    <th
+                      key={header.id}
+                      className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-600"
+                    >
+                      {header.isPlaceholder ? null : canSort ? (
+                        <button
+                          type="button"
+                          onClick={header.column.getToggleSortingHandler()}
+                          className="inline-flex cursor-pointer items-center gap-1.5 hover:text-slate-900"
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />
+                        </button>
+                      ) : (
+                        flexRender(header.column.columnDef.header, header.getContext())
+                      )}
+                    </th>
+                  );
+                })}
+              </tr>
+            ))}
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {rows.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="px-4 py-10 text-center text-sm text-slate-500"
+                >
+                  {emptyMessage}
+                </td>
+              </tr>
+            ) : (
+              rows.map((row) => (
+                <tr key={row.id} className="transition hover:bg-slate-50/70">
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="px-4 py-3 align-middle text-slate-700">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {table.getPageCount() > 1 && (
+        <div className="flex items-center justify-between text-xs text-slate-600">
+          <span>
+            Page {table.getState().pagination.pageIndex + 1} sur {table.getPageCount()}
+          </span>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Précédent
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Suivant
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

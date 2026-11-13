@@ -16,4 +16,3 @@ export interface PasswordVerifyResult {
   valid: boolean;
   needsRehash: boolean;
 }
-

@@ -6,7 +6,35 @@
  * Les deux dernières règles PRÊTENT les glyphes arabes de Droid Arabic Kufi à la famille « Inter Variable » : tout texte
  * arabe s'affiche en Droid Arabic Kufi, même sans lang="ar", partout où la police est Inter.
  */
-@font-face{font-family:"Droid Arabic Kufi";font-style:normal;font-weight:400;font-display:swap;src:url("./droid-arabic-kufi-regular.woff") format("woff");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200F,U+FB50-FDFF,U+FE70-FEFC}
-@font-face{font-family:"Droid Arabic Kufi";font-style:normal;font-weight:700;font-display:swap;src:url("./droid-arabic-kufi-bold.woff") format("woff");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200F,U+FB50-FDFF,U+FE70-FEFC}
-@font-face{font-family:"Inter Variable";font-style:normal;font-weight:100 500;font-display:swap;src:url("./droid-arabic-kufi-regular.woff") format("woff");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200F,U+FB50-FDFF,U+FE70-FEFC}
-@font-face{font-family:"Inter Variable";font-style:normal;font-weight:600 900;font-display:swap;src:url("./droid-arabic-kufi-bold.woff") format("woff");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200F,U+FB50-FDFF,U+FE70-FEFC}
+@font-face {
+  font-family: 'Droid Arabic Kufi';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./droid-arabic-kufi-regular.woff') format('woff');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+FB50-FDFF, U+FE70-FEFC;
+}
+@font-face {
+  font-family: 'Droid Arabic Kufi';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./droid-arabic-kufi-bold.woff') format('woff');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+FB50-FDFF, U+FE70-FEFC;
+}
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 500;
+  font-display: swap;
+  src: url('./droid-arabic-kufi-regular.woff') format('woff');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+FB50-FDFF, U+FE70-FEFC;
+}
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 600 900;
+  font-display: swap;
+  src: url('./droid-arabic-kufi-bold.woff') format('woff');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-08FF, U+200C-200F, U+FB50-FDFF, U+FE70-FEFC;
+}

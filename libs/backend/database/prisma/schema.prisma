@@ -18,6 +18,25 @@ model AppBootCheck {
   @@map("app_boot_checks")
 }
 
+/// Zones logistiques territoriales G4D (Sprint 02-B / Chantier 33)
+model Zone {
+  id        Int       @id @default(autoincrement())
+  nom       String    @db.VarChar(255)
+  code      String    @unique @db.VarChar(50)
+  actif     Boolean   @default(true)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  villes          Ville[]
+  agenceZones     AgenceZone[]
+  membreZones     MembreZone[]
+  partenaireZones PartenaireZone[]
+
+  @@index([actif, deletedAt])
+  @@map("zones")
+}
+
 /// Référentiel des villes G4D (FK requise par users.ville_id, ID historique conservé)
 model Ville {
   id              Int       @id
@@ -28,9 +47,11 @@ model Ville {
   standardTarifId Int?      @map("standard_tarif_id")
   deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(6)
   createdAt       DateTime? @map("created_at") @db.Timestamptz(6)
-  updatedAt       DateTime? @map("updated_at") @db.Timestamptz(6)
+  updatedAt       DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  users User[]
+  zone    Zone?    @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  users   User[]
+  agences Agence[]
 
   @@index([nameFr])
   @@index([zoneId])
@@ -73,14 +94,20 @@ model User {
   createdAt                 DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt                 DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  ville           Ville?              @relation(fields: [villeId], references: [id], onDelete: SetNull)
-  parent          User?               @relation("UserSubAccounts", fields: [parentId], references: [id], onDelete: Cascade)
-  subAccounts     User[]              @relation("UserSubAccounts")
-  userRoles       UserRole[]
-  userPermissions UserPermission[]
-  ownedRoles      Role[]              @relation("RoleOwner")
-  authSessions    AuthSession[]
-  authLogs        AuthenticationLog[]
+  ville               Ville?               @relation(fields: [villeId], references: [id], onDelete: SetNull)
+  parent              User?                @relation("UserSubAccounts", fields: [parentId], references: [id], onDelete: Cascade)
+  subAccounts         User[]               @relation("UserSubAccounts")
+  userRoles           UserRole[]
+  userPermissions     UserPermission[]
+  ownedRoles          Role[]               @relation("RoleOwner")
+  clientScopedRoles   Role[]               @relation("RoleClientScope")
+  agencesResponsable  Agence[]             @relation("AgenceResponsable")
+  agenceMembres       AgenceMembre[]
+  partenaireCoursier  PartenaireCoursier?
+  partenaireMembres   PartenaireMembre[]
+  apiIdentifiants     ApiIdentifiant[]
+  authSessions        AuthSession[]
+  authLogs            AuthenticationLog[]
 
   @@index([email])
   @@index([villeId])
@@ -90,22 +117,34 @@ model User {
   @@map("users")
 }
 
-/// Rôles RBAC (globaux ou personnalisés C137 via owner_id/libelle)
+/// Rôles RBAC multi-organisations (portées: plateforme, agence, client, partenaire)
 model Role {
-  id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(255)
-  guardName String    @default("web") @map("guard_name") @db.VarChar(255)
-  ownerId   Int?      @map("owner_id")
-  libelle   String?   @db.VarChar(100)
-  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id             Int       @id @default(autoincrement())
+  name           String    @db.VarChar(255)
+  guardName      String    @default("web") @map("guard_name") @db.VarChar(255)
+  portee         String    @default("plateforme") @db.VarChar(32)
+  agenceId       Int?      @map("agence_id")
+  compteClientId Int?      @map("compte_client_id")
+  partenaireId   Int?      @map("partenaire_id")
+  systeme        Boolean   @default(false)
+  ownerId        Int?      @map("owner_id")
+  libelle        String?   @db.VarChar(100)
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   owner           User?            @relation("RoleOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  agence          Agence?          @relation(fields: [agenceId], references: [id], onDelete: Cascade)
+  compteClient    User?            @relation("RoleClientScope", fields: [compteClientId], references: [id], onDelete: Cascade)
+  partenaire      Partenaire?      @relation(fields: [partenaireId], references: [id], onDelete: Cascade)
   rolePermissions RolePermission[]
   userRoles       UserRole[]
 
   @@unique([name, guardName])
   @@index([ownerId])
+  @@index([portee])
+  @@index([agenceId])
+  @@index([compteClientId])
+  @@index([partenaireId])
   @@map("roles")
 }
 
@@ -161,6 +200,230 @@ model UserPermission {
   @@id([permissionId, userId])
   @@index([userId])
   @@map("user_permissions")
+}
+
+/// 1. Établissements physiques de distribution G4D (ex: Agence Salé)
+model Agence {
+  id            Int       @id @default(autoincrement())
+  nom           String    @db.VarChar(255)
+  code          String    @unique @db.VarChar(50)
+  villeId       Int?      @map("ville_id")
+  responsableId Int?      @map("responsable_id")
+  telephone     String?   @db.VarChar(50)
+  adresse       String?   @db.VarChar(500)
+  actif         Boolean   @default(true)
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz(6)
+  createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  ville             Ville?             @relation(fields: [villeId], references: [id], onDelete: SetNull)
+  responsable       User?              @relation("AgenceResponsable", fields: [responsableId], references: [id], onDelete: SetNull)
+  agenceZones       AgenceZone[]
+  membres           AgenceMembre[]
+  agencePartenaires AgencePartenaire[]
+  roles             Role[]
+
+  @@index([villeId])
+  @@index([responsableId])
+  @@index([actif, deletedAt])
+  @@map("agences")
+}
+
+/// 2. Définition des zones de compétence d'une agence (livraison / ramassage)
+model AgenceZone {
+  id        Int       @id @default(autoincrement())
+  agenceId  Int       @map("agence_id")
+  zoneId    Int       @map("zone_id")
+  livraison Boolean   @default(true)
+  ramassage Boolean   @default(true)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  agence Agence @relation(fields: [agenceId], references: [id], onDelete: Cascade)
+  zone   Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@unique([agenceId, zoneId])
+  @@index([zoneId])
+  @@map("agence_zone")
+}
+
+/// 3. Personnel rattaché à une ou plusieurs agences avec un rôle distinct par agence
+model AgenceMembre {
+  id        Int       @id @default(autoincrement())
+  agenceId  Int       @map("agence_id")
+  userId    Int       @map("user_id")
+  role      String    @db.VarChar(32)
+  actif     Boolean   @default(true)
+  depuis    DateTime? @db.Date
+  jusqua    DateTime? @db.Date
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  agence      Agence       @relation(fields: [agenceId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  membreZones MembreZone[]
+
+  @@unique([agenceId, userId])
+  @@index([userId, actif])
+  @@index([agenceId, role, actif])
+  @@map("agence_membres")
+}
+
+/// 4. Activité opérationnelle (livraison | ramassage) d'un membre d'agence sur une zone
+model MembreZone {
+  id             Int       @id @default(autoincrement())
+  agenceMembreId Int       @map("agence_membre_id")
+  zoneId         Int       @map("zone_id")
+  activite       String    @db.VarChar(32)
+  actif          Boolean   @default(true)
+  createdAt      DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  agenceMembre AgenceMembre @relation(fields: [agenceMembreId], references: [id], onDelete: Cascade)
+  zone         Zone         @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@unique([agenceMembreId, zoneId, activite])
+  @@index([zoneId, activite, actif])
+  @@map("membre_zones")
+}
+
+/// 5. Sociétés partenaires B2B de transport / messagerie
+model Partenaire {
+  id            Int       @id @default(autoincrement())
+  code          String    @unique @db.VarChar(50)
+  raisonSociale String    @map("raison_sociale") @db.VarChar(255)
+  ice           String?   @db.VarChar(64)
+  telephone     String?   @db.VarChar(50)
+  email         String?   @db.Citext
+  actif         Boolean   @default(true)
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamptz(6)
+  createdAt     DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  agencePartenaires AgencePartenaire[]
+  coursiers         PartenaireCoursier[]
+  membres           PartenaireMembre[]
+  connexions        PartenaireConnexion[]
+  apiIdentifiants   ApiIdentifiant[]
+  roles             Role[]
+
+  @@index([actif, deletedAt])
+  @@map("partenaires")
+}
+
+/// 6. Contrat liant une agence locale à une société partenaire
+model AgencePartenaire {
+  id           Int       @id @default(autoincrement())
+  agenceId     Int       @map("agence_id")
+  partenaireId Int       @map("partenaire_id")
+  depuis       DateTime? @db.Date
+  jusqua       DateTime? @db.Date
+  actif        Boolean   @default(true)
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  agence          Agence           @relation(fields: [agenceId], references: [id], onDelete: Cascade)
+  partenaire      Partenaire       @relation(fields: [partenaireId], references: [id], onDelete: Cascade)
+  partenaireZones PartenaireZone[]
+
+  @@unique([agenceId, partenaireId])
+  @@index([partenaireId, actif])
+  @@map("agence_partenaires")
+}
+
+/// 7. Zones confiées à un partenaire au titre d'un contrat d'agence
+model PartenaireZone {
+  id                 Int       @id @default(autoincrement())
+  agencePartenaireId Int       @map("agence_partenaire_id")
+  zoneId             Int       @map("zone_id")
+  actif              Boolean   @default(true)
+  createdAt          DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  agencePartenaire AgencePartenaire @relation(fields: [agencePartenaireId], references: [id], onDelete: Cascade)
+  zone             Zone             @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@unique([agencePartenaireId, zoneId])
+  @@index([zoneId, actif])
+  @@map("partenaire_zones")
+}
+
+/// 8. Coursiers d'une société partenaire (avec liaison optionnelle vers compte users historique)
+model PartenaireCoursier {
+  id           Int       @id @default(autoincrement())
+  partenaireId Int       @map("partenaire_id")
+  nom          String    @db.VarChar(255)
+  telephone    String?   @db.VarChar(50)
+  userId       Int?      @unique @map("user_id")
+  actif        Boolean   @default(true)
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  partenaire Partenaire @relation(fields: [partenaireId], references: [id], onDelete: Cascade)
+  user       User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([partenaireId, actif])
+  @@map("partenaire_coursiers")
+}
+
+/// Membres portail rattachés à une société partenaire (portée partenaire multi-utilisateurs)
+model PartenaireMembre {
+  id           Int       @id @default(autoincrement())
+  partenaireId Int       @map("partenaire_id")
+  userId       Int       @map("user_id")
+  role         String    @default("operateur") @db.VarChar(32)
+  actif        Boolean   @default(true)
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  partenaire Partenaire @relation(fields: [partenaireId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([partenaireId, userId])
+  @@index([userId, actif])
+  @@map("partenaire_membres")
+}
+
+/// 9. Connexions API sortantes vers les transporteurs partenaires (identifiants chiffrés)
+model PartenaireConnexion {
+  id                 Int       @id @default(autoincrement())
+  partenaireId       Int       @map("partenaire_id")
+  apiTypeCode        String    @default("custom") @map("api_type_code") @db.VarChar(64)
+  baseUrl            String    @map("base_url") @db.VarChar(500)
+  identifiantChiffre String    @map("identifiant_chiffre") @db.Text
+  secretChiffre      String    @map("secret_chiffre") @db.Text
+  actif              Boolean   @default(true)
+  createdAt          DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  partenaire Partenaire @relation(fields: [partenaireId], references: [id], onDelete: Cascade)
+
+  @@index([partenaireId, actif])
+  @@map("partenaire_connexions")
+}
+
+/// 10. Clés API entrantes B2B (HMAC-SHA256 avec API_SECRET_PEPPER ; interdit sur sous-comptes D-09)
+model ApiIdentifiant {
+  id              Int       @id @default(autoincrement())
+  partenaireId    Int?      @map("partenaire_id")
+  userId          Int?      @map("user_id")
+  libelle         String    @db.VarChar(120)
+  clePublique     String    @unique @map("cle_publique") @db.VarChar(64)
+  secretEmpreinte String    @map("secret_empreinte") @db.VarChar(128)
+  scopes          Json?
+  actif           Boolean   @default(true)
+  expiresAt       DateTime? @map("expires_at") @db.Timestamptz(6)
+  lastUsedAt      DateTime? @map("last_used_at") @db.Timestamptz(6)
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz(6)
+  createdAt       DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  partenaire Partenaire? @relation(fields: [partenaireId], references: [id], onDelete: Cascade)
+  user       User?       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([partenaireId, actif])
+  @@index([userId, actif])
+  @@map("api_identifiants")
 }
 
 /// Sessions opaques PostgreSQL (id = hash SHA-256 du jeton cookie __Host-g4d.session)

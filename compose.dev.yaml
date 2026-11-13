@@ -19,13 +19,27 @@ services:
       timeout: 5s
       retries: 5
 
-  redis:
+  redis-cache:
     image: redis:8-alpine
-    container_name: zakaria2-redis-dev
+    container_name: zakaria2-redis-cache-dev
+    restart: unless-stopped
+    command:
+      ['redis-server', '--maxmemory', '256mb', '--maxmemory-policy', 'allkeys-lru', '--save', '']
+    ports:
+      - '127.0.0.1:56379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'PING']
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis-queue:
+    image: redis:8-alpine
+    container_name: zakaria2-redis-queue-dev
     restart: unless-stopped
     command: ['redis-server', '--appendonly', 'yes', '--maxmemory-policy', 'noeviction']
     ports:
-      - '127.0.0.1:56379:6379'
+      - '127.0.0.1:56380:6379'
     volumes:
       - zakaria2_redis8_data:/data
     healthcheck:
@@ -34,7 +48,14 @@ services:
       timeout: 3s
       retries: 5
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: zakaria2-mailpit-dev
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:1025:1025'
+      - '127.0.0.1:8025:8025'
+
 volumes:
   zakaria2_pg18_data:
   zakaria2_redis8_data:
-

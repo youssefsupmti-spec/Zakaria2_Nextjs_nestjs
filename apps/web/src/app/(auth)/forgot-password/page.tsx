@@ -18,4 +18,3 @@ export default function ForgotPasswordPage() {
     </G4dAuthShell>
   );
 }
-

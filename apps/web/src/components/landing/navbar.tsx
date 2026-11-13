@@ -43,9 +43,7 @@ export function Navbar({ preloaderHidden }: { preloaderHidden: boolean }) {
             <div className="g4d-preloader__bar"></div>
           </div>
 
-          <p className="g4d-preloader__tagline">
-            Le Meilleur Dans Le Domaine
-          </p>
+          <p className="g4d-preloader__tagline">Le Meilleur Dans Le Domaine</p>
         </div>
       </div>
 
@@ -82,11 +80,7 @@ export function Navbar({ preloaderHidden }: { preloaderHidden: boolean }) {
         <div className="d-flex flex-column tw-gap-8">
           <div>
             <Link href="/" className="cursor-big">
-              <img
-                src={G4D_LOGO_PATH}
-                alt="G4D — Group For Delivery"
-                className="g4d-logo"
-              />
+              <img src={G4D_LOGO_PATH} alt="G4D — Group For Delivery" className="g4d-logo" />
             </Link>
           </div>
           <div>
@@ -113,10 +107,7 @@ export function Navbar({ preloaderHidden }: { preloaderHidden: boolean }) {
                 <span className="tw-w-10 tw-h-10 flex-shrink-0 bg-main-600 rounded-circle text-white tw-text-xl d-flex justify-content-center align-items-center">
                   <FeatherIcon name="telephone" />
                 </span>
-                <a
-                  href="tel:+212623344607"
-                  className="text-main-two-600 fw-medium"
-                >
+                <a href="tel:+212623344607" className="text-main-two-600 fw-medium">
                   (+212)6 23 34 46 07
                 </a>
               </div>
@@ -145,11 +136,7 @@ export function Navbar({ preloaderHidden }: { preloaderHidden: boolean }) {
         </button>
         <div className="mobile-menu__inner">
           <Link href="/" className="mobile-menu__logo d-block tw-mb-8">
-            <img
-              src={G4D_LOGO_PATH}
-              alt="G4D — Group For Delivery"
-              className="g4d-logo-sm"
-            />
+            <img src={G4D_LOGO_PATH} alt="G4D — Group For Delivery" className="g4d-logo-sm" />
           </Link>
           <div className="mobile-menu__menu">
             <ul className="nav-menu cursor-small d-block nav-menu--mobile tw-mt-8">
@@ -203,16 +190,10 @@ export function Navbar({ preloaderHidden }: { preloaderHidden: boolean }) {
               </li>
             </ul>
             <div className="d-flex flex-column tw-gap-4 tw-mt-8">
-              <a
-                href="/login"
-                className="btn btn-main-two rounded-0 tw-py-4 text-center"
-              >
+              <a href="/login" className="btn btn-main-two rounded-0 tw-py-4 text-center">
                 Se connecter
               </a>
-              <a
-                href="/login"
-                className="btn btn-main rounded-0 tw-py-4 text-center"
-              >
+              <a href="/login" className="btn btn-main rounded-0 tw-py-4 text-center">
                 Devenir client
               </a>
             </div>
@@ -290,21 +271,13 @@ export function Navbar({ preloaderHidden }: { preloaderHidden: boolean }) {
               {/* Logo Desktop */}
               <div className="logo-mask-bg cursor-big position-relative d-lg-flex d-none z-1 tw-w-156-px d-flex justify-content-center align-items-center">
                 <Link href="/" className="tw-mt-7">
-                  <img
-                    src={G4D_LOGO_PATH}
-                    alt="G4D — Group For Delivery"
-                    className="g4d-logo"
-                  />
+                  <img src={G4D_LOGO_PATH} alt="G4D — Group For Delivery" className="g4d-logo" />
                 </Link>
               </div>
               {/* Logo Mobile */}
               <div className="position-relative d-lg-none d-inline-block z-1">
                 <Link href="/" className="cursor-big">
-                  <img
-                    src={G4D_LOGO_PATH}
-                    alt="G4D — Group For Delivery"
-                    className="g4d-logo-sm"
-                  />
+                  <img src={G4D_LOGO_PATH} alt="G4D — Group For Delivery" className="g4d-logo-sm" />
                 </Link>
               </div>
 

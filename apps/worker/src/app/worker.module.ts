@@ -7,4 +7,3 @@ import { MailWorkerService } from './mail-worker.service';
   providers: [MailWorkerService],
 })
 export class WorkerModule {}
-

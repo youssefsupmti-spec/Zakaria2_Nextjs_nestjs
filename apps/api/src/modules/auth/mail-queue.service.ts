@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { Queue } from 'bullmq';
-import { loadBackendEnv } from '@zakaria/backend-config';
+import { getBullMqConnectionOptions, loadBackendEnv } from '@zakaria/backend-config';
 import {
   MAIL_JOB_PASSWORD_RESET,
   MAIL_QUEUE_NAME,
@@ -16,13 +16,7 @@ export class MailQueueService implements OnModuleDestroy {
     const env = loadBackendEnv();
     this.queue = new Queue<PasswordResetMailJobPayload>(MAIL_QUEUE_NAME, {
       prefix: env.REDIS_PREFIX,
-      connection: {
-        host: env.REDIS_HOST,
-        port: env.REDIS_PORT,
-        username: env.REDIS_USERNAME,
-        password: env.REDIS_PASSWORD,
-        maxRetriesPerRequest: null,
-      },
+      connection: getBullMqConnectionOptions(env),
       defaultJobOptions: {
         attempts: 3,
         backoff: {
@@ -47,4 +41,3 @@ export class MailQueueService implements OnModuleDestroy {
     await this.queue.close();
   }
 }
-

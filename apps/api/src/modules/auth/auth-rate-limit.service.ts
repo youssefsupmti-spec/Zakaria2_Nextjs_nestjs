@@ -62,7 +62,10 @@ export class AuthRateLimitService {
     const ipCount = Number(ipRaw ?? 0);
 
     if (acctCount >= MAX_LOGIN_FAILURES_ACCOUNT || ipCount >= MAX_LOGIN_ATTEMPTS_IP) {
-      const waitMinutes = Math.max(1, Math.ceil((acctTtl > 0 ? acctTtl : LOGIN_WINDOW_SECONDS) / 60));
+      const waitMinutes = Math.max(
+        1,
+        Math.ceil((acctTtl > 0 ? acctTtl : LOGIN_WINDOW_SECONDS) / 60),
+      );
       throw new HttpException(
         `Trop de tentatives de connexion. Veuillez réessayer dans environ ${waitMinutes} minute(s).`,
         HttpStatus.TOO_MANY_REQUESTS,

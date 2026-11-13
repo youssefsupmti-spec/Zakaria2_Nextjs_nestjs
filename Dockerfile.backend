@@ -22,7 +22,7 @@ RUN pnpm run db:generate && \
     node -e "require('@node-rs/argon2')" && \
     pnpm exec tsc -p apps/api/tsconfig.json && \
     pnpm exec tsc -p apps/worker/tsconfig.json && \
-    mkdir -p node_modules/@zakaria && \
+    mkdir -p /app/storage/uploads node_modules/@zakaria && \
     ln -sf /app/dist/apps/api/libs/shared/contracts/src node_modules/@zakaria/shared-contracts && \
     ln -sf /app/dist/apps/api/libs/backend/config/src node_modules/@zakaria/backend-config && \
     ln -sf /app/dist/apps/api/libs/backend/database/src node_modules/@zakaria/backend-database

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* ============================================================================
  * POLICES LOCALES AUTO-HÉBERGÉES (ZÉRO GOOGLE FONTS — RÈGLE PROPRIÉTAIRE G4D)
@@ -30,12 +30,12 @@
 
 :root {
   /* Identité Visuelle Officielle G4D — Group For Delivery (Zakaria2) */
-  --g4d-blue: #1B9DD9;
-  --g4d-blue-light: #3FB4E8;
-  --g4d-blue-dark: #0E86C2;
-  --g4d-orange: #F9A03F;
-  --g4d-orange-dark: #E08A2B;
-  --g4d-navy: #0F172A;
+  --g4d-blue: #1b9dd9;
+  --g4d-blue-light: #3fb4e8;
+  --g4d-blue-dark: #0e86c2;
+  --g4d-orange: #f9a03f;
+  --g4d-orange-dark: #e08a2b;
+  --g4d-navy: #0f172a;
   --g4d-navy-deep: #0c1e2c;
 
   --background: #ffffff;
@@ -51,7 +51,9 @@
   --color-g4d-navy: var(--g4d-navy);
   --color-g4d-navy-deep: var(--g4d-navy-deep);
 
-  --font-sans: 'Inter Variable', 'Droid Arabic Kufi', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans:
+    'Inter Variable', 'Droid Arabic Kufi', ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 html {
@@ -74,7 +76,8 @@ body {
 
 /* Animations fluides pour la Landing Page G4D */
 @keyframes floatSlow {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -84,4 +87,16 @@ body {
 
 .animate-float-slow {
   animation: floatSlow 5s ease-in-out infinite;
+}
+
+/* Neutralisation définitive du fond jaune Chrome Autofill (#fefce8) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+  caret-color: #0f172a !important;
+  transition: background-color 9999s ease-out 0s;
 }

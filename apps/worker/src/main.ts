@@ -17,4 +17,3 @@ async function bootstrapWorker(): Promise<void> {
 }
 
 void bootstrapWorker();
-

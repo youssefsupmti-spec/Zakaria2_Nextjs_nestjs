@@ -15,13 +15,10 @@ export const RequirePermissions = (...permissions: string[]) =>
  */
 export const CurrentAuth = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): AuthContext => {
-    const request = ctx
-      .switchToHttp()
-      .getRequest<FastifyRequest & { authContext?: AuthContext }>();
+    const request = ctx.switchToHttp().getRequest<FastifyRequest & { authContext?: AuthContext }>();
     if (!request.authContext) {
       throw new Error('CurrentAuth utilisé sans SessionAuthGuard.');
     }
     return request.authContext;
   },
 );
-

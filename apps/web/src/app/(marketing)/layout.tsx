@@ -3,41 +3,17 @@ import type { ReactNode } from 'react';
 export default function MarketingLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <link
-        rel="stylesheet"
-        href="/fonts/filament/filament/inter/index.css"
-        precedence="default"
-      />
-      <link
-        rel="stylesheet"
-        href="/fonts/wx/index.css"
-        precedence="default"
-      />
-      <link
-        rel="stylesheet"
-        href="/assets/landing/css/bootstrap.min.css"
-        precedence="default"
-      />
+      <link rel="stylesheet" href="/fonts/filament/filament/inter/index.css" precedence="default" />
+      <link rel="stylesheet" href="/fonts/wx/index.css" precedence="default" />
+      <link rel="stylesheet" href="/assets/landing/css/bootstrap.min.css" precedence="default" />
       <link
         rel="stylesheet"
         href="/assets/landing/css/swiper-bundle.min.css"
         precedence="default"
       />
-      <link
-        rel="stylesheet"
-        href="/assets/landing/css/aos.css"
-        precedence="default"
-      />
-      <link
-        rel="stylesheet"
-        href="/assets/landing/css/main.css"
-        precedence="default"
-      />
-      <link
-        rel="stylesheet"
-        href="/assets/landing/css/font-awesome.min.css"
-        precedence="default"
-      />
+      <link rel="stylesheet" href="/assets/landing/css/aos.css" precedence="default" />
+      <link rel="stylesheet" href="/assets/landing/css/main.css" precedence="default" />
+      <link rel="stylesheet" href="/assets/landing/css/font-awesome.min.css" precedence="default" />
       <link
         rel="stylesheet"
         href="/assets/landing/css/landing.css?v=20261112-7"

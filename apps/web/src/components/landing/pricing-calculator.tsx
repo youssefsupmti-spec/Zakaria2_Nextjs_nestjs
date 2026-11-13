@@ -30,10 +30,22 @@ const CITY_FEES: CityFee[] = [
   { id: 17, name_fr: 'Chefchaouen', frais_livraison: 40, frais_retour: 0, delay: '24h - 48h' },
   { id: 18, name_fr: 'Dakhla', frais_livraison: 45, frais_retour: 0, delay: '48h - 72h' },
   { id: 19, name_fr: 'Dar Bouazza', frais_livraison: 25, frais_retour: 0, delay: '24h' },
-  { id: 20, name_fr: 'Dcheira El Jihadia', frais_livraison: 35, frais_retour: 0, delay: '24h - 48h' },
+  {
+    id: 20,
+    name_fr: 'Dcheira El Jihadia',
+    frais_livraison: 35,
+    frais_retour: 0,
+    delay: '24h - 48h',
+  },
   { id: 21, name_fr: 'El Hajeb', frais_livraison: 35, frais_retour: 0, delay: '24h - 48h' },
   { id: 22, name_fr: 'El Jadida', frais_livraison: 35, frais_retour: 0, delay: '24h' },
-  { id: 23, name_fr: 'El Kelaa des Sraghna', frais_livraison: 35, frais_retour: 0, delay: '24h - 48h' },
+  {
+    id: 23,
+    name_fr: 'El Kelaa des Sraghna',
+    frais_livraison: 35,
+    frais_retour: 0,
+    delay: '24h - 48h',
+  },
   { id: 24, name_fr: 'Errachidia', frais_livraison: 40, frais_retour: 0, delay: '24h - 48h' },
   { id: 25, name_fr: 'Essaouira', frais_livraison: 35, frais_retour: 0, delay: '24h - 48h' },
   { id: 26, name_fr: 'Fès', frais_livraison: 35, frais_retour: 0, delay: '24h' },
@@ -109,10 +121,7 @@ export function PricingCalculator() {
   }, [search]);
 
   const totalCount = search.trim() ? filteredFees.length : TOTAL_CITIES;
-  const lastPage = Math.max(
-    1,
-    Math.ceil(filteredFees.length / PER_PAGE)
-  );
+  const lastPage = Math.max(1, Math.ceil(filteredFees.length / PER_PAGE));
   const safePage = Math.min(currentPage, lastPage);
 
   const pageItems = useMemo(() => {
@@ -120,17 +129,12 @@ export function PricingCalculator() {
     return filteredFees.slice(start, start + PER_PAGE);
   }, [filteredFees, safePage]);
 
-  const firstItem =
-    filteredFees.length === 0 ? 0 : (safePage - 1) * PER_PAGE + 1;
+  const firstItem = filteredFees.length === 0 ? 0 : (safePage - 1) * PER_PAGE + 1;
   const lastItem = Math.min(safePage * PER_PAGE, filteredFees.length);
 
   const pages = useMemo(() => {
     const set = new Set<number>([1]);
-    for (
-      let p = Math.max(2, safePage - 1);
-      p <= Math.min(lastPage - 1, safePage + 1);
-      p++
-    ) {
+    for (let p = Math.max(2, safePage - 1); p <= Math.min(lastPage - 1, safePage + 1); p++) {
       set.add(p);
     }
     if (lastPage > 1) set.add(lastPage);
@@ -147,12 +151,9 @@ export function PricingCalculator() {
               <i className="fas fa-truck-fast" aria-hidden="true"></i>
             </span>
             <div>
-              <h5 className="fw-bold mb-0 text-main-two-600 cursor-big">
-                Tarifs de livraison
-              </h5>
+              <h5 className="fw-bold mb-0 text-main-two-600 cursor-big">Tarifs de livraison</h5>
               <p className="text-neutral-700 small mb-0 cursor-small">
-                Recherchez votre ville de destination, votre tarif
-                s&apos;affiche instantanément
+                Recherchez votre ville de destination, votre tarif s&apos;affiche instantanément
               </p>
             </div>
           </div>
@@ -161,18 +162,12 @@ export function PricingCalculator() {
         {/* Stats bar — 3 métriques */}
         <div className="d-flex flex-wrap gap-2">
           <div className="g4d-pc-stat">
-            <i
-              className="fas fa-map-location-dot g4d-pc-stat__icon"
-              aria-hidden="true"
-            ></i>
+            <i className="fas fa-map-location-dot g4d-pc-stat__icon" aria-hidden="true"></i>
             <span className="g4d-pc-stat__num">{TOTAL_CITIES}</span>
             <span className="g4d-pc-stat__label">villes tarifées</span>
           </div>
           <div className="g4d-pc-stat">
-            <i
-              className="fas fa-layer-group g4d-pc-stat__icon"
-              aria-hidden="true"
-            ></i>
+            <i className="fas fa-layer-group g4d-pc-stat__icon" aria-hidden="true"></i>
             <span className="g4d-pc-stat__num">{TOTAL_ZONES}</span>
             <span className="g4d-pc-stat__label">zones de livraison</span>
           </div>
@@ -243,26 +238,16 @@ export function PricingCalculator() {
               <table className="g4d-tarifs-table" suppressHydrationWarning>
                 <thead className="g4d-tarifs-table__head">
                   <tr>
-                    <th className="g4d-tarifs-table__th">
-                      Ville de destination
-                    </th>
-                    <th className="g4d-tarifs-table__th g4d-tarifs-table__th--end">
-                      Livraison
-                    </th>
-                    <th className="g4d-tarifs-table__th g4d-tarifs-table__th--end">
-                      Retour
-                    </th>
-                    <th className="g4d-tarifs-table__th g4d-tarifs-table__th--end">
-                      Délai
-                    </th>
+                    <th className="g4d-tarifs-table__th">Ville de destination</th>
+                    <th className="g4d-tarifs-table__th g4d-tarifs-table__th--end">Livraison</th>
+                    <th className="g4d-tarifs-table__th g4d-tarifs-table__th--end">Retour</th>
+                    <th className="g4d-tarifs-table__th g4d-tarifs-table__th--end">Délai</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pageItems.map((fee) => (
                     <tr className="g4d-tarifs-table__tr" key={fee.id}>
-                      <td className="g4d-tarifs-table__td-city">
-                        {fee.name_fr}
-                      </td>
+                      <td className="g4d-tarifs-table__td-city">{fee.name_fr}</td>
                       <td className="g4d-tarifs-table__td-amount g4d-tarifs-table__td-amount--end">
                         <span className="g4d-tarifs-table__price g4d-tarifs-table__price--livraison">
                           {formatAmount(fee.frais_livraison)}&nbsp;DH
@@ -274,9 +259,7 @@ export function PricingCalculator() {
                         </span>
                       </td>
                       <td className="g4d-tarifs-table__td-amount g4d-tarifs-table__td-amount--end">
-                        <span className="text-neutral-700 cursor-small">
-                          {fee.delay || '—'}
-                        </span>
+                        <span className="text-neutral-700 cursor-small">{fee.delay || '—'}</span>
                       </td>
                     </tr>
                   ))}
@@ -288,9 +271,7 @@ export function PricingCalculator() {
               <div className="g4d-tarifs-card__empty-icon">
                 <i className="fas fa-magnifying-glass" aria-hidden="true"></i>
               </div>
-              <p className="fw-semibold text-main-two-600 mb-1 cursor-big">
-                Aucune ville trouvée
-              </p>
+              <p className="fw-semibold text-main-two-600 mb-1 cursor-big">Aucune ville trouvée</p>
               <p className="text-neutral-500 small mb-0 cursor-small">
                 Aucun résultat pour <strong>«&nbsp;{search}&nbsp;»</strong>
               </p>
@@ -358,10 +339,8 @@ export function PricingCalculator() {
       )}
 
       <p className="text-neutral-400 small text-center mt-3 mb-0 cursor-small">
-        Tarifs standards HT &middot; Hors assurance &middot; Valables
-        jusqu&apos;à modification
+        Tarifs standards HT &middot; Hors assurance &middot; Valables jusqu&apos;à modification
       </p>
     </div>
   );
 }
-

@@ -1,17 +1,21 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { loadBackendEnv } from '@zakaria/backend-config';
 import { DatabaseService } from '@zakaria/backend-database';
 import {
   SESSION_DURATION_TTL_SECONDS,
   SessionDurationSchema,
+  type ActiveSessionItemDto,
   type SessionDuration,
 } from '@zakaria/shared-contracts';
+import { AccessContextService } from '../access-control/access-context.service';
 import type { AuthContext, RequestMeta } from './auth.types';
-import {
-  PermissionResolverService,
-  type ResolvedUserAccess,
-} from './permission-resolver.service';
+import { PermissionResolverService, type ResolvedUserAccess } from './permission-resolver.service';
 
 const SESSION_CACHE_TTL_SECONDS = 60;
 const LAST_ACTIVE_TOUCH_INTERVAL_MS = 5 * 60 * 1000;
@@ -23,6 +27,7 @@ export class SessionService {
   constructor(
     private readonly database: DatabaseService,
     private readonly permissionResolver: PermissionResolverService,
+    private readonly accessContextService: AccessContextService,
   ) {}
 
   hashToken(rawToken: string): string {
@@ -53,9 +58,7 @@ export class SessionService {
       );
     }
     if (resolved.user.parentId !== null && (resolved.parentDeleted || !resolved.parentActive)) {
-      throw new ForbiddenException(
-        'Le compte principal titulaire est désactivé ou suspendu.',
-      );
+      throw new ForbiddenException('Le compte principal titulaire est désactivé ou suspendu.');
     }
     if (resolved.user.roles.length === 0) {
       throw new ForbiddenException(
@@ -68,7 +71,12 @@ export class SessionService {
     userId: number,
     durationCode: SessionDuration,
     meta: RequestMeta,
-  ): Promise<{ rawToken: string; sessionId: string; expiresAt: Date; durationCode: SessionDuration }> {
+  ): Promise<{
+    rawToken: string;
+    sessionId: string;
+    expiresAt: Date;
+    durationCode: SessionDuration;
+  }> {
     const rawToken = randomBytes(32).toString('base64url');
     const sessionId = this.hashToken(rawToken);
     const ttlSeconds = SESSION_DURATION_TTL_SECONDS[durationCode];
@@ -94,7 +102,7 @@ export class SessionService {
     }
 
     const sessionId = this.hashToken(rawToken);
-    const redis = this.database.getRedisClient();
+    const redis = this.database.getCacheRedisClient();
     const cacheKey = this.sessionCacheKey(sessionId);
 
     let sessionMeta: {
@@ -198,6 +206,8 @@ export class SessionService {
 
     this.assertAccountAccessAllowed(resolved);
 
+    const accessContext = await this.accessContextService.resolveForUser(resolved.user);
+
     if (Date.now() - sessionMeta.lastActiveAt.getTime() > LAST_ACTIVE_TOUCH_INTERVAL_MS) {
       void this.database.prisma.authSession
         .update({
@@ -211,8 +221,59 @@ export class SessionService {
       sessionId,
       durationCode: sessionMeta.durationCode,
       expiresAt: sessionMeta.expiresAt,
-      user: resolved.user,
+      user: {
+        ...resolved.user,
+        accessContext,
+      },
     };
+  }
+
+  async listActiveSessions(
+    userId: number,
+    currentSessionId: string,
+  ): Promise<ActiveSessionItemDto[]> {
+    const rows = await this.database.prisma.authSession.findMany({
+      where: {
+        userId,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
+      orderBy: { lastActiveAt: 'desc' },
+      select: {
+        id: true,
+        durationCode: true,
+        expiresAt: true,
+        lastActiveAt: true,
+        createdAt: true,
+        ipAddress: true,
+        userAgent: true,
+      },
+    });
+
+    return rows.map((row) => {
+      const parsedDuration = SessionDurationSchema.safeParse(row.durationCode);
+      return {
+        id: row.id,
+        durationCode: parsedDuration.success ? parsedDuration.data : '8h',
+        expiresAt: row.expiresAt.toISOString(),
+        lastActiveAt: row.lastActiveAt.toISOString(),
+        createdAt: row.createdAt.toISOString(),
+        ipAddress: row.ipAddress,
+        userAgent: row.userAgent,
+        isCurrent: row.id === currentSessionId,
+      };
+    });
+  }
+
+  async revokeOwnSession(userId: number, targetSessionId: string): Promise<void> {
+    const existing = await this.database.prisma.authSession.findFirst({
+      where: { id: targetSessionId, userId },
+      select: { id: true },
+    });
+    if (!existing) {
+      throw new NotFoundException('Session introuvable ou non autorisée.');
+    }
+    await this.revokeSessionById(targetSessionId, 'user_revoked');
   }
 
   async revokeSessionByToken(rawToken: string, reason = 'logout'): Promise<number | null> {
@@ -267,4 +328,3 @@ export class SessionService {
     await this.permissionResolver.invalidateUserCache(userId);
   }
 }
-

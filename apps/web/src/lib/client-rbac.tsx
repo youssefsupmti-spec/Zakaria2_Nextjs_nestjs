@@ -59,4 +59,3 @@ export function Can({
   const allowed = usePermission(permission);
   return allowed ? <>{children}</> : <>{fallback}</>;
 }
-

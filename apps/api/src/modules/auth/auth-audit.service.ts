@@ -38,11 +38,7 @@ export class AuthAuditService {
 
   constructor(private readonly database: DatabaseService) {}
 
-  async record(
-    event: AuthAuditEvent,
-    userId: number | null,
-    meta: RequestMeta,
-  ): Promise<void> {
+  async record(event: AuthAuditEvent, userId: number | null, meta: RequestMeta): Promise<void> {
     const parsed = parseUserAgentSummary(meta.userAgent);
     try {
       await this.database.prisma.authenticationLog.create({
@@ -64,4 +60,3 @@ export class AuthAuditService {
     }
   }
 }
-

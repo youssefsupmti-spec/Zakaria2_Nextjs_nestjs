@@ -1,10 +1,5 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
-import {
-  BadRequestException,
-  Injectable,
-  Logger,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { loadBackendEnv } from '@zakaria/backend-config';
 import { DatabaseService } from '@zakaria/backend-database';
 import {
@@ -15,6 +10,7 @@ import {
   type LoginResponseDto,
   type SessionDuration,
 } from '@zakaria/shared-contracts';
+import { AccessContextService } from '../access-control/access-context.service';
 import { AuthAuditService } from './auth-audit.service';
 import { AuthRateLimitService } from './auth-rate-limit.service';
 import type { RequestMeta } from './auth.types';
@@ -40,6 +36,7 @@ export class AuthService {
     private readonly sessionService: SessionService,
     private readonly audit: AuthAuditService,
     private readonly mailQueue: MailQueueService,
+    private readonly accessContextService: AccessContextService,
   ) {}
 
   private hashResetToken(rawToken: string): string {
@@ -118,7 +115,10 @@ export class AuthService {
 
     const durationCode: SessionDuration =
       parsed.data.sessionDuration ?? (parsed.data.rememberMe ? '30d' : '8h');
-    const session = await this.sessionService.createSession(user.id, durationCode, meta);
+    const [session, accessContext] = await Promise.all([
+      this.sessionService.createSession(user.id, durationCode, meta),
+      this.accessContextService.resolveForUser(resolved.user, true),
+    ]);
 
     await this.rateLimit.clearLoginFailures(ipKey, emailNormalized);
     await this.audit.record('login', user.id, meta);
@@ -127,7 +127,10 @@ export class AuthService {
       rawToken: session.rawToken,
       ttlSeconds: SESSION_DURATION_TTL_SECONDS[durationCode],
       response: {
-        user: resolved.user,
+        user: {
+          ...resolved.user,
+          accessContext,
+        },
         sessionExpiresAt: session.expiresAt.toISOString(),
         sessionDuration: durationCode,
         redirectTo: '/dashboard',
@@ -143,15 +146,10 @@ export class AuthService {
     }
   }
 
-  async requestPasswordReset(
-    rawPayload: unknown,
-    meta: RequestMeta,
-  ): Promise<{ message: string }> {
+  async requestPasswordReset(rawPayload: unknown, meta: RequestMeta): Promise<{ message: string }> {
     const parsed = ForgotPasswordRequestSchema.safeParse(rawPayload);
     if (!parsed.success) {
-      throw new BadRequestException(
-        parsed.error.issues[0]?.message ?? 'Adresse e-mail invalide.',
-      );
+      throw new BadRequestException(parsed.error.issues[0]?.message ?? 'Adresse e-mail invalide.');
     }
 
     const emailNormalized = parsed.data.email.trim().toLowerCase();
@@ -221,10 +219,7 @@ export class AuthService {
     return { message: NEUTRAL_FORGOT_PASSWORD_MESSAGE };
   }
 
-  async resetPassword(
-    rawPayload: unknown,
-    meta: RequestMeta,
-  ): Promise<{ message: string }> {
+  async resetPassword(rawPayload: unknown, meta: RequestMeta): Promise<{ message: string }> {
     const parsed = ResetPasswordRequestSchema.safeParse(rawPayload);
     if (!parsed.success) {
       throw new BadRequestException(
@@ -245,9 +240,7 @@ export class AuthService {
 
     const expectedHash = this.hashResetToken(parsed.data.token.trim());
     if (!this.safeEqualHex(expectedHash, tokenRecord.token)) {
-      throw new BadRequestException(
-        'Ce lien de réinitialisation est invalide ou a expiré.',
-      );
+      throw new BadRequestException('Ce lien de réinitialisation est invalide ou a expiré.');
     }
 
     const fallbackExpiry = tokenRecord.createdAt
@@ -305,4 +298,3 @@ export class AuthService {
     };
   }
 }
-

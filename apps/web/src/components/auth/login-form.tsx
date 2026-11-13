@@ -1,16 +1,36 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertCircle, ArrowRight, Clock, Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import {
   LoginRequestSchema,
-  SESSION_DURATION_OPTIONS,
   type LoginRequestDto,
   type LoginResponseDto,
+  type SessionDuration,
 } from '@zakaria/shared-contracts';
+import { ApiClientError, apiFetch } from '@/lib/api-client';
 
-export function LoginForm() {
+interface LoginFormProps {
+  nextRedirect?: string;
+}
+
+const SESSION_PILL_OPTIONS: ReadonlyArray<{
+  value: SessionDuration;
+  pill: string;
+  details: string;
+}> = [
+  { value: '30m', pill: '30m', details: '30 minutes' },
+  { value: '2h', pill: '2h', details: '2 heures' },
+  { value: '8h', pill: '8h', details: '8 heures (Par défaut)' },
+  { value: '1d', pill: '24h', details: '24 heures' },
+  { value: '7d', pill: '7j', details: '7 jours' },
+  { value: '30d', pill: '30j', details: '30 jours' },
+];
+
+export function LoginForm({ nextRedirect }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [authFeedback, setAuthFeedback] = useState<{
     type: 'error' | 'info';
@@ -20,6 +40,8 @@ export function LoginForm() {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginRequestDto>({
     resolver: zodResolver(LoginRequestSchema),
@@ -30,44 +52,36 @@ export function LoginForm() {
     },
   });
 
+  const selectedDuration = watch('sessionDuration') ?? '8h';
+  const activeOption =
+    SESSION_PILL_OPTIONS.find((item) => item.value === selectedDuration) ?? SESSION_PILL_OPTIONS[2];
+
   const onSubmit = async (values: LoginRequestDto) => {
     setAuthFeedback(null);
     try {
-      const response = await fetch('/api/v1/auth/login', {
+      const body = await apiFetch<LoginResponseDto>('/auth/login', {
         method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
+        body: {
           email: values.email,
           password: values.password,
           sessionDuration: values.sessionDuration ?? '8h',
-        }),
+        },
       });
 
-      const body = (await response.json().catch(() => null)) as
-        | LoginResponseDto
-        | { message?: string | string[] }
-        | null;
-
-      if (!response.ok) {
-        const rawMsg = body && 'message' in body ? body.message : undefined;
-        const message = Array.isArray(rawMsg)
-          ? rawMsg[0]
-          : rawMsg || 'Identifiants invalides ou accès refusé.';
+      const safeNext =
+        nextRedirect && nextRedirect.startsWith('/') && !nextRedirect.startsWith('//')
+          ? nextRedirect
+          : null;
+      const redirectTo = safeNext ?? (body?.redirectTo ? body.redirectTo : '/dashboard');
+      window.location.assign(redirectTo);
+    } catch (error) {
+      if (error instanceof ApiClientError) {
         setAuthFeedback({
           type: 'error',
-          message,
+          message: error.message || 'Identifiants invalides ou accès refusé.',
         });
         return;
       }
-
-      const redirectTo =
-        body && 'redirectTo' in body && body.redirectTo ? body.redirectTo : '/dashboard';
-      window.location.assign(redirectTo);
-    } catch {
       setAuthFeedback({
         type: 'error',
         message: 'Impossible de joindre le serveur d’authentification G4D.',
@@ -79,183 +93,175 @@ export function LoginForm() {
     <>
       {authFeedback && (
         <div
-          className={`mb-[22px] flex items-start gap-2.5 rounded-none border-[1.5px] px-4 py-3 text-[13px] font-semibold ${
+          role="alert"
+          className={`mb-5 flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-[13px] font-medium ${
             authFeedback.type === 'error'
-              ? 'border-[#FECACA] bg-[#FEF2F2] text-[#B91C1C]'
-              : 'border-[#BAE6FD] bg-[#F0F9FF] text-[#0E86C2]'
+              ? 'border-red-200 bg-red-50 text-red-700'
+              : 'border-sky-200 bg-sky-50 text-sky-800'
           }`}
-          style={{
-            marginBottom: '22px',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '10px',
-            padding: '12px 16px',
-            fontSize: '13px',
-            fontWeight: 600,
-            border: `1.5px solid ${authFeedback.type === 'error' ? '#FECACA' : '#BAE6FD'}`,
-            background: authFeedback.type === 'error' ? '#FEF2F2' : '#F0F9FF',
-            color: authFeedback.type === 'error' ? '#B91C1C' : '#0E86C2',
-          }}
         >
-          <svg
-            className={`w-5 h-5 shrink-0 mt-px ${
-              authFeedback.type === 'error' ? 'text-[#EF4444]' : 'text-[#1B9DD9]'
+          <AlertCircle
+            className={`mt-0.5 h-4 w-4 shrink-0 ${
+              authFeedback.type === 'error' ? 'text-red-500' : 'text-sky-600'
             }`}
-            width="20"
-            height="20"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"
-              clipRule="evenodd"
-            />
-          </svg>
+            aria-hidden="true"
+          />
           <span>{authFeedback.message}</span>
         </div>
       )}
 
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="g4d-auth-form flex flex-col gap-[18px]"
-        noValidate
-      >
-        <label className="g4d-auth-field flex flex-col gap-2">
-          <span className="g4d-auth-label-text text-[13px] font-bold text-[#334155]">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
+        {/* Adresse e-mail */}
+        <div className="space-y-1.5">
+          <label htmlFor="login-email" className="block text-[13px] font-semibold text-slate-800">
             Adresse e-mail
-          </span>
-          <input
-            type="email"
-            autoComplete="username"
-            autoFocus
-            placeholder="vous@entreprise.com"
-            className={`g4d-auth-input ${
-              errors.email ? 'g4d-auth-input--error border-red-500' : 'border-[#E5E9F0]'
-            }`}
-            {...register('email')}
-          />
+          </label>
+          <div className="relative">
+            <Mail
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+              aria-hidden="true"
+            />
+            <input
+              id="login-email"
+              type="email"
+              autoComplete="username"
+              autoFocus
+              placeholder="vous@entreprise.com"
+              className={`h-11 w-full rounded-xl border bg-white pl-10 pr-3.5 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-2 ${
+                errors.email
+                  ? 'border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/20'
+                  : 'border-slate-300 hover:border-slate-400 focus-visible:border-sky-600 focus-visible:ring-sky-500/20'
+              }`}
+              {...register('email')}
+            />
+          </div>
           {errors.email && (
-            <span
-              className="text-[12.5px] font-medium text-red-500"
-              style={{ fontSize: '12.5px', fontWeight: 500, color: '#EF4444' }}
-            >
+            <p className="text-xs font-medium text-red-600" role="alert">
               {errors.email.message}
-            </span>
+            </p>
           )}
-        </label>
+        </div>
 
-        <label className="g4d-auth-field flex flex-col gap-2">
-          <span className="g4d-auth-label-row flex items-center justify-between">
-            <span className="g4d-auth-label-text text-[13px] font-bold text-[#334155]">
+        {/* Mot de passe */}
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between gap-2">
+            <label
+              htmlFor="login-password"
+              className="block text-[13px] font-semibold text-slate-800"
+            >
               Mot de passe
-            </span>
-            <a
+            </label>
+            <Link
               href="/forgot-password"
-              className="g4d-auth-forgot text-[12.5px] font-bold text-[#1B9DD9] bg-transparent border-0 cursor-pointer p-0 hover:underline"
+              className="text-xs font-semibold text-sky-600 hover:text-sky-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded"
             >
               Mot de passe oublié ?
-            </a>
-          </span>
-          <span className="g4d-auth-input-wrap relative block">
+            </Link>
+          </div>
+          <div className="relative">
+            <Lock
+              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+              aria-hidden="true"
+            />
             <input
+              id="login-password"
               type={showPassword ? 'text' : 'password'}
               autoComplete="current-password"
               placeholder="••••••••"
-              className={`g4d-auth-input g4d-auth-input--pw ${
-                errors.password ? 'g4d-auth-input--error border-red-500' : 'border-[#E5E9F0]'
+              className={`h-11 w-full rounded-xl border bg-white pl-10 pr-11 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-colors focus-visible:outline-none focus-visible:ring-2 ${
+                errors.password
+                  ? 'border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/20'
+                  : 'border-slate-300 hover:border-slate-400 focus-visible:border-sky-600 focus-visible:ring-sky-500/20'
               }`}
               {...register('password')}
             />
             <button
               type="button"
-              tabIndex={-1}
-              aria-label="Afficher / masquer le mot de passe"
+              aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+              aria-pressed={showPassword}
               onClick={() => setShowPassword((prev) => !prev)}
-              className="g4d-auth-pw-toggle"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500"
             >
-              {!showPassword ? (
-                <svg
-                  className="w-5 h-5"
-                  width="20"
-                  height="20"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-                  <path
-                    fillRule="evenodd"
-                    d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113-1.487 4.471-5.705 7.697-10.677 7.697-4.97 0-9.186-3.223-10.675-7.69a1.762 1.762 0 0 1 0-1.113ZM17.25 12a5.25 5.25 0 1 1-10.5 0 5.25 5.25 0 0 1 10.5 0Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" aria-hidden="true" />
               ) : (
-                <svg
-                  className="w-5 h-5"
-                  width="20"
-                  height="20"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path d="M3.53 2.47a.75.75 0 0 0-1.06 1.06l18 18a.75.75 0 1 0 1.06-1.06l-18-18ZM22.676 12.553a11.249 11.249 0 0 1-2.631 4.31l-3.099-3.099a5.25 5.25 0 0 0-6.71-6.71L7.759 4.577a11.217 11.217 0 0 1 4.242-.827c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113Z" />
-                  <path d="M15.75 12c0 .18-.013.357-.037.53l-4.244-4.243A3.75 3.75 0 0 1 15.75 12ZM12.53 15.713l-4.243-4.244a3.75 3.75 0 0 0 4.244 4.243Z" />
-                  <path d="M6.75 12c0-.619.107-1.213.304-1.764l-3.1-3.1a11.25 11.25 0 0 0-2.63 4.31c-.12.362-.12.752 0 1.114 1.489 4.467 5.704 7.69 10.675 7.69 1.5 0 2.933-.294 4.242-.827l-2.477-2.477A5.25 5.25 0 0 1 6.75 12Z" />
-                </svg>
+                <Eye className="h-4 w-4" aria-hidden="true" />
               )}
             </button>
-          </span>
+          </div>
           {errors.password && (
-            <span
-              className="text-[12.5px] font-medium text-red-500"
-              style={{ fontSize: '12.5px', fontWeight: 500, color: '#EF4444' }}
-            >
+            <p className="text-xs font-medium text-red-600" role="alert">
               {errors.password.message}
-            </span>
+            </p>
           )}
-        </label>
+        </div>
 
-        {/* Sélecteur de durée de session ("Rester connecté") */}
-        <label className="g4d-auth-field flex flex-col gap-2">
-          <span className="g4d-auth-label-text text-[13px] font-bold text-[#334155]">
-            Garder ma session active
-          </span>
-          <select
-            aria-label="Durée de la session"
-            className="g4d-auth-select"
-            {...register('sessionDuration')}
+        {/* Sélecteur de durée de session (Segmented Control 6 boutons) */}
+        <div className="space-y-2">
+          <input type="hidden" {...register('sessionDuration')} />
+          <div className="flex items-center justify-between gap-2">
+            <span
+              id="session-duration-label"
+              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-slate-800"
+            >
+              <Clock className="h-3.5 w-3.5 text-slate-400" aria-hidden="true" />
+              Durée de session
+            </span>
+            <span className="text-xs font-medium text-sky-700 tabular-nums">
+              {activeOption.details}
+            </span>
+          </div>
+
+          <div
+            role="group"
+            aria-labelledby="session-duration-label"
+            className="grid grid-cols-6 gap-1 rounded-xl bg-slate-100 p-1 border border-slate-200/80"
           >
-            {SESSION_DURATION_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            {SESSION_PILL_OPTIONS.map((opt) => {
+              const isSelected = selectedDuration === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() =>
+                    setValue('sessionDuration', opt.value, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    })
+                  }
+                  className={`h-8 rounded-lg text-xs font-semibold tabular-nums transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 ${
+                    isSelected
+                      ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200/80'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  {opt.pill}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
+        {/* Bouton de soumission */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="g4d-auth-submit"
+          className="mt-1 h-12 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#1B9DD9] via-[#0284C7] to-[#0369A1] px-4 text-sm font-bold text-white shadow-lg shadow-sky-600/25 transition-all hover:brightness-105 hover:-translate-y-px active:translate-y-0 disabled:opacity-65 disabled:cursor-wait focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 cursor-pointer"
         >
           {!isSubmitting ? (
-            <span
-              className="inline-flex items-center gap-[9px]"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '9px' }}
-            >
-              Se connecter
-              <span className="text-[18px] leading-none -translate-y-px">&rarr;</span>
-            </span>
+            <>
+              <span>Se connecter</span>
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </>
           ) : (
-            <span
-              className="inline-flex items-center gap-2"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
-            >
-              <span className="w-[18px] h-[18px] border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              Connexion…
-            </span>
+            <>
+              <span
+                className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+                aria-hidden="true"
+              />
+              <span>Connexion en cours&hellip;</span>
+            </>
           )}
         </button>
       </form>

@@ -7,6 +7,7 @@ import {
   ResetPasswordRequestSchema,
   type ResetPasswordRequestDto,
 } from '@zakaria/shared-contracts';
+import { ApiClientError, apiFetch } from '@/lib/api-client';
 
 interface ResetPasswordFormProps {
   initialEmail?: string;
@@ -42,31 +43,18 @@ export function ResetPasswordForm({
   const onSubmit = async (values: ResetPasswordRequestDto) => {
     setFeedback(null);
     try {
-      const response = await fetch('/api/v1/auth/reset-password', {
+      const body = await apiFetch<{ message?: string }>('/auth/reset-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify(values),
+        body: values,
       });
 
-      const body = (await response.json().catch(() => null)) as
-        | { message?: string | string[] }
-        | null;
-
-      const rawMsg = body?.message;
-      const message = Array.isArray(rawMsg)
-        ? rawMsg[0]
-        : rawMsg || 'Votre mot de passe a été réinitialisé.';
-
-      if (!response.ok) {
-        setFeedback({ type: 'error', message });
+      const message = body?.message || 'Votre mot de passe a été réinitialisé.';
+      setFeedback({ type: 'success', message });
+    } catch (error) {
+      if (error instanceof ApiClientError) {
+        setFeedback({ type: 'error', message: error.message });
         return;
       }
-
-      setFeedback({ type: 'success', message });
-    } catch {
       setFeedback({
         type: 'error',
         message: 'Impossible de contacter le serveur G4D pour réinitialiser le mot de passe.',
@@ -86,7 +74,8 @@ export function ResetPasswordForm({
           fontWeight: 600,
         }}
       >
-        Lien de réinitialisation incomplet ou invalide. Veuillez effectuer une nouvelle demande depuis la page{' '}
+        Lien de réinitialisation incomplet ou invalide. Veuillez effectuer une nouvelle demande
+        depuis la page{' '}
         <a href="/forgot-password" className="g4d-auth-link">
           Mot de passe oublié
         </a>
@@ -189,4 +178,3 @@ export function ResetPasswordForm({
     </>
   );
 }
-

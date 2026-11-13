@@ -7,6 +7,7 @@ import {
   ForgotPasswordRequestSchema,
   type ForgotPasswordRequestDto,
 } from '@zakaria/shared-contracts';
+import { ApiClientError, apiFetch } from '@/lib/api-client';
 
 export function ForgotPasswordForm() {
   const [feedback, setFeedback] = useState<{
@@ -26,32 +27,20 @@ export function ForgotPasswordForm() {
   const onSubmit = async (values: ForgotPasswordRequestDto) => {
     setFeedback(null);
     try {
-      const response = await fetch('/api/v1/auth/forgot-password', {
+      const body = await apiFetch<{ message?: string }>('/auth/forgot-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({ email: values.email }),
+        body: { email: values.email },
       });
 
-      const body = (await response.json().catch(() => null)) as
-        | { message?: string | string[] }
-        | null;
-
-      const rawMsg = body?.message;
-      const message = Array.isArray(rawMsg)
-        ? rawMsg[0]
-        : rawMsg ||
-          "Si cette adresse e-mail correspond à un compte actif, un lien de réinitialisation vient d'être envoyé.";
-
-      if (!response.ok) {
-        setFeedback({ type: 'error', message });
+      const message =
+        body?.message ||
+        "Si cette adresse e-mail correspond à un compte actif, un lien de réinitialisation vient d'être envoyé.";
+      setFeedback({ type: 'success', message });
+    } catch (error) {
+      if (error instanceof ApiClientError) {
+        setFeedback({ type: 'error', message: error.message });
         return;
       }
-
-      setFeedback({ type: 'success', message });
-    } catch {
       setFeedback({
         type: 'error',
         message: 'Impossible de contacter le serveur G4D pour le moment.',
@@ -105,4 +94,3 @@ export function ForgotPasswordForm() {
     </>
   );
 }
-

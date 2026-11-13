@@ -47,9 +47,7 @@ function loadScriptOnce(src: string): Promise<void> {
   return promise;
 }
 
-export async function bootLandingInteractions(
-  onMapReady: () => void
-): Promise<() => void> {
+export async function bootLandingInteractions(onMapReady: () => void): Promise<() => void> {
   const cleanups: Array<() => void> = [];
   let disposed = false;
 
@@ -84,9 +82,7 @@ export async function bootLandingInteractions(
   // ── 2. Sticky Header & Scroll-to-Top SVG Progress ──────────────────────────
   const headerEl = document.querySelector('.header');
   const progressWrap = document.querySelector('.progress-wrap');
-  const progressPath = document.querySelector(
-    '.progress-wrap path'
-  ) as SVGPathElement | null;
+  const progressPath = document.querySelector('.progress-wrap path') as SVGPathElement | null;
 
   let pathLength = 0;
   if (progressPath) {
@@ -119,8 +115,7 @@ export async function bootLandingInteractions(
       }
     }
     if (progressPath && pathLength > 0) {
-      const height =
-        document.documentElement.scrollHeight - window.innerHeight;
+      const height = document.documentElement.scrollHeight - window.innerHeight;
       if (height > 0) {
         const progress = pathLength - (scrollTop * pathLength) / height;
         progressPath.style.strokeDashoffset = `${progress}`;
@@ -138,9 +133,7 @@ export async function bootLandingInteractions(
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     progressWrap.addEventListener('click', onProgressClick);
-    cleanups.push(() =>
-      progressWrap.removeEventListener('click', onProgressClick)
-    );
+    cleanups.push(() => progressWrap.removeEventListener('click', onProgressClick));
   }
 
   // ── 3. Swipers (Banner + Aperçu Plateforme + Témoignages) ──────────────────
@@ -150,11 +143,7 @@ export async function bootLandingInteractions(
     // 3a. Hero Banner Slider
     const bannerEl = document.querySelector('.banner-slider') as any;
     if (bannerEl && !bannerEl.swiper) {
-      const bannerMenu = [
-        'Livraison Nationale',
-        'Plateforme E-commerce',
-        'Support Client',
-      ];
+      const bannerMenu = ['Livraison Nationale', 'Plateforme E-commerce', 'Support Client'];
       const bannerSwiper = new Swiper('.banner-slider', {
         loop: true,
         speed: 800,
@@ -219,15 +208,10 @@ export async function bootLandingInteractions(
         },
       });
 
-      const tabButtons = Array.from(
-        document.querySelectorAll('.g4d-apercu-tab')
-      );
+      const tabButtons = Array.from(document.querySelectorAll('.g4d-apercu-tab'));
       tabButtons.forEach((tab) => {
         const onClick = () => {
-          const idx = parseInt(
-            (tab as HTMLElement).dataset.slide || '0',
-            10
-          );
+          const idx = parseInt((tab as HTMLElement).dataset.slide || '0', 10);
           apercuSwiper.slideToLoop(idx);
         };
         tab.addEventListener('click', onClick);
@@ -285,31 +269,23 @@ export async function bootLandingInteractions(
   const featureItems = Array.from(document.querySelectorAll('.features-item'));
   featureItems.forEach((item) => {
     const onEnter = () => {
-      featureItems.forEach((el) =>
-        el.classList.remove('bg-white', 'common-shadow-two')
-      );
+      featureItems.forEach((el) => el.classList.remove('bg-white', 'common-shadow-two'));
       item.classList.add('bg-white', 'common-shadow-two');
     };
     item.addEventListener('mouseenter', onEnter);
     cleanups.push(() => item.removeEventListener('mouseenter', onEnter));
   });
 
-  const transportItems = Array.from(
-    document.querySelectorAll('.transport-way-item')
-  );
+  const transportItems = Array.from(document.querySelectorAll('.transport-way-item'));
   transportItems.forEach((item) => {
     const onEnter = () => {
       transportItems.forEach((el) => {
-        el.querySelector('.transport-way-item__icon')?.classList.remove(
-          'bg-main-two-600'
-        );
+        el.querySelector('.transport-way-item__icon')?.classList.remove('bg-main-two-600');
         const content = el.querySelector('.transport-way-item__content');
         content?.classList.remove('border-main-two-600');
         content?.classList.add('border-neutral-50');
       });
-      item
-        .querySelector('.transport-way-item__icon')
-        ?.classList.add('bg-main-two-600');
+      item.querySelector('.transport-way-item__icon')?.classList.add('bg-main-two-600');
       const activeContent = item.querySelector('.transport-way-item__content');
       activeContent?.classList.remove('border-neutral-50');
       activeContent?.classList.add('border-main-two-600');
@@ -352,9 +328,7 @@ export async function bootLandingInteractions(
       document.body.addEventListener('mousemove', onMouseMove, {
         passive: true,
       });
-      cleanups.push(() =>
-        document.body.removeEventListener('mousemove', onMouseMove)
-      );
+      cleanups.push(() => document.body.removeEventListener('mousemove', onMouseMove));
     }
 
     // 5b. Offcanvas Sidebar & Mobile Menu
@@ -416,9 +390,7 @@ export async function bootLandingInteractions(
     });
 
     // 5c. Position-Aware Button Flair ([data-block="button"])
-    const buttonElements = Array.from(
-      document.querySelectorAll('[data-block="button"]')
-    );
+    const buttonElements = Array.from(document.querySelectorAll('[data-block="button"]'));
     buttonElements.forEach((buttonEl) => {
       const flair = buttonEl.querySelector('.button__flair');
       if (!flair) return;
@@ -427,16 +399,8 @@ export async function bootLandingInteractions(
 
       const getXY = (e: MouseEvent) => {
         const { left, top, width, height } = buttonEl.getBoundingClientRect();
-        const x = gsap.utils.clamp(
-          0,
-          100,
-          gsap.utils.mapRange(0, width, 0, 100, e.clientX - left)
-        );
-        const y = gsap.utils.clamp(
-          0,
-          100,
-          gsap.utils.mapRange(0, height, 0, 100, e.clientY - top)
-        );
+        const x = gsap.utils.clamp(0, 100, gsap.utils.mapRange(0, width, 0, 100, e.clientX - left));
+        const y = gsap.utils.clamp(0, 100, gsap.utils.mapRange(0, height, 0, 100, e.clientY - top));
         return { x, y };
       };
 
@@ -483,7 +447,7 @@ export async function bootLandingInteractions(
     // 5d. SplitText & ScrollTrigger Parallax (.splitTextStyleOne, .about-plane, .truck-head, .moon-shape)
     if (win.SplitText && win.ScrollTrigger) {
       const splitHeadings = Array.from(
-        document.querySelectorAll('.splitTextStyleOne:not([data-g4d-split])')
+        document.querySelectorAll('.splitTextStyleOne:not([data-g4d-split])'),
       );
       splitHeadings.forEach((heading) => {
         heading.setAttribute('data-g4d-split', '1');
@@ -526,11 +490,7 @@ export async function bootLandingInteractions(
               scrub: 2,
             },
           })
-          .fromTo(
-            '.about-plane',
-            { x: -260 },
-            { x: 260, y: -380, rotate: -40, duration: 1.6 }
-          );
+          .fromTo('.about-plane', { x: -260 }, { x: 260, y: -380, rotate: -40, duration: 1.6 });
       }
 
       if (document.querySelector('.truck-head')) {
@@ -565,10 +525,7 @@ export async function bootLandingInteractions(
   const initParticles = () => {
     loadScriptOnce('/assets/landing/js/particles.min.js').then(() => {
       if (disposed) return;
-      if (
-        typeof win.particlesJS !== 'undefined' &&
-        document.getElementById('g4d-particles-js')
-      ) {
+      if (typeof win.particlesJS !== 'undefined' && document.getElementById('g4d-particles-js')) {
         try {
           win.particlesJS('g4d-particles-js', {
             particles: {
@@ -629,68 +586,61 @@ export async function bootLandingInteractions(
   };
 
   const initCoverageMap = () => {
-    loadScriptOnce('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js').then(
-      () => {
-        if (disposed) return;
-        if (win.L) {
-          const mapEl = document.getElementById('g4d-coverage-map') as any;
-          if (mapEl && !mapEl._leaflet_id) {
-            const L = win.L;
-            const map = L.map(mapEl, {
-              center: [29.5, -8.5],
-              zoom: 5,
-              minZoom: 5,
-              maxZoom: 11,
-              scrollWheelZoom: false,
-              zoomControl: true,
+    loadScriptOnce('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js').then(() => {
+      if (disposed) return;
+      if (win.L) {
+        const mapEl = document.getElementById('g4d-coverage-map') as any;
+        if (mapEl && !mapEl._leaflet_id) {
+          const L = win.L;
+          const map = L.map(mapEl, {
+            center: [29.5, -8.5],
+            zoom: 5,
+            minZoom: 5,
+            maxZoom: 11,
+            scrollWheelZoom: false,
+            zoomControl: true,
+          });
+
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap &copy; CARTO',
+            subdomains: 'abcd',
+            maxZoom: 19,
+          }).addTo(map);
+
+          HUBS.forEach((h) => {
+            const cls = h.primary ? 'g4d-map-dot g4d-map-dot--hub' : 'g4d-map-dot';
+            const sz = h.primary ? 18 : 11;
+            const icon = L.divIcon({
+              className: '',
+              html: `<div class="${cls}"></div>`,
+              iconSize: [sz, sz],
+              iconAnchor: [sz / 2, sz / 2],
+              popupAnchor: [0, -(sz / 2 + 4)],
             });
 
-            L.tileLayer(
-              'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-              {
-                attribution: '&copy; OpenStreetMap &copy; CARTO',
-                subdomains: 'abcd',
-                maxZoom: 19,
-              }
-            ).addTo(map);
+            L.marker([h.lat, h.lng], { icon })
+              .addTo(map)
+              .bindPopup(
+                `<div class="g4d-map-popup"><strong>${h.city}</strong><span>${
+                  h.primary ? 'Hub régional G4D' : 'Ville desservie'
+                }</span></div>`,
+              );
+          });
 
-            HUBS.forEach((h) => {
-              const cls = h.primary
-                ? 'g4d-map-dot g4d-map-dot--hub'
-                : 'g4d-map-dot';
-              const sz = h.primary ? 18 : 11;
-              const icon = L.divIcon({
-                className: '',
-                html: `<div class="${cls}"></div>`,
-                iconSize: [sz, sz],
-                iconAnchor: [sz / 2, sz / 2],
-                popupAnchor: [0, -(sz / 2 + 4)],
-              });
-
-              L.marker([h.lat, h.lng], { icon })
-                .addTo(map)
-                .bindPopup(
-                  `<div class="g4d-map-popup"><strong>${h.city}</strong><span>${
-                    h.primary ? 'Hub régional G4D' : 'Ville desservie'
-                  }</span></div>`
-                );
-            });
-
-            onMapReady();
-            setTimeout(() => map.invalidateSize(), 200);
-            cleanups.push(() => {
-              try {
-                map.remove();
-              } catch {
-                // ignore
-              }
-            });
-          } else {
-            onMapReady();
-          }
+          onMapReady();
+          setTimeout(() => map.invalidateSize(), 200);
+          cleanups.push(() => {
+            try {
+              map.remove();
+            } catch {
+              // ignore
+            }
+          });
+        } else {
+          onMapReady();
         }
       }
-    );
+    });
   };
 
   if (typeof IntersectionObserver !== 'undefined') {
@@ -703,7 +653,7 @@ export async function bootLandingInteractions(
             initParticles();
           }
         },
-        { rootMargin: '500px 0px' }
+        { rootMargin: '500px 0px' },
       );
       obsParticles.observe(suiviEl);
       cleanups.push(() => obsParticles.disconnect());
@@ -720,7 +670,7 @@ export async function bootLandingInteractions(
             initCoverageMap();
           }
         },
-        { rootMargin: '600px 0px' }
+        { rootMargin: '600px 0px' },
       );
       obsMap.observe(couvertureEl);
       cleanups.push(() => obsMap.disconnect());
@@ -739,4 +689,3 @@ export async function bootLandingInteractions(
     cleanups.forEach((fn) => fn());
   };
 }
-

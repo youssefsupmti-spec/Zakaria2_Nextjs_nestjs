@@ -278,4 +278,3 @@ export function FeatherIcon({ name, className = '', style, ...props }: FeatherIc
     </svg>
   );
 }
-

@@ -18,10 +18,7 @@ interface TrackResult {
   recipient: string;
 }
 
-const DEMO_PARCELS: Record<
-  string,
-  { result: TrackResult; timeline: TimelineEvent[] }
-> = {
+const DEMO_PARCELS: Record<string, { result: TrackResult; timeline: TimelineEvent[] }> = {
   'G4D-4821': {
     result: {
       code: 'G4D-4821',
@@ -181,7 +178,7 @@ export function ParcelTracker() {
     }
     if (!/^[A-Za-z0-9-]+$/.test(trimmed)) {
       setErrorMessage(
-        'Format de code invalide. Utilisez uniquement des lettres, chiffres et tirets.'
+        'Format de code invalide. Utilisez uniquement des lettres, chiffres et tirets.',
       );
       return;
     }
@@ -261,8 +258,8 @@ export function ParcelTracker() {
               lineHeight: 1.65,
             }}
           >
-            Entrez votre code G4D pour localiser votre livraison et consulter
-            l&apos;historique complet de ses statuts.
+            Entrez votre code G4D pour localiser votre livraison et consulter l&apos;historique
+            complet de ses statuts.
           </p>
         </div>
 
@@ -285,9 +282,7 @@ export function ParcelTracker() {
                   id="g4d-track-input"
                   value={trackingCode}
                   onChange={(e) => setTrackingCode(e.target.value)}
-                  className={`form-control border-0 ${
-                    errorMessage ? 'is-invalid' : ''
-                  }`}
+                  className={`form-control border-0 ${errorMessage ? 'is-invalid' : ''}`}
                   placeholder="Code de suivi — ex : G4D-2025-XXXXX"
                   maxLength={60}
                   autoComplete="off"
@@ -526,10 +521,7 @@ export function ParcelTracker() {
                         >
                           Historique des statuts
                         </p>
-                        <div
-                          className="position-relative"
-                          style={{ paddingLeft: '1.5rem' }}
-                        >
+                        <div className="position-relative" style={{ paddingLeft: '1.5rem' }}>
                           <div
                             className="position-absolute top-0 bottom-0"
                             style={{
@@ -542,15 +534,11 @@ export function ParcelTracker() {
                           ></div>
                           <div className="d-flex flex-column gap-4">
                             {timeline.map((event, i) => (
-                              <div
-                                key={i}
-                                className="d-flex align-items-start gap-3"
-                              >
+                              <div key={i} className="d-flex align-items-start gap-3">
                                 <div
                                   className="position-absolute rounded-circle border border-white border-2"
                                   style={{
-                                    backgroundColor:
-                                      event.status_color || '#6c757d',
+                                    backgroundColor: event.status_color || '#6c757d',
                                     width: '13px',
                                     height: '13px',
                                     marginTop: '3px',
@@ -599,10 +587,7 @@ export function ParcelTracker() {
                             opacity: 0.6,
                           }}
                         ></i>
-                        <p
-                          className="mb-0"
-                          style={{ fontSize: '.875rem', color: '#6b7280' }}
-                        >
+                        <p className="mb-0" style={{ fontSize: '.875rem', color: '#6b7280' }}>
                           Aucun historique disponible pour ce colis.
                         </p>
                       </div>
@@ -648,10 +633,7 @@ export function ParcelTracker() {
                           fontSize: '.85rem',
                         }}
                       ></i>
-                      <span
-                        className="text-white fw-semibold"
-                        style={{ fontSize: '.85rem' }}
-                      >
+                      <span className="text-white fw-semibold" style={{ fontSize: '.85rem' }}>
                         Suivi de colis
                       </span>
                     </div>
@@ -714,8 +696,7 @@ export function ParcelTracker() {
                       <strong style={{ color: 'var(--g4d-blue-deeper)' }}>
                         {trackingCode.toUpperCase()}
                       </strong>
-                      . Vérifiez le code sur votre bon de livraison et
-                      réessayez.
+                      . Vérifiez le code sur votre bon de livraison et réessayez.
                     </p>
                     <button
                       type="button"
@@ -742,4 +723,3 @@ export function ParcelTracker() {
     </div>
   );
 }
-
