@@ -110,7 +110,7 @@ export function AppSidebar() {
         <img
           src={G4D_LOGO_TRIM_PATH}
           alt="G4D Express"
-          className="relative h-11 w-auto max-w-[175px] object-contain drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] drop-shadow-[0_4px_12px_rgba(0,0,0,0.22)] transition-all duration-200 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7"
+          className="relative h-15 w-auto max-w-[175px] object-contain drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] drop-shadow-[0_4px_12px_rgba(0,0,0,0.22)] transition-all duration-200 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7"
         />
       </SidebarHeader>
 
