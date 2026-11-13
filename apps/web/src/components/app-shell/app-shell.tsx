@@ -103,10 +103,10 @@ export function AppShell({
       <AppSidebar />
 
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 backdrop-blur-xs">
-          <div className="flex min-w-0 items-center gap-2">
+        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 backdrop-blur-xs">
+          <div className="flex min-w-0 items-center gap-2.5">
             <SidebarTrigger className="-ml-1" />
-            <Separator orientation="vertical" className="mr-1 h-4" />
+            <Separator orientation="vertical" className="mx-1 h-5" />
             <nav aria-label="Fil d'Ariane" className="flex min-w-0 items-center gap-1.5 text-sm">
               <span className="hidden text-slate-500 sm:inline">{breadcrumb.section}</span>
               <span className="hidden text-slate-300 sm:inline">/</span>

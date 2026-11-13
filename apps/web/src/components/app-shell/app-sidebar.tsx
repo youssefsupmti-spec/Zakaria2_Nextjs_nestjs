@@ -2,20 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  Building2,
-  ChevronRight,
-  ChevronsUpDown,
-  Globe,
-  Handshake,
-  KeyRound,
-  LayoutDashboard,
-  LogOut,
-  MapPin,
-  ShieldCheck,
-  UserCog,
-  Users,
-} from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { useEffect, useRef, useState } from 'react';
 import {
   Sidebar,
@@ -35,6 +22,7 @@ import {
   SidebarSeparator,
   useSidebar,
 } from '@/components/ui/sidebar';
+import '@/components/ui/solar-icons';
 import { apiFetch } from '@/lib/api-client';
 import { G4D_LOGO_TRIM_PATH } from '@/lib/brand';
 import { useAuth } from '@/lib/client-rbac';
@@ -113,19 +101,23 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      {/* Zone dédiée au logo G4D sans déformation */}
-      <SidebarHeader className="h-16 items-center justify-center px-4 group-data-[collapsible=icon]:h-14 group-data-[collapsible=icon]:px-2">
+      {/* Zone dédiée au logo G4D centré avec halo subtil sur le dégradé bleu */}
+      <SidebarHeader className="relative h-20 items-center justify-center px-4 group-data-[collapsible=icon]:h-14 group-data-[collapsible=icon]:px-2">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-4 inset-y-2 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_72%)] group-data-[collapsible=icon]:inset-1"
+        />
         <img
           src={G4D_LOGO_TRIM_PATH}
           alt="G4D Express"
-          className="h-11 w-auto max-w-[175px] object-contain transition-all duration-200 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7"
+          className="relative h-11 w-auto max-w-[175px] object-contain drop-shadow-[0_1px_1px_rgba(255,255,255,0.85)] drop-shadow-[0_4px_12px_rgba(0,0,0,0.22)] transition-all duration-200 group-data-[collapsible=icon]:h-7 group-data-[collapsible=icon]:w-7"
         />
       </SidebarHeader>
 
-      <SidebarSeparator className="mx-3 bg-sidebar-border/80" />
+      <SidebarSeparator className="mx-4 bg-white/10" />
 
       {/* Navigation principale & sous-menus */}
-      <SidebarContent className="px-1 pt-2">
+      <SidebarContent className="px-1.5 pt-1">
         <SidebarGroup>
           <SidebarGroupLabel>Pilotage &amp; réseau</SidebarGroupLabel>
           <SidebarMenu>
@@ -135,7 +127,7 @@ export function AppSidebar() {
                 isActive={pathname === '/dashboard'}
                 tooltip="Tableau de bord"
               >
-                <LayoutDashboard />
+                <Icon icon="solar:widget-2-linear" width={21} height={21} aria-hidden="true" />
                 <span>Tableau de bord</span>
               </SidebarMenuLink>
             </SidebarMenuItem>
@@ -150,7 +142,12 @@ export function AppSidebar() {
                         isActive={pathname.startsWith('/agences')}
                         tooltip="Agences & Zones"
                       >
-                        <MapPin />
+                        <Icon
+                          icon="solar:buildings-2-linear"
+                          width={21}
+                          height={21}
+                          aria-hidden="true"
+                        />
                         <span>Agences &amp; Zones</span>
                       </SidebarMenuLink>
                     </SidebarMenuItem>
@@ -162,7 +159,12 @@ export function AppSidebar() {
                         isActive={pathname.startsWith('/partenaires')}
                         tooltip="Partenaires & API"
                       >
-                        <Handshake />
+                        <Icon
+                          icon="solar:hand-shake-linear"
+                          width={21}
+                          height={21}
+                          aria-hidden="true"
+                        />
                         <span>Partenaires &amp; API</span>
                       </SidebarMenuLink>
                     </SidebarMenuItem>
@@ -177,15 +179,19 @@ export function AppSidebar() {
                     className={cn(
                       networkExpanded &&
                         isNetworkRoute &&
-                        'font-semibold text-slate-900 [&>svg:first-child]:text-[var(--g4d-blue)]',
+                        'bg-white/[0.08] font-semibold text-white [&>svg:first-child]:text-white',
                     )}
                   >
-                    <Building2 />
+                    <Icon icon="solar:delivery-linear" width={21} height={21} aria-hidden="true" />
                     <span>Réseau Logistique</span>
-                    <ChevronRight
+                    <Icon
+                      icon="solar:alt-arrow-down-linear"
+                      width={16}
+                      height={16}
+                      aria-hidden="true"
                       className={cn(
-                        'ml-auto size-3.5 text-slate-400 transition-transform duration-150',
-                        networkExpanded && 'rotate-90 text-[var(--g4d-blue)]',
+                        'ml-auto size-4! shrink-0 text-white/60 transition-transform duration-200',
+                        networkExpanded ? 'rotate-0 text-white' : '-rotate-90',
                       )}
                     />
                   </SidebarMenuButton>
@@ -197,7 +203,12 @@ export function AppSidebar() {
                             href="/agences"
                             isActive={pathname.startsWith('/agences')}
                           >
-                            <MapPin />
+                            <Icon
+                              icon="solar:buildings-2-linear"
+                              width={19}
+                              height={19}
+                              aria-hidden="true"
+                            />
                             <span>Agences &amp; Zones</span>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
@@ -208,7 +219,12 @@ export function AppSidebar() {
                             href="/partenaires"
                             isActive={pathname.startsWith('/partenaires')}
                           >
-                            <Handshake />
+                            <Icon
+                              icon="solar:hand-shake-linear"
+                              width={19}
+                              height={19}
+                              aria-hidden="true"
+                            />
                             <span>Partenaires &amp; API</span>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
@@ -219,6 +235,8 @@ export function AppSidebar() {
               ))}
           </SidebarMenu>
         </SidebarGroup>
+
+        <SidebarSeparator className="mx-4 my-0.5 bg-white/10 group-data-[collapsible=icon]:hidden" />
 
         <SidebarGroup>
           <SidebarGroupLabel>Gouvernance &amp; sécurité</SidebarGroupLabel>
@@ -232,7 +250,7 @@ export function AppSidebar() {
                       isActive={pathname.startsWith('/users')}
                       tooltip="Utilisateurs & Comptes"
                     >
-                      <UserCog />
+                      <Icon icon="solar:user-id-linear" width={21} height={21} aria-hidden="true" />
                       <span>Utilisateurs &amp; Comptes</span>
                     </SidebarMenuLink>
                   </SidebarMenuItem>
@@ -242,7 +260,12 @@ export function AppSidebar() {
                       isActive={pathname.startsWith('/roles')}
                       tooltip="Rôles & Permissions"
                     >
-                      <ShieldCheck />
+                      <Icon
+                        icon="solar:shield-keyhole-linear"
+                        width={21}
+                        height={21}
+                        aria-hidden="true"
+                      />
                       <span>Rôles &amp; Permissions</span>
                     </SidebarMenuLink>
                   </SidebarMenuItem>
@@ -256,15 +279,24 @@ export function AppSidebar() {
                     className={cn(
                       adminExpanded &&
                         isAdminRoute &&
-                        'font-semibold text-slate-900 [&>svg:first-child]:text-[var(--g4d-blue)]',
+                        'bg-white/[0.08] font-semibold text-white [&>svg:first-child]:text-white',
                     )}
                   >
-                    <Users />
+                    <Icon
+                      icon="solar:users-group-rounded-linear"
+                      width={21}
+                      height={21}
+                      aria-hidden="true"
+                    />
                     <span>Accès &amp; Équipe</span>
-                    <ChevronRight
+                    <Icon
+                      icon="solar:alt-arrow-down-linear"
+                      width={16}
+                      height={16}
+                      aria-hidden="true"
                       className={cn(
-                        'ml-auto size-3.5 text-slate-400 transition-transform duration-150',
-                        adminExpanded && 'rotate-90 text-[var(--g4d-blue)]',
+                        'ml-auto size-4! shrink-0 text-white/60 transition-transform duration-200',
+                        adminExpanded ? 'rotate-0 text-white' : '-rotate-90',
                       )}
                     />
                   </SidebarMenuButton>
@@ -275,7 +307,12 @@ export function AppSidebar() {
                           href="/users"
                           isActive={pathname.startsWith('/users')}
                         >
-                          <UserCog />
+                          <Icon
+                            icon="solar:user-id-linear"
+                            width={19}
+                            height={19}
+                            aria-hidden="true"
+                          />
                           <span>Utilisateurs &amp; Comptes</span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
@@ -284,7 +321,12 @@ export function AppSidebar() {
                           href="/roles"
                           isActive={pathname.startsWith('/roles')}
                         >
-                          <ShieldCheck />
+                          <Icon
+                            icon="solar:shield-keyhole-linear"
+                            width={19}
+                            height={19}
+                            aria-hidden="true"
+                          />
                           <span>Rôles &amp; Permissions</span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
@@ -299,7 +341,7 @@ export function AppSidebar() {
                 isActive={pathname.startsWith('/account/sessions')}
                 tooltip="Sessions & Appareils"
               >
-                <KeyRound />
+                <Icon icon="solar:devices-linear" width={21} height={21} aria-hidden="true" />
                 <span>Sessions &amp; Appareils</span>
               </SidebarMenuLink>
             </SidebarMenuItem>
@@ -307,8 +349,8 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* Footer / Profil utilisateur compact et moderne */}
-      <SidebarFooter className="border-t border-sidebar-border/80 p-2.5">
+      {/* Footer / Carte profil utilisateur translucide sur fond dégradé */}
+      <SidebarFooter className="border-t border-white/10 p-3 group-data-[collapsible=icon]:p-2">
         <div ref={userMenuRef} className="relative">
           <SidebarMenu>
             <SidebarMenuItem>
@@ -318,22 +360,31 @@ export function AppSidebar() {
                 tooltip={`${user.nomComplet} — Mon compte`}
                 aria-expanded={userMenuOpen}
                 onClick={() => setUserMenuOpen((prev) => !prev)}
-                className="px-2 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:shadow-none group-data-[collapsible=icon]:ring-0"
+                className="rounded-[11px] border border-white/14 bg-white/[0.08] px-2.5 py-2 text-left transition-all duration-200 hover:border-white/22 hover:bg-white/[0.13] group-data-[collapsible=icon]:border-transparent group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:px-0"
               >
-                <div className="relative flex size-8 shrink-0 items-center justify-center rounded-md bg-[var(--g4d-blue)]/12 text-xs font-bold text-[var(--g4d-blue-dark)] ring-1 ring-[var(--g4d-blue)]/25">
+                <div className="relative flex size-9 shrink-0 items-center justify-center rounded-[9px] bg-white/16 text-xs font-bold text-white ring-1 ring-white/25">
                   {getUserInitials(user.nomComplet)}
                   <span
-                    className="absolute -right-0.5 -bottom-0.5 size-2 rounded-full border border-white bg-emerald-500"
+                    className="absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full border-2 border-[#12476c] bg-emerald-400"
                     aria-hidden="true"
                   />
                 </div>
-                <div className="grid flex-1 text-left leading-tight">
-                  <span className="truncate text-[13px] font-semibold text-slate-900">
+                <div className="grid flex-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
+                  <span className="truncate text-[13px] font-semibold text-white">
                     {user.nomComplet}
                   </span>
-                  <span className="truncate text-[11px] text-slate-500">{user.email}</span>
+                  <span className="truncate text-[11px] text-white/65">{user.email}</span>
                 </div>
-                <ChevronsUpDown className="ml-auto size-3.5 text-slate-400" />
+                <Icon
+                  icon="solar:alt-arrow-down-linear"
+                  width={16}
+                  height={16}
+                  aria-hidden="true"
+                  className={cn(
+                    'ml-auto size-4! shrink-0 text-white/70 transition-transform duration-200 group-data-[collapsible=icon]:hidden',
+                    userMenuOpen && 'rotate-180 text-white',
+                  )}
+                />
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
@@ -341,14 +392,12 @@ export function AppSidebar() {
           {userMenuOpen && (
             <div
               className={cn(
-                'z-50 min-w-56 rounded-md border border-sidebar-border bg-white p-1 shadow-lg',
-                isCollapsed
-                  ? 'fixed bottom-3 left-14'
-                  : 'absolute bottom-full left-0 mb-1.5 w-full',
+                'z-50 min-w-56 rounded-[11px] border border-slate-200/90 bg-white p-1.5 text-slate-900 shadow-xl',
+                isCollapsed ? 'fixed bottom-3 left-14' : 'absolute bottom-full left-0 mb-2 w-full',
               )}
             >
               <div className="flex items-center gap-2.5 border-b border-slate-100 px-2.5 py-2">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-[var(--g4d-blue)]/12 text-xs font-bold text-[var(--g4d-blue-dark)] ring-1 ring-[var(--g4d-blue)]/25">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-[#16517f]/12 text-xs font-bold text-[#12476c] ring-1 ring-[#16517f]/25">
                   {getUserInitials(user.nomComplet)}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -367,16 +416,28 @@ export function AppSidebar() {
                     setUserMenuOpen(false);
                     if (isMobile) setOpenMobile(false);
                   }}
-                  className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[var(--g4d-blue-dark)]"
+                  className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-50 hover:text-[#16517f]"
                 >
-                  <KeyRound className="size-3.5 text-[var(--g4d-blue)]" />
+                  <Icon
+                    icon="solar:devices-linear"
+                    width={17}
+                    height={17}
+                    className="text-[#1a5fa0]"
+                    aria-hidden="true"
+                  />
                   <span>Sessions &amp; Appareils</span>
                 </Link>
                 <a
                   href="/"
-                  className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-[var(--g4d-blue-dark)]"
+                  className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-50 hover:text-[#16517f]"
                 >
-                  <Globe className="size-3.5 text-[var(--g4d-blue)]" />
+                  <Icon
+                    icon="solar:global-linear"
+                    width={17}
+                    height={17}
+                    className="text-[#1a5fa0]"
+                    aria-hidden="true"
+                  />
                   <span>Vitrine publique G4D</span>
                 </a>
               </div>
@@ -386,9 +447,9 @@ export function AppSidebar() {
                   type="button"
                   disabled={loggingOut}
                   onClick={handleLogout}
-                  className="flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-60"
+                  className="flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-red-600 transition-colors duration-200 hover:bg-red-50 disabled:opacity-60"
                 >
-                  <LogOut className="size-3.5" />
+                  <Icon icon="solar:logout-2-linear" width={17} height={17} aria-hidden="true" />
                   <span>{loggingOut ? 'Déconnexion…' : 'Se déconnecter'}</span>
                 </button>
               </div>

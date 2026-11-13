@@ -2,12 +2,12 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { Icon } from '@iconify/react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { PanelLeftIcon, X } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { Button } from './button';
 import { Separator } from './separator';
+import './solar-icons';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -143,7 +143,7 @@ export function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          'flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground',
+          'g4d-sidebar-gradient flex h-full w-(--sidebar-width) flex-col text-sidebar-foreground',
           className,
         )}
         {...props}
@@ -159,7 +159,7 @@ export function Sidebar({
         {openMobile && (
           <div className="fixed inset-0 z-50 flex md:hidden" role="dialog" aria-modal="true">
             <div
-              className="fixed inset-0 bg-slate-900/50 backdrop-blur-[1px]"
+              className="fixed inset-0 bg-slate-950/55 backdrop-blur-[1px]"
               onClick={() => setOpenMobile(false)}
               aria-hidden="true"
             />
@@ -169,7 +169,7 @@ export function Sidebar({
               data-mobile="true"
               style={{ '--sidebar-width': SIDEBAR_WIDTH_MOBILE } as React.CSSProperties}
               className={cn(
-                'relative z-10 flex h-full w-(--sidebar-width) flex-col bg-gradient-to-b from-[var(--sidebar-gradient-from)] via-sidebar to-[var(--sidebar-gradient-to)] text-sidebar-foreground shadow-xl',
+                'g4d-sidebar-gradient relative z-10 flex h-full w-(--sidebar-width) flex-col text-sidebar-foreground shadow-xl',
                 side === 'right' ? 'ml-auto' : 'mr-auto',
               )}
             >
@@ -177,9 +177,9 @@ export function Sidebar({
                 type="button"
                 onClick={() => setOpenMobile(false)}
                 aria-label="Fermer le menu latéral"
-                className="absolute top-3 right-3 inline-flex size-7 items-center justify-center rounded-md text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                className="absolute top-3 right-3 z-20 inline-flex size-8 items-center justify-center rounded-md text-white/75 transition-colors duration-200 hover:bg-white/10 hover:text-white"
               >
-                <X className="size-4" />
+                <Icon icon="solar:close-circle-linear" width={20} height={20} aria-hidden="true" />
               </button>
               <div className="flex h-full w-full flex-col">{children}</div>
             </div>
@@ -226,7 +226,7 @@ export function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="flex h-full w-full flex-col bg-gradient-to-b from-[var(--sidebar-gradient-from)] via-sidebar to-[var(--sidebar-gradient-to)] group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm"
+          className="g4d-sidebar-gradient flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm"
         >
           {children}
         </div>
@@ -239,27 +239,54 @@ export function SidebarTrigger({
   className,
   onClick,
   ...props
-}: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar } = useSidebar();
+}: React.ComponentProps<'button'>) {
+  const { toggleSidebar, state, isMobile, openMobile } = useSidebar();
+  const isExpanded = isMobile ? openMobile : state === 'expanded';
+  const label = isExpanded
+    ? 'Réduire la barre latérale'
+    : 'Développer la barre latérale';
+  const iconName = isExpanded
+    ? 'solar:sidebar-minimalistic-linear'
+    : 'solar:sidebar-linear';
 
   return (
-    <Button
+    <button
+      type="button"
       data-sidebar="trigger"
       data-slot="sidebar-trigger"
-      variant="ghost"
-      size="icon"
-      className={cn('size-7 rounded-md', className)}
+      data-state={isExpanded ? 'expanded' : 'collapsed'}
+      aria-label={label}
+      aria-expanded={isExpanded}
+      title={`${label} (Ctrl+B)`}
+      className={cn(
+        'group/toggle relative inline-flex size-[42px] shrink-0 cursor-pointer items-center justify-center rounded-[12px] border border-slate-200/80 bg-transparent text-[#12476c] transition-all duration-[180ms] ease-out hover:border-[#1a5fa0]/25 hover:bg-[#1a5fa0]/[0.07] hover:text-[#1a5fa0] active:translate-y-[0.5px] active:bg-[#1a5fa0]/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1b9dd9]/40 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50',
+        className,
+      )}
       onClick={(event) => {
         onClick?.(event);
         toggleSidebar();
       }}
       {...props}
     >
-      <PanelLeftIcon className="size-4" />
-      <span className="sr-only">Basculer la barre latérale</span>
-    </Button>
+      <Icon
+        icon={iconName}
+        width={22}
+        height={22}
+        aria-hidden="true"
+        className="size-[22px] shrink-0 transition-transform duration-[180ms] ease-out"
+      />
+      <span
+        role="tooltip"
+        className="pointer-events-none invisible absolute top-full left-0 z-50 mt-2 whitespace-nowrap rounded-md bg-[#0f172a] px-2.5 py-1 text-[11px] font-medium text-white opacity-0 shadow-md transition-all duration-150 group-hover/toggle:visible group-hover/toggle:opacity-100 group-focus-visible/toggle:visible group-focus-visible/toggle:opacity-100"
+      >
+        {label}
+      </span>
+      <span className="sr-only">{label}</span>
+    </button>
   );
 }
+
+export const SidebarToggle = SidebarTrigger;
 
 export function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
   const { toggleSidebar } = useSidebar();
@@ -328,7 +355,7 @@ export function SidebarSeparator({ className, ...props }: React.ComponentProps<t
     <Separator
       data-slot="sidebar-separator"
       data-sidebar="separator"
-      className={cn('mx-2 w-auto bg-sidebar-border', className)}
+      className={cn('mx-3 w-auto bg-white/10', className)}
       {...props}
     />
   );
@@ -365,8 +392,8 @@ export function SidebarGroupLabel({ className, ...props }: React.ComponentProps<
       data-slot="sidebar-group-label"
       data-sidebar="group-label"
       className={cn(
-        'flex h-7 shrink-0 items-center rounded-md px-2.5 text-[11px] font-semibold tracking-tight text-slate-500 outline-none transition-[margin,opacity] duration-200 ease-linear',
-        'group-data-[collapsible=icon]:-mt-7 group-data-[collapsible=icon]:opacity-0',
+        'flex shrink-0 items-center rounded-md px-3 pt-3 pb-1.5 text-[10.5px] font-semibold uppercase tracking-[0.08em] text-white/50 outline-none transition-[margin,opacity] duration-200 ease-linear',
+        'group-data-[collapsible=icon]:-mt-8 group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0',
         className,
       )}
       {...props}
@@ -397,18 +424,18 @@ export function SidebarMenuItem({ className, ...props }: React.ComponentProps<'l
 }
 
 const sidebarMenuButtonVariants = cva(
-  'peer/menu-button relative flex w-full items-center gap-2.5 overflow-hidden rounded-md px-2.5 py-2 text-left text-[13px] font-medium text-slate-700 outline-none transition-all duration-150 ease-out hover:bg-white/65 hover:text-slate-900 [&:hover>svg]:text-[var(--g4d-blue)] focus-visible:ring-2 focus-visible:ring-sidebar-ring active:bg-white/80 disabled:pointer-events-none disabled:opacity-50 data-[active=true]:bg-white data-[active=true]:font-semibold data-[active=true]:text-[var(--g4d-blue-dark)] data-[active=true]:shadow-[0_1px_2px_rgba(12,30,44,0.06)] data-[active=true]:ring-1 data-[active=true]:ring-sidebar-border/90 [&[data-active=true]>svg]:text-[var(--g4d-blue)] data-[active=true]:before:absolute data-[active=true]:before:left-0 data-[active=true]:before:top-1.5 data-[active=true]:before:bottom-1.5 data-[active=true]:before:w-[3px] data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-[var(--g4d-blue)] group-data-[collapsible=icon]:size-8! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2! group-data-[collapsible=icon]:data-[active=true]:before:hidden [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-slate-500 [&>svg]:transition-colors cursor-pointer',
+  'peer/menu-button relative flex w-full items-center gap-3 overflow-hidden rounded-[11px] px-3 py-2 text-left text-[13.5px] font-medium text-white/80 outline-none transition-all duration-200 ease-out hover:bg-white/[0.08] hover:text-white [&:hover>svg]:text-white focus-visible:ring-2 focus-visible:ring-sidebar-ring active:bg-white/[0.12] disabled:pointer-events-none disabled:opacity-50 data-[active=true]:bg-white/14 data-[active=true]:font-semibold data-[active=true]:text-white data-[active=true]:ring-1 data-[active=true]:ring-white/18 [&[data-active=true]>svg]:text-white data-[active=true]:before:absolute data-[active=true]:before:left-0 data-[active=true]:before:top-2 data-[active=true]:before:bottom-2 data-[active=true]:before:w-[3px] data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-white group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-2! group-data-[collapsible=icon]:data-[active=true]:before:hidden [&>span:last-child]:truncate [&>svg]:size-[21px] [&>svg]:shrink-0 [&>svg]:text-white/75 [&>svg]:transition-colors [&>svg]:duration-200 cursor-pointer',
   {
     variants: {
       variant: {
         default: '',
         outline:
-          'bg-white/80 ring-1 ring-sidebar-border/90 shadow-2xs hover:bg-white hover:text-slate-900',
+          'border border-white/14 bg-white/[0.08] text-white/90 hover:border-white/22 hover:bg-white/[0.13] hover:text-white',
       },
       size: {
-        default: 'h-9 text-[13px]',
+        default: 'h-10 text-[13.5px]',
         sm: 'h-8 text-xs',
-        lg: 'h-12 text-sm group-data-[collapsible=icon]:p-0!',
+        lg: 'h-14 text-sm group-data-[collapsible=icon]:h-10! group-data-[collapsible=icon]:p-1.5!',
       },
     },
     defaultVariants: {
@@ -494,7 +521,7 @@ export function SidebarMenuSub({ className, ...props }: React.ComponentProps<'ul
       data-slot="sidebar-menu-sub"
       data-sidebar="menu-sub"
       className={cn(
-        'ml-4 mt-1 flex min-w-0 flex-col gap-0.5 border-l border-sidebar-border py-0.5 pl-2.5',
+        'ml-5 mt-1 flex min-w-0 flex-col gap-1 border-l border-white/15 py-1 pl-3',
         'group-data-[collapsible=icon]:hidden',
         className,
       )}
@@ -542,8 +569,8 @@ export function SidebarMenuSubButton({
         }
       }}
       className={cn(
-        'relative flex h-8 min-w-0 items-center gap-2 overflow-hidden rounded-md px-2.5 font-medium text-slate-600 outline-none transition-all duration-150 hover:bg-white/60 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-sidebar-ring [&>svg]:size-3.5 [&>svg]:shrink-0 [&>svg]:text-slate-400 [&>svg]:transition-colors [&:hover>svg]:text-[var(--g4d-blue)] data-[active=true]:bg-white data-[active=true]:font-semibold data-[active=true]:text-[var(--g4d-blue-dark)] data-[active=true]:shadow-[0_1px_2px_rgba(12,30,44,0.05)] data-[active=true]:ring-1 data-[active=true]:ring-sidebar-border/80 [&[data-active=true]>svg]:text-[var(--g4d-blue)] data-[active=true]:before:absolute data-[active=true]:before:left-0 data-[active=true]:before:top-1.5 data-[active=true]:before:bottom-1.5 data-[active=true]:before:w-[2.5px] data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-[var(--g4d-blue)]',
-        size === 'sm' ? 'text-xs' : 'text-[12.5px]',
+        'relative flex h-9 min-w-0 items-center gap-2.5 overflow-hidden rounded-[10px] px-3 font-medium text-white/75 outline-none transition-all duration-200 hover:bg-white/[0.08] hover:text-white focus-visible:ring-2 focus-visible:ring-sidebar-ring [&>svg]:size-[19px] [&>svg]:shrink-0 [&>svg]:text-white/65 [&>svg]:transition-colors [&>svg]:duration-200 [&:hover>svg]:text-white data-[active=true]:bg-white/14 data-[active=true]:font-semibold data-[active=true]:text-white data-[active=true]:ring-1 data-[active=true]:ring-white/16 [&[data-active=true]>svg]:text-white data-[active=true]:before:absolute data-[active=true]:before:left-0 data-[active=true]:before:top-2 data-[active=true]:before:bottom-2 data-[active=true]:before:w-[2.5px] data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-white',
+        size === 'sm' ? 'text-xs' : 'text-[13px]',
         'group-data-[collapsible=icon]:hidden',
         className,
       )}

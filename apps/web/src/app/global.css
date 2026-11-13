@@ -75,16 +75,21 @@
   --input: #e2e8f0;
   --ring: #1b9dd9;
 
-  --sidebar-gradient-from: #eef6fc;
-  --sidebar: #f3f9fd;
-  --sidebar-gradient-to: #e6f2fa;
-  --sidebar-foreground: #0f172a;
-  --sidebar-primary: var(--g4d-blue);
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #ffffff;
-  --sidebar-accent-foreground: var(--g4d-blue-dark);
-  --sidebar-border: #d5e6f3;
-  --sidebar-ring: var(--g4d-blue);
+  --sidebar-bg-gradient: linear-gradient(
+    168deg,
+    #1a5fa0 0%,
+    #16517f 62%,
+    #12476c 82%,
+    #f7901e 172%
+  );
+  --sidebar: #16517f;
+  --sidebar-foreground: rgba(255, 255, 255, 0.92);
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #12476c;
+  --sidebar-accent: rgba(255, 255, 255, 0.14);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.12);
+  --sidebar-ring: rgba(255, 255, 255, 0.35);
 
   --text-dark: #0f172a;
   --gray-text: #64748b;
@@ -184,4 +189,9 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: #0f172a !important;
   caret-color: #0f172a !important;
   transition: background-color 9999s ease-out 0s;
+}
+
+/* Fond dégradé officiel de la Sidebar G4D (Bleu Enterprise -> accent orange subtil en pied) */
+.g4d-sidebar-gradient {
+  background: linear-gradient(168deg, #1a5fa0 0%, #16517f 62%, #12476c 82%, #f7901e 172%);
 }

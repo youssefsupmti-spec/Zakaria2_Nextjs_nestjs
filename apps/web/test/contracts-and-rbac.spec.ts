@@ -1,3 +1,4 @@
+import { getIcon } from '@iconify/react';
 import { describe, expect, it } from 'vitest';
 import {
   CreateAgenceSchema,
@@ -5,6 +6,7 @@ import {
   CreateUserSchema,
   SESSION_DURATION_OPTIONS,
 } from '@zakaria/shared-contracts';
+import '../src/components/ui/solar-icons';
 import { ApiClientError } from '../src/lib/api-client';
 
 describe('Contrats Front/Back & Client API G4D (Lot 2.5 / Sprint 02-B)', () => {
@@ -53,5 +55,29 @@ describe('Contrats Front/Back & Client API G4D (Lot 2.5 / Sprint 02-B)', () => {
     const err = new ApiClientError('Accès refusé', 403, { reason: 'csrf' });
     expect(err.statusCode).toBe(403);
     expect(err.message).toBe('Accès refusé');
+  });
+
+  it('pré-enregistre les icônes Iconify Solar Linear de la Sidebar et du bouton SidebarToggle', () => {
+    const requiredSolarIcons = [
+      'solar:sidebar-minimalistic-linear',
+      'solar:sidebar-linear',
+      'solar:widget-2-linear',
+      'solar:delivery-linear',
+      'solar:buildings-2-linear',
+      'solar:hand-shake-linear',
+      'solar:users-group-rounded-linear',
+      'solar:user-id-linear',
+      'solar:shield-keyhole-linear',
+      'solar:devices-linear',
+      'solar:settings-linear',
+      'solar:alt-arrow-down-linear',
+      'solar:global-linear',
+      'solar:logout-2-linear',
+      'solar:close-circle-linear',
+    ];
+
+    for (const iconName of requiredSolarIcons) {
+      expect(getIcon(iconName), `Icône manquante: ${iconName}`).toBeTruthy();
+    }
   });
 });

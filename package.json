@@ -29,6 +29,8 @@
     "@fastify/cookie": "11.1.5",
     "@fastify/helmet": "13.2.0",
     "@hookform/resolvers": "7.0.5",
+    "@iconify-json/solar": "^1.2.15",
+    "@iconify/react": "^6.0.4",
     "@nestjs/bullmq": "12.0.1",
     "@nestjs/common": "12.4.2",
     "@nestjs/core": "12.4.2",
