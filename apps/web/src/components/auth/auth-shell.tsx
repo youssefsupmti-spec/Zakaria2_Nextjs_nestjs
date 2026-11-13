@@ -16,7 +16,7 @@ interface G4dAuthShellProps {
 
 export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShellProps) {
   return (
-    <div className="g4d-auth-root min-h-screen w-full grid grid-cols-1 lg:grid-cols-12 bg-white text-slate-900 font-sans antialiased">
+    <div className="g4d-auth-root min-h-screen w-full flex flex-row max-[900px]:flex-col bg-white text-slate-900 font-sans antialiased">
       <style>{`
         .g4d-auth-root .g4d-auth-form {
           display: flex;
@@ -167,8 +167,8 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
         }
       `}</style>
 
-      {/* Panneau Gauche : Visuel G4D pur sans texte ni logo superposé (6 colonnes Desktop) */}
-      <aside className="hidden lg:block lg:col-span-6 relative overflow-hidden bg-[#06152d]">
+      {/* Panneau Visuel G4D : 50% sur Desktop, bandeau haut 260px (<=900px) et 50px (<=480px) */}
+      <aside className="relative overflow-hidden bg-[#06152d] flex-[0_0_50%] min-h-screen max-[900px]:order-[-1] max-[900px]:w-full max-[900px]:flex-[0_0_260px] max-[900px]:min-h-[260px] max-[480px]:flex-[0_0_50px] max-[480px]:min-h-[50px]">
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -181,8 +181,8 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
         />
       </aside>
 
-      {/* Panneau Droit : Formulaire SaaS minimaliste & professionnel sur fond blanc (6 colonnes Desktop) */}
-      <main className="col-span-1 lg:col-span-6 flex flex-col justify-between min-h-screen bg-white px-4 py-4 sm:px-10 sm:py-6 lg:px-14">
+      {/* Panneau Formulaire : 50% Desktop (48px 56px), flex-1 (36px 24px <=900px, 28px 18px <=480px) */}
+      <main className="relative z-[2] flex-[0_0_50%] flex flex-col justify-between items-center min-h-screen bg-white px-[56px] py-[48px] overflow-y-auto max-[900px]:flex-1 max-[900px]:w-full max-[900px]:min-h-0 max-[900px]:px-[24px] max-[900px]:py-[36px] max-[480px]:px-[18px] max-[480px]:py-[28px]">
         {/* Barre supérieure discrète */}
         <header className="flex flex-wrap items-center justify-between gap-3 w-full">
           <a
@@ -213,7 +213,7 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
               priority
               imageClassName="h-24 sm:h-28 max-h-28 w-auto shadow-none filter-none"
             />
-            <span className="mt-3 inline-flex lg:hidden items-center gap-2 rounded-full bg-sky-50/90 border border-sky-100/90 px-4 py-1.5 text-xs font-bold text-[#0c4a6e] shadow-[0_1px_2px_rgba(2,132,199,0.06)]">
+            <span className="mt-3 hidden max-[900px]:inline-flex items-center gap-2 rounded-full bg-sky-50/90 border border-sky-100/90 px-4 py-1.5 text-xs font-bold text-[#0c4a6e] shadow-[0_1px_2px_rgba(2,132,199,0.06)]">
               <Truck className="h-3.5 w-3.5 text-[#f97316]" aria-hidden="true" />
               Le Meilleur dans le Domaine
             </span>
