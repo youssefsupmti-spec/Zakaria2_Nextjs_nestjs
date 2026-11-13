@@ -297,7 +297,7 @@ export class SessionService {
       });
     }
 
-    const redis = this.database.getRedisClient();
+    const redis = this.database.getCacheRedisClient();
     if (redis.status === 'ready') {
       await redis.del(this.sessionCacheKey(sessionId)).catch(() => undefined);
     }
@@ -317,7 +317,7 @@ export class SessionService {
         data: { revokedAt: new Date(), revokedReason: reason },
       });
 
-      const redis = this.database.getRedisClient();
+      const redis = this.database.getCacheRedisClient();
       if (redis.status === 'ready') {
         await redis
           .del(...activeSessions.map((s) => this.sessionCacheKey(s.id)))

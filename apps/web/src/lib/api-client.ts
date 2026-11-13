@@ -21,10 +21,12 @@ function readCookie(name: string): string | null {
   return match?.[1] ? decodeURIComponent(match[1]) : null;
 }
 
-async function ensureCsrfToken(): Promise<string | null> {
-  const existing = readCookie('g4d.csrf');
-  if (existing && existing.includes('.')) {
-    return existing;
+async function ensureCsrfToken(forceRefresh = false): Promise<string | null> {
+  if (!forceRefresh) {
+    const existing = readCookie('g4d.csrf');
+    if (existing && existing.includes('.')) {
+      return existing;
+    }
   }
   const res = await fetch('/api/v1/security/csrf', {
     method: 'GET',
@@ -65,20 +67,36 @@ export async function apiFetch<T = unknown>(
     }
   }
 
-  if (MUTATING_METHODS.has(method)) {
+  const isMutating = MUTATING_METHODS.has(method);
+  if (isMutating) {
     const csrfToken = await ensureCsrfToken();
     if (csrfToken) {
       headers.set('X-CSRF-Token', csrfToken);
     }
   }
 
-  const response = await fetch(url, {
+  let response = await fetch(url, {
     ...options,
     method,
     credentials: 'include',
     headers,
     body: serializedBody,
   });
+
+  // Si le jeton g4d.csrf en cookie est obsolète/rotatif, renouveler et réessayer une fois
+  if (isMutating && response.status === 403) {
+    const refreshedToken = await ensureCsrfToken(true);
+    if (refreshedToken) {
+      headers.set('X-CSRF-Token', refreshedToken);
+      response = await fetch(url, {
+        ...options,
+        method,
+        credentials: 'include',
+        headers,
+        body: serializedBody,
+      });
+    }
+  }
 
   const payload = (await response.json().catch(() => null)) as
     ({ message?: string | string[]; details?: unknown } & T) | null;

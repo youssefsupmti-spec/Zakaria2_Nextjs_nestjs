@@ -32,11 +32,12 @@ export class CsrfGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+
+    this.csrfService.assertTrustedOrigin(request);
+
     if (skipCsrf) {
       return true;
     }
-
-    this.csrfService.assertTrustedOrigin(request);
 
     if (this.csrfService.hasSessionCookie(request)) {
       this.csrfService.assertDoubleSubmitToken(request);

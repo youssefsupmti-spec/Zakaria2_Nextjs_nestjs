@@ -74,6 +74,24 @@ async function proxyToBackend(
       responseHeaders.set('cache-control', 'no-store, private');
     }
 
+    if (cleanSegments === 'auth/logout' && method === 'POST') {
+      const forwardedProto = upstreamHeaders.get('x-forwarded-proto') ?? '';
+      const isHttps = forwardedProto.includes('https') || process.env.NODE_ENV === 'production';
+      const secureAttr = isHttps ? '; Secure' : '';
+      responseHeaders.append(
+        'set-cookie',
+        '__Host-g4d.session=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax',
+      );
+      responseHeaders.append(
+        'set-cookie',
+        `g4d.session=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax${secureAttr}`,
+      );
+      responseHeaders.append(
+        'set-cookie',
+        `g4d.csrf=; Max-Age=0; Path=/; SameSite=Lax${secureAttr}`,
+      );
+    }
+
     const payload = await upstreamResponse.arrayBuffer();
     return new NextResponse(payload, {
       status: upstreamResponse.status,

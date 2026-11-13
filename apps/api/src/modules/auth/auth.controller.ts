@@ -19,6 +19,7 @@ import { AuthService } from './auth.service';
 import { CurrentAuth } from './decorators/auth.decorators';
 import { SessionAuthGuard } from './guards/session-auth.guard';
 import { SessionService } from './session.service';
+import { SkipCsrf } from '../security/csrf.guard';
 
 @ApiTags('Authentification')
 @Controller('auth')
@@ -81,6 +82,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @SkipCsrf()
   @HttpCode(HttpStatus.OK)
   async logout(@Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply) {
     const meta = this.extractMeta(request);
@@ -104,6 +106,12 @@ export class AuthController {
         path: '/',
       });
     }
+    reply.clearCookie('g4d.csrf', {
+      httpOnly: false,
+      secure,
+      sameSite: 'lax',
+      path: '/',
+    });
 
     return { ok: true, redirectTo: '/login' };
   }
