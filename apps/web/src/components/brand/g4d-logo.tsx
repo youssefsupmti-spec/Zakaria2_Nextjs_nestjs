@@ -47,7 +47,7 @@ export function G4dLogo({
           'h-auto w-auto object-contain transition-transform duration-200',
           variant === 'default' && 'max-h-12',
           variant === 'light' &&
-          'h-16 xl:h-20 max-h-20 w-auto shadow-none filter-none bg-transparent border-0',
+            'h-16 xl:h-20 max-h-20 w-auto shadow-none filter-none bg-transparent border-0',
           variant === 'compact' && 'max-h-9',
           imageClassName,
         )}

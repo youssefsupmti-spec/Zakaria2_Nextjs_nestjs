@@ -171,8 +171,8 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
       <aside className="hidden lg:flex lg:col-span-5 relative flex-col justify-between overflow-hidden bg-[#06152d] text-white p-8 xl:p-11">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-cover bg-[center_bottom] bg-no-repeat opacity-90"
-          style={{ backgroundImage: "url('/images/auth-aside-bg.webp?v=20261113-2')" }}
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-90"
+          style={{ backgroundImage: "url('/brand/Gemini_Generated_Image_a6v3mga6v3mga6v3.jpg')" }}
         />
         <div
           aria-hidden="true"

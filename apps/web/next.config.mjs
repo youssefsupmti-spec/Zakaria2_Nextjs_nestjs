@@ -16,6 +16,9 @@ const nextConfig = {
         pathname: '/assets/**',
       },
       {
+        pathname: '/brand/**',
+      },
+      {
         pathname: '/images/**',
       },
     ],
