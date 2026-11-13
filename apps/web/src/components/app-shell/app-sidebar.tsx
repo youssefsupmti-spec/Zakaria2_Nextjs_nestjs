@@ -203,12 +203,6 @@ export function AppSidebar() {
                             href="/agences"
                             isActive={pathname.startsWith('/agences')}
                           >
-                            <Icon
-                              icon="solar:buildings-2-linear"
-                              width={19}
-                              height={19}
-                              aria-hidden="true"
-                            />
                             <span>Agences &amp; Zones</span>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
@@ -219,12 +213,6 @@ export function AppSidebar() {
                             href="/partenaires"
                             isActive={pathname.startsWith('/partenaires')}
                           >
-                            <Icon
-                              icon="solar:hand-shake-linear"
-                              width={19}
-                              height={19}
-                              aria-hidden="true"
-                            />
                             <span>Partenaires &amp; API</span>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
@@ -307,12 +295,6 @@ export function AppSidebar() {
                           href="/users"
                           isActive={pathname.startsWith('/users')}
                         >
-                          <Icon
-                            icon="solar:user-id-linear"
-                            width={19}
-                            height={19}
-                            aria-hidden="true"
-                          />
                           <span>Utilisateurs &amp; Comptes</span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
@@ -321,12 +303,6 @@ export function AppSidebar() {
                           href="/roles"
                           isActive={pathname.startsWith('/roles')}
                         >
-                          <Icon
-                            icon="solar:shield-keyhole-linear"
-                            width={19}
-                            height={19}
-                            aria-hidden="true"
-                          />
                           <span>Rôles &amp; Permissions</span>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>

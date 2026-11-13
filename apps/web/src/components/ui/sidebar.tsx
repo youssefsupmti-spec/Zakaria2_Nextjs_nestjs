@@ -235,19 +235,11 @@ export function Sidebar({
   );
 }
 
-export function SidebarTrigger({
-  className,
-  onClick,
-  ...props
-}: React.ComponentProps<'button'>) {
+export function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<'button'>) {
   const { toggleSidebar, state, isMobile, openMobile } = useSidebar();
   const isExpanded = isMobile ? openMobile : state === 'expanded';
-  const label = isExpanded
-    ? 'Réduire la barre latérale'
-    : 'Développer la barre latérale';
-  const iconName = isExpanded
-    ? 'solar:sidebar-minimalistic-linear'
-    : 'solar:sidebar-linear';
+  const label = isExpanded ? 'Réduire la barre latérale' : 'Développer la barre latérale';
+  const iconName = isExpanded ? 'solar:sidebar-minimalistic-linear' : 'solar:sidebar-linear';
 
   return (
     <button
