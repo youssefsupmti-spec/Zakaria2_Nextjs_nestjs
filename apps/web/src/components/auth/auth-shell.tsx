@@ -213,16 +213,18 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
               priority
               imageClassName="h-24 sm:h-28 max-h-28 w-auto shadow-none filter-none"
             />
-            <span className="mt-3 inline-flex items-center gap-2 rounded-full bg-sky-50/90 border border-sky-100/90 px-4 py-1.5 text-xs font-bold text-[#0c4a6e] shadow-[0_1px_2px_rgba(2,132,199,0.06)]">
+            <span className="mt-3 inline-flex lg:hidden items-center gap-2 rounded-full bg-sky-50/90 border border-sky-100/90 px-4 py-1.5 text-xs font-bold text-[#0c4a6e] shadow-[0_1px_2px_rgba(2,132,199,0.06)]">
               <Truck className="h-3.5 w-3.5 text-[#f97316]" aria-hidden="true" />
               Le Meilleur dans le Domaine
             </span>
           </div>
 
-          <h1 className="text-2xl sm:text-[28px] font-extrabold tracking-tight text-slate-900 m-0">
+          <h1 className="font-barlow-condensed text-center text-[2rem] leading-tight font-extrabold text-[var(--text-dark)] tracking-[0.04em] uppercase m-0 mb-[6px]">
             {title}
           </h1>
-          <p className="mt-1.5 text-sm text-slate-500 leading-relaxed mb-7">{subtitle}</p>
+          <p className="font-barlow text-center text-[0.95rem] font-normal text-[var(--gray-text)] leading-relaxed mt-0 mb-7">
+            {subtitle}
+          </p>
 
           {children}
 
