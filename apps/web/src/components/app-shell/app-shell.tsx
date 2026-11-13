@@ -8,6 +8,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { useAuth } from '@/lib/client-rbac';
 import { LogoutButton } from '../dashboard/logout-button';
 import { AppSidebar } from './app-sidebar';
+import { ThemeToggle, type ThemeMode } from './theme-toggle';
 
 const MARKETING_STYLE_PATTERNS = [
   '/assets/landing/css/',
@@ -35,9 +36,11 @@ function resolveBreadcrumb(pathname: string): { section: string; page: string } 
 export function AppShell({
   children,
   defaultSidebarOpen = true,
+  defaultTheme = 'light',
 }: {
   children: ReactNode;
   defaultSidebarOpen?: boolean;
+  defaultTheme?: ThemeMode;
 }) {
   const { user } = useAuth();
   const pathname = usePathname();
@@ -103,28 +106,35 @@ export function AppShell({
       <AppSidebar />
 
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 backdrop-blur-xs">
+        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between gap-3 border-b border-slate-200 bg-white/95 px-4 backdrop-blur-xs transition-colors duration-200 dark:border-slate-800 dark:bg-slate-900/90">
           <div className="flex min-w-0 items-center gap-2.5">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mx-1 h-5" />
             <nav aria-label="Fil d'Ariane" className="flex min-w-0 items-center gap-1.5 text-sm">
-              <span className="hidden text-slate-500 sm:inline">{breadcrumb.section}</span>
-              <span className="hidden text-slate-300 sm:inline">/</span>
-              <span className="truncate font-semibold text-slate-900">{breadcrumb.page}</span>
+              <span className="hidden text-slate-500 dark:text-slate-400 sm:inline">
+                {breadcrumb.section}
+              </span>
+              <span className="hidden text-slate-300 dark:text-slate-600 sm:inline">/</span>
+              <span className="truncate font-semibold text-slate-900 dark:text-slate-100">
+                {breadcrumb.page}
+              </span>
             </nav>
           </div>
 
           <div className="flex items-center gap-2.5">
             {(ctx?.agenceMemberships.length ?? 0) > 0 && (
               <div className="hidden items-center gap-1.5 md:flex">
-                <label htmlFor="agency-switcher" className="text-xs font-medium text-slate-500">
+                <label
+                  htmlFor="agency-switcher"
+                  className="text-xs font-medium text-slate-500 dark:text-slate-400"
+                >
                   Agence :
                 </label>
                 <select
                   id="agency-switcher"
                   value={selectedAgenceId ?? ''}
                   onChange={(e) => setSelectedAgenceId(Number(e.target.value) || null)}
-                  className="h-8 rounded-md border border-slate-200 bg-slate-50 px-2.5 text-xs font-semibold text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B9DD9]/30"
+                  className="h-8 rounded-md border border-slate-200 bg-slate-50 px-2.5 text-xs font-semibold text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B9DD9]/30 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 >
                   {ctx?.agenceMemberships.map((m) => (
                     <option key={m.agenceId} value={m.agenceId}>
@@ -137,6 +147,7 @@ export function AppShell({
             <Badge variant="success" className="hidden sm:inline-flex">
               Connecté ({ctx?.primaryScope ?? 'client'})
             </Badge>
+            <ThemeToggle defaultTheme={defaultTheme} />
             <LogoutButton />
           </div>
         </header>

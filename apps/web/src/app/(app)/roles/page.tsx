@@ -80,8 +80,12 @@ export default function RolesPage() {
       header: 'Libellé',
       cell: ({ row }) => (
         <div>
-          <p className="font-bold text-slate-900">{row.original.libelle || row.original.name}</p>
-          <p className="font-mono text-xs text-slate-500">{row.original.name}</p>
+          <p className="font-bold text-slate-900 dark:text-slate-100">
+            {row.original.libelle || row.original.name}
+          </p>
+          <p className="font-mono text-xs text-slate-500 dark:text-slate-400">
+            {row.original.name}
+          </p>
         </div>
       ),
     },
@@ -89,7 +93,7 @@ export default function RolesPage() {
       accessorKey: 'portee',
       header: 'Portée',
       cell: ({ row }) => (
-        <span className="rounded-md bg-sky-50 px-2.5 py-0.5 text-xs font-bold uppercase text-sky-700">
+        <span className="rounded-md bg-sky-50 px-2.5 py-0.5 text-xs font-bold uppercase text-sky-700 dark:bg-sky-950/60 dark:text-sky-300">
           {row.original.portee}
         </span>
       ),
@@ -128,23 +132,27 @@ export default function RolesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-slate-900">Rôles &amp; Permissions RBAC</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
+          Rôles &amp; Permissions RBAC
+        </h1>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Création de rôles bornés par portée organisationnelle avec anti-escalade de privilèges.
         </p>
       </div>
 
       {errorMsg && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-900/70 dark:bg-red-950/50 dark:text-red-300">
           {errorMsg}
         </div>
       )}
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs"
+        className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900"
       >
-        <h2 className="text-base font-bold text-slate-900">Créer un rôle personnalisé</h2>
+        <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+          Créer un rôle personnalisé
+        </h2>
         <div className="grid gap-3 sm:grid-cols-3">
           <div>
             <Label htmlFor="r-name">Slug technique</Label>
@@ -178,7 +186,7 @@ export default function RolesPage() {
                   permissionIds: [],
                 }))
               }
-              className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm"
+              className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
             >
               {ROLE_SCOPE_VALUES.map((scope) => (
                 <option key={scope} value={scope}>
@@ -190,14 +198,14 @@ export default function RolesPage() {
         </div>
 
         <div className="space-y-2">
-          <p className="text-xs font-bold uppercase text-slate-500">
+          <p className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400">
             Permissions attribuables ({permissionsQuery.data?.length ?? 0})
           </p>
-          <div className="grid max-h-48 gap-2 overflow-y-auto rounded-xl border border-slate-100 bg-slate-50 p-3 sm:grid-cols-3">
+          <div className="grid max-h-48 gap-2 overflow-y-auto rounded-xl border border-slate-100 bg-slate-50 p-3 sm:grid-cols-3 dark:border-slate-800 dark:bg-slate-800/60">
             {(permissionsQuery.data ?? []).map((perm) => (
               <label
                 key={perm.id}
-                className="flex cursor-pointer items-center gap-2 text-xs text-slate-700"
+                className="flex cursor-pointer items-center gap-2 text-xs text-slate-700 dark:text-slate-200"
               >
                 <input
                   type="checkbox"

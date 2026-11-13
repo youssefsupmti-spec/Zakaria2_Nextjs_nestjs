@@ -77,7 +77,7 @@ export default function AgencesPage() {
       accessorKey: 'code',
       header: 'Code',
       cell: ({ row }) => (
-        <span className="rounded-md bg-sky-50 px-2.5 py-1 font-mono text-xs font-bold text-sky-700">
+        <span className="rounded-md bg-sky-50 px-2.5 py-1 font-mono text-xs font-bold text-sky-700 dark:bg-sky-950/60 dark:text-sky-300">
           {row.original.code}
         </span>
       ),
@@ -104,7 +104,9 @@ export default function AgencesPage() {
       cell: ({ row }) => (
         <span
           className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-            row.original.actif ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
+            row.original.actif
+              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+              : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
           }`}
         >
           {row.original.actif ? 'Active' : 'Inactive'}
@@ -126,14 +128,16 @@ export default function AgencesPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-extrabold text-slate-900">Agences &amp; Périmètres Zones</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
+          Agences &amp; Périmètres Zones
+        </h1>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Gestion multi-agence, zones livraison/ramassage et rattachement des équipes locales.
         </p>
       </div>
 
       {errorMsg && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-900/70 dark:bg-red-950/50 dark:text-red-300">
           {errorMsg}
         </div>
       )}
@@ -142,9 +146,11 @@ export default function AgencesPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <form
             onSubmit={handleCreateAgence}
-            className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs"
+            className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900"
           >
-            <h2 className="text-base font-bold text-slate-900">Nouvelle Agence</h2>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              Nouvelle Agence
+            </h2>
             <div className="grid gap-3 sm:grid-cols-3">
               <div>
                 <Label htmlFor="agence-code">Code</Label>
@@ -174,9 +180,11 @@ export default function AgencesPage() {
 
           <form
             onSubmit={handleCreateZone}
-            className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs"
+            className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900"
           >
-            <h2 className="text-base font-bold text-slate-900">Nouvelle Zone Territoriale</h2>
+            <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              Nouvelle Zone Territoriale
+            </h2>
             <div className="grid gap-3 sm:grid-cols-3">
               <div>
                 <Label htmlFor="zone-code">Code</Label>
@@ -207,7 +215,9 @@ export default function AgencesPage() {
       )}
 
       <section className="space-y-3">
-        <h2 className="text-lg font-bold text-slate-900">Agences configurées</h2>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+          Agences configurées
+        </h2>
         <DataTable
           data={agencesQuery.data ?? []}
           columns={agenceColumns}
@@ -217,16 +227,17 @@ export default function AgencesPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-bold text-slate-900">
+        <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
           Référentiel des Zones ({zonesQuery.data?.length ?? 0})
         </h2>
         <div className="flex flex-wrap gap-2">
           {(zonesQuery.data ?? []).map((zone) => (
             <span
               key={zone.id}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700"
+              className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
             >
-              <strong className="font-mono text-sky-700">{zone.code}</strong> · {zone.nom}
+              <strong className="font-mono text-sky-700 dark:text-sky-400">{zone.code}</strong> ·{' '}
+              {zone.nom}
             </span>
           ))}
         </div>

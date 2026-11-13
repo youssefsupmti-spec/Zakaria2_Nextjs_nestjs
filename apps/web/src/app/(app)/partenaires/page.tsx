@@ -84,7 +84,7 @@ export default function PartenairesPage() {
       accessorKey: 'code',
       header: 'Code',
       cell: ({ row }) => (
-        <span className="rounded-md bg-amber-50 px-2.5 py-1 font-mono text-xs font-bold text-amber-800">
+        <span className="rounded-md bg-amber-50 px-2.5 py-1 font-mono text-xs font-bold text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
           {row.original.code}
         </span>
       ),
@@ -117,7 +117,7 @@ export default function PartenairesPage() {
           disabled={issueKeyMutation.isPending}
           onClick={() => issueKeyMutation.mutate(row.original)}
         >
-          <KeyRound className="h-3.5 w-3.5 text-sky-600" />
+          <KeyRound className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
           Émettre clé API
         </Button>
       ),
@@ -132,20 +132,22 @@ export default function PartenairesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-slate-900">Partenaires B2B &amp; Clés API</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
+          Partenaires B2B &amp; Clés API
+        </h1>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Sociétés de transport externes, coursiers et identifiants API HMAC-SHA256 (règle D-09).
         </p>
       </div>
 
       {errorMsg && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-900/70 dark:bg-red-950/50 dark:text-red-300">
           {errorMsg}
         </div>
       )}
 
       {issuedSecret && (
-        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm text-amber-950">
+        <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm text-amber-950 dark:border-amber-800/70 dark:bg-amber-950/50 dark:text-amber-200">
           <p className="font-bold">
             Clé API générée — copiez le secret ci-dessous maintenant (affiché une seule fois) :
           </p>
@@ -159,9 +161,11 @@ export default function PartenairesPage() {
       {isPlatformAdmin && (
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs"
+          className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900"
         >
-          <h2 className="text-base font-bold text-slate-900">Déclarer un Partenaire B2B</h2>
+          <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+            Déclarer un Partenaire B2B
+          </h2>
           <div className="grid gap-3 sm:grid-cols-4">
             <div>
               <Label htmlFor="part-code">Code</Label>

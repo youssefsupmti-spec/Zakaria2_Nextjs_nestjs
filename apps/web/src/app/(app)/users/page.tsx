@@ -92,7 +92,7 @@ export default function UsersPage() {
           {row.original.userRoles.map((ur) => (
             <span
               key={ur.role.id}
-              className="rounded-md bg-sky-50 px-2 py-0.5 text-xs font-bold text-sky-700"
+              className="rounded-md bg-sky-50 px-2 py-0.5 text-xs font-bold text-sky-700 dark:bg-sky-950/60 dark:text-sky-300"
             >
               {ur.role.libelle || ur.role.name}
             </span>
@@ -112,7 +112,9 @@ export default function UsersPage() {
       cell: ({ row }) => (
         <span
           className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-            row.original.active ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+            row.original.active
+              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
+              : 'bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300'
           }`}
         >
           {row.original.active ? 'Actif' : 'Désactivé'}
@@ -150,24 +152,28 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-slate-900">Utilisateurs &amp; Équipes</h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">
+          Utilisateurs &amp; Équipes
+        </h1>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
           Gestion cloisonnée par organisation (règles D-06 cascade sous-comptes &amp; D-08 flotte
           agence).
         </p>
       </div>
 
       {errorMsg && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 dark:border-red-900/70 dark:bg-red-950/50 dark:text-red-300">
           {errorMsg}
         </div>
       )}
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs"
+        className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-900"
       >
-        <h2 className="text-base font-bold text-slate-900">Créer un compte dans votre périmètre</h2>
+        <h2 className="text-base font-bold text-slate-900 dark:text-slate-100">
+          Créer un compte dans votre périmètre
+        </h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <Label htmlFor="u-nom">Nom complet</Label>
@@ -213,7 +219,7 @@ export default function UsersPage() {
               id="u-role"
               value={form.roleId}
               onChange={(e) => setForm((s) => ({ ...s, roleId: e.target.value }))}
-              className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm"
+              className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
               required
             >
               <option value="">Choisir un rôle…</option>

@@ -83,4 +83,31 @@ describe('Contrats Front/Back & Client API G4D (Lot 2.5 / Sprint 02-B)', () => {
       expect(getIcon(iconName), `Icône manquante: ${iconName}`).toBeTruthy();
     }
   });
+
+  it('pré-enregistre les icônes Iconify Solar Bold Duotone (Sidebar, SidebarToggle, ThemeToggle)', () => {
+    const requiredBoldDuotoneIcons = [
+      'solar:widget-5-bold-duotone',
+      'solar:widget-2-bold-duotone',
+      'solar:delivery-bold-duotone',
+      'solar:buildings-2-bold-duotone',
+      'solar:hand-shake-bold-duotone',
+      'solar:users-group-rounded-bold-duotone',
+      'solar:user-id-bold-duotone',
+      'solar:shield-keyhole-bold-duotone',
+      'solar:devices-bold-duotone',
+      'solar:settings-bold-duotone',
+      'solar:alt-arrow-down-bold-duotone',
+      'solar:global-bold-duotone',
+      'solar:logout-2-bold-duotone',
+      'solar:close-circle-bold-duotone',
+      'solar:panel-left-close-bold-duotone',
+      'solar:panel-left-open-bold-duotone',
+      'solar:sun-2-bold-duotone',
+      'solar:moon-bold-duotone',
+    ];
+
+    for (const iconName of requiredBoldDuotoneIcons) {
+      expect(getIcon(iconName), `Icône Bold Duotone manquante: ${iconName}`).toBeTruthy();
+    }
+  });
 });

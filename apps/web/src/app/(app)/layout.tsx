@@ -11,11 +11,14 @@ export const dynamic = 'force-dynamic';
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const [session, cookieStore] = await Promise.all([requireServerAuthSession(), cookies()]);
   const defaultSidebarOpen = cookieStore.get('sidebar_state')?.value !== 'false';
+  const defaultTheme = cookieStore.get('g4d_theme')?.value === 'dark' ? 'dark' : 'light';
 
   return (
     <QueryProvider>
       <AuthProvider initialUser={session.user}>
-        <AppShell defaultSidebarOpen={defaultSidebarOpen}>{children}</AppShell>
+        <AppShell defaultSidebarOpen={defaultSidebarOpen} defaultTheme={defaultTheme}>
+          {children}
+        </AppShell>
       </AuthProvider>
     </QueryProvider>
   );

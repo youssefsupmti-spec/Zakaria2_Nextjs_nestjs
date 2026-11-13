@@ -127,7 +127,13 @@ export function AppSidebar() {
                 isActive={pathname === '/dashboard'}
                 tooltip="Tableau de bord"
               >
-                <Icon icon="solar:widget-2-linear" width={21} height={21} aria-hidden="true" />
+                <Icon
+                  icon="solar:widget-5-bold-duotone"
+                  width={20}
+                  height={20}
+                  className="size-5 shrink-0"
+                  aria-hidden="true"
+                />
                 <span>Tableau de bord</span>
               </SidebarMenuLink>
             </SidebarMenuItem>
@@ -143,9 +149,9 @@ export function AppSidebar() {
                         tooltip="Agences & Zones"
                       >
                         <Icon
-                          icon="solar:buildings-2-linear"
-                          width={21}
-                          height={21}
+                          icon="solar:buildings-2-bold-duotone"
+                          width={20}
+                          height={20}
                           aria-hidden="true"
                         />
                         <span>Agences &amp; Zones</span>
@@ -160,9 +166,9 @@ export function AppSidebar() {
                         tooltip="Partenaires & API"
                       >
                         <Icon
-                          icon="solar:hand-shake-linear"
-                          width={21}
-                          height={21}
+                          icon="solar:hand-shake-bold-duotone"
+                          width={20}
+                          height={20}
                           aria-hidden="true"
                         />
                         <span>Partenaires &amp; API</span>
@@ -182,10 +188,15 @@ export function AppSidebar() {
                         'bg-white/[0.08] font-semibold text-white [&>svg:first-child]:text-white',
                     )}
                   >
-                    <Icon icon="solar:delivery-linear" width={21} height={21} aria-hidden="true" />
+                    <Icon
+                      icon="solar:delivery-bold-duotone"
+                      width={20}
+                      height={20}
+                      aria-hidden="true"
+                    />
                     <span>Réseau Logistique</span>
                     <Icon
-                      icon="solar:alt-arrow-down-linear"
+                      icon="solar:alt-arrow-down-bold-duotone"
                       width={16}
                       height={16}
                       aria-hidden="true"
@@ -238,7 +249,12 @@ export function AppSidebar() {
                       isActive={pathname.startsWith('/users')}
                       tooltip="Utilisateurs & Comptes"
                     >
-                      <Icon icon="solar:user-id-linear" width={21} height={21} aria-hidden="true" />
+                      <Icon
+                        icon="solar:user-id-bold-duotone"
+                        width={20}
+                        height={20}
+                        aria-hidden="true"
+                      />
                       <span>Utilisateurs &amp; Comptes</span>
                     </SidebarMenuLink>
                   </SidebarMenuItem>
@@ -249,9 +265,9 @@ export function AppSidebar() {
                       tooltip="Rôles & Permissions"
                     >
                       <Icon
-                        icon="solar:shield-keyhole-linear"
-                        width={21}
-                        height={21}
+                        icon="solar:shield-keyhole-bold-duotone"
+                        width={20}
+                        height={20}
                         aria-hidden="true"
                       />
                       <span>Rôles &amp; Permissions</span>
@@ -271,14 +287,14 @@ export function AppSidebar() {
                     )}
                   >
                     <Icon
-                      icon="solar:users-group-rounded-linear"
-                      width={21}
-                      height={21}
+                      icon="solar:users-group-rounded-bold-duotone"
+                      width={20}
+                      height={20}
                       aria-hidden="true"
                     />
                     <span>Accès &amp; Équipe</span>
                     <Icon
-                      icon="solar:alt-arrow-down-linear"
+                      icon="solar:alt-arrow-down-bold-duotone"
                       width={16}
                       height={16}
                       aria-hidden="true"
@@ -317,7 +333,7 @@ export function AppSidebar() {
                 isActive={pathname.startsWith('/account/sessions')}
                 tooltip="Sessions & Appareils"
               >
-                <Icon icon="solar:devices-linear" width={21} height={21} aria-hidden="true" />
+                <Icon icon="solar:devices-bold-duotone" width={20} height={20} aria-hidden="true" />
                 <span>Sessions &amp; Appareils</span>
               </SidebarMenuLink>
             </SidebarMenuItem>
@@ -352,7 +368,7 @@ export function AppSidebar() {
                   <span className="truncate text-[11px] text-white/65">{user.email}</span>
                 </div>
                 <Icon
-                  icon="solar:alt-arrow-down-linear"
+                  icon="solar:alt-arrow-down-bold-duotone"
                   width={16}
                   height={16}
                   aria-hidden="true"
@@ -368,18 +384,22 @@ export function AppSidebar() {
           {userMenuOpen && (
             <div
               className={cn(
-                'z-50 min-w-56 rounded-[11px] border border-slate-200/90 bg-white p-1.5 text-slate-900 shadow-xl',
+                'z-50 min-w-56 rounded-[11px] border border-slate-200/90 bg-white p-1.5 text-slate-900 shadow-xl dark:border-slate-700/90 dark:bg-slate-900 dark:text-slate-100',
                 isCollapsed ? 'fixed bottom-3 left-16' : 'absolute bottom-full left-0 mb-2 w-full',
               )}
             >
-              <div className="flex items-center gap-2.5 border-b border-slate-100 px-2.5 py-2">
-                <div className="flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-[#16517f]/12 text-xs font-bold text-[#12476c] ring-1 ring-[#16517f]/25">
+              <div className="flex items-center gap-2.5 border-b border-slate-100 px-2.5 py-2 dark:border-slate-800">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-[#16517f]/12 text-xs font-bold text-[#12476c] ring-1 ring-[#16517f]/25 dark:bg-[#1a5fa0]/30 dark:text-sky-300 dark:ring-sky-400/25">
                   {getUserInitials(user.nomComplet)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-semibold text-slate-900">{user.nomComplet}</p>
-                  <p className="truncate text-[11px] text-slate-500">{user.email}</p>
-                  <p className="text-[10px] font-medium text-slate-400">
+                  <p className="truncate text-xs font-semibold text-slate-900 dark:text-slate-100">
+                    {user.nomComplet}
+                  </p>
+                  <p className="truncate text-[11px] text-slate-500 dark:text-slate-400">
+                    {user.email}
+                  </p>
+                  <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
                     Titulaire #{user.titulaireId} · ID #{user.id}
                   </p>
                 </div>
@@ -392,40 +412,45 @@ export function AppSidebar() {
                     setUserMenuOpen(false);
                     if (isMobile) setOpenMobile(false);
                   }}
-                  className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-50 hover:text-[#16517f]"
+                  className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-50 hover:text-[#16517f] dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
                 >
                   <Icon
-                    icon="solar:devices-linear"
+                    icon="solar:devices-bold-duotone"
                     width={17}
                     height={17}
-                    className="text-[#1a5fa0]"
+                    className="text-[#1a5fa0] dark:text-sky-400"
                     aria-hidden="true"
                   />
                   <span>Sessions &amp; Appareils</span>
                 </Link>
                 <a
                   href="/"
-                  className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-50 hover:text-[#16517f]"
+                  className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-50 hover:text-[#16517f] dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
                 >
                   <Icon
-                    icon="solar:global-linear"
+                    icon="solar:global-bold-duotone"
                     width={17}
                     height={17}
-                    className="text-[#1a5fa0]"
+                    className="text-[#1a5fa0] dark:text-sky-400"
                     aria-hidden="true"
                   />
                   <span>Vitrine publique G4D</span>
                 </a>
               </div>
 
-              <div className="border-t border-slate-100 pt-1">
+              <div className="border-t border-slate-100 pt-1 dark:border-slate-800">
                 <button
                   type="button"
                   disabled={loggingOut}
                   onClick={handleLogout}
-                  className="flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-red-600 transition-colors duration-200 hover:bg-red-50 disabled:opacity-60"
+                  className="flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-1.5 text-left text-xs font-semibold text-red-600 transition-colors duration-200 hover:bg-red-50 disabled:opacity-60 dark:text-red-400 dark:hover:bg-red-950/50"
                 >
-                  <Icon icon="solar:logout-2-linear" width={17} height={17} aria-hidden="true" />
+                  <Icon
+                    icon="solar:logout-2-bold-duotone"
+                    width={17}
+                    height={17}
+                    aria-hidden="true"
+                  />
                   <span>{loggingOut ? 'Déconnexion…' : 'Se déconnecter'}</span>
                 </button>
               </div>
