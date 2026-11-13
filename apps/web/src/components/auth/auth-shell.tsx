@@ -1,8 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Truck } from 'lucide-react';
+import { ArrowLeft, Truck } from 'lucide-react';
 import { G4dLogo } from '@/components/brand/g4d-logo';
 
 const CURRENT_YEAR = 2026;
@@ -192,17 +191,6 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             Retour à l&apos;accueil
           </a>
-
-          <div className="text-sm text-slate-500">
-            Nouveau vendeur ?{' '}
-            <Link
-              href="/register"
-              className="inline-flex items-center gap-1 font-semibold text-sky-600 hover:text-sky-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded-md px-1 py-0.5"
-            >
-              Créer un compte
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </Link>
-          </div>
         </header>
 
         {/* Conteneur central respirant directement sur le fond blanc */}

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertCircle, ArrowRight, Clock, Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { AlertCircle, Clock, Eye, EyeOff, Lock, Mail, UserPlus } from 'lucide-react';
 import {
   LoginRequestSchema,
   type LoginRequestDto,
@@ -247,12 +247,24 @@ export function LoginForm({ nextRedirect }: LoginFormProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="mt-1 h-12 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#1B9DD9] via-[#0284C7] to-[#0369A1] px-4 text-sm font-bold text-white shadow-lg shadow-sky-600/25 transition-all hover:brightness-105 hover:-translate-y-px active:translate-y-0 disabled:opacity-65 disabled:cursor-wait focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 cursor-pointer"
+          className="mt-1 h-12 w-full inline-flex items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-[#1B9DD9] via-[#0284C7] to-[#0369A1] px-6 text-sm font-bold tracking-wide text-white shadow-lg shadow-sky-600/25 transition-all hover:brightness-105 hover:-translate-y-px active:translate-y-0 disabled:opacity-65 disabled:cursor-wait focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 cursor-pointer"
         >
           {!isSubmitting ? (
             <>
+              <span
+                className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20 shrink-0"
+                aria-hidden="true"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="h-4 w-4 text-white"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3.6c1.93 0 3.5 1.57 3.5 3.5S13.93 12.6 12 12.6s-3.5-1.57-3.5-3.5S10.07 5.6 12 5.6zm0 14.4c-2.67 0-5.03-1.35-6.42-3.41.03-2.13 4.28-3.29 6.42-3.29 2.13 0 6.39 1.16 6.42 3.29-1.39 2.06-3.75 3.41-6.42 3.41z" />
+                </svg>
+              </span>
               <span>Se connecter</span>
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </>
           ) : (
             <>
@@ -264,6 +276,18 @@ export function LoginForm({ nextRedirect }: LoginFormProps) {
             </>
           )}
         </button>
+
+        {/* Lien d'inscription vendeur sous le bouton de connexion */}
+        <div className="pt-2 text-center text-sm text-slate-500">
+          Nouveau vendeur ?{' '}
+          <Link
+            href="/register"
+            className="inline-flex items-center gap-1.5 font-semibold text-sky-600 hover:text-sky-700 hover:underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded-md px-1 py-0.5"
+          >
+            <UserPlus className="h-4 w-4" aria-hidden="true" />
+            <span>Créer un compte</span>
+          </Link>
+        </div>
       </form>
     </>
   );
