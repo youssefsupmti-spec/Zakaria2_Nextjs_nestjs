@@ -7,6 +7,7 @@ import {
   ResetPasswordRequestSchema,
   type ResetPasswordRequestDto,
 } from '@zakaria/shared-contracts';
+import { AlertCircle, CheckCircle2, Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react';
 import { ApiClientError, apiFetch } from '@/lib/api-client';
 
 interface ResetPasswordFormProps {
@@ -65,43 +66,53 @@ export function ResetPasswordForm({
   if (missingToken) {
     return (
       <div
-        style={{
-          padding: '16px',
-          border: '1.5px solid #FECACA',
-          background: '#FEF2F2',
-          color: '#B91C1C',
-          fontSize: '13.5px',
-          fontWeight: 600,
-        }}
+        role="alert"
+        className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-4 text-sm font-medium text-red-700"
       >
-        Lien de réinitialisation incomplet ou invalide. Veuillez effectuer une nouvelle demande
-        depuis la page{' '}
-        <a href="/forgot-password" className="g4d-auth-link">
-          Mot de passe oublié
-        </a>
-        .
+        <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-600" aria-hidden="true" />
+        <p className="m-0">
+          Lien de réinitialisation incomplet ou invalide. Veuillez effectuer une nouvelle demande
+          depuis la page{' '}
+          <a
+            href="/forgot-password"
+            className="font-bold text-[#0284c7] hover:text-[#ea580c] underline"
+          >
+            Mot de passe oublié
+          </a>
+          .
+        </p>
       </div>
     );
   }
 
   return (
-    <>
+    <div className="space-y-5">
       {feedback && (
         <div
-          style={{
-            marginBottom: '22px',
-            padding: '12px 16px',
-            fontSize: '13px',
-            fontWeight: 600,
-            border: `1.5px solid ${feedback.type === 'error' ? '#FECACA' : '#BBF7D0'}`,
-            background: feedback.type === 'error' ? '#FEF2F2' : '#F0FDF4',
-            color: feedback.type === 'error' ? '#B91C1C' : '#166534',
-          }}
+          role={feedback.type === 'error' ? 'alert' : 'status'}
+          className={
+            feedback.type === 'error'
+              ? 'flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700'
+              : 'rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800 space-y-2'
+          }
         >
-          <p style={{ margin: 0 }}>{feedback.message}</p>
+          <div className="flex items-start gap-2.5">
+            {feedback.type === 'error' ? (
+              <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 text-red-600" aria-hidden="true" />
+            ) : (
+              <CheckCircle2
+                className="h-4 w-4 shrink-0 mt-0.5 text-emerald-600"
+                aria-hidden="true"
+              />
+            )}
+            <p className="m-0">{feedback.message}</p>
+          </div>
           {feedback.type === 'success' && (
-            <p style={{ margin: '10px 0 0' }}>
-              <a href="/login" className="g4d-auth-link">
+            <p className="m-0 pl-6.5">
+              <a
+                href="/login"
+                className="font-bold text-[#0284c7] hover:text-[#ea580c] transition-colors"
+              >
                 Aller à la page de connexion &rarr;
               </a>
             </p>
@@ -110,71 +121,119 @@ export function ResetPasswordForm({
       )}
 
       {feedback?.type !== 'success' && (
-        <form onSubmit={handleSubmit(onSubmit)} className="g4d-auth-form" noValidate>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           <input type="hidden" {...register('token')} />
 
-          <label className="g4d-auth-field">
-            <span className="g4d-auth-label-text">Adresse e-mail</span>
+          <div className="space-y-1.5">
+            <label
+              htmlFor="reset-email"
+              className="block text-[13px] font-semibold tracking-tight text-slate-700"
+            >
+              Adresse e-mail
+            </label>
             <input
+              id="reset-email"
               type="email"
               readOnly={Boolean(initialEmail)}
-              className={`g4d-auth-input ${errors.email ? 'g4d-auth-input--error' : ''}`}
+              aria-invalid={Boolean(errors.email)}
+              className={`w-full h-12 rounded-xl border bg-slate-50/70 px-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-colors focus:bg-white focus:outline-none focus:ring-4 read-only:bg-slate-100 read-only:text-slate-600 ${
+                errors.email
+                  ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10'
+                  : 'border-slate-300 focus:border-[#0284c7] focus:ring-[#0284c7]/15'
+              }`}
               {...register('email')}
             />
             {errors.email && (
-              <span style={{ fontSize: '12.5px', fontWeight: 500, color: '#EF4444' }}>
-                {errors.email.message}
-              </span>
+              <p className="text-xs font-medium text-red-600 mt-1">{errors.email.message}</p>
             )}
-          </label>
+          </div>
 
-          <label className="g4d-auth-field">
-            <span className="g4d-auth-label-text">Nouveau mot de passe (min. 8 caractères)</span>
-            <span className="g4d-auth-input-wrap">
+          <div className="space-y-1.5">
+            <label
+              htmlFor="reset-password"
+              className="block text-[13px] font-semibold tracking-tight text-slate-700"
+            >
+              Nouveau mot de passe (min. 8 caractères)
+            </label>
+            <div className="relative">
               <input
+                id="reset-password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="new-password"
                 placeholder="••••••••"
-                className={`g4d-auth-input g4d-auth-input--pw ${errors.password ? 'g4d-auth-input--error' : ''}`}
+                aria-invalid={Boolean(errors.password)}
+                className={`w-full h-12 rounded-xl border bg-slate-50/70 pl-4 pr-12 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-colors focus:bg-white focus:outline-none focus:ring-4 ${
+                  errors.password
+                    ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10'
+                    : 'border-slate-300 focus:border-[#0284c7] focus:ring-[#0284c7]/15'
+                }`}
                 {...register('password')}
               />
               <button
                 type="button"
                 tabIndex={-1}
+                aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="g4d-auth-pw-toggle"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-500 hover:bg-slate-200/60 hover:text-slate-800 transition-colors cursor-pointer"
               >
-                {showPassword ? 'Masquer' : 'Voir'}
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" aria-hidden="true" />
+                ) : (
+                  <Eye className="h-4 w-4" aria-hidden="true" />
+                )}
               </button>
-            </span>
+            </div>
             {errors.password && (
-              <span style={{ fontSize: '12.5px', fontWeight: 500, color: '#EF4444' }}>
-                {errors.password.message}
-              </span>
+              <p className="text-xs font-medium text-red-600 mt-1">{errors.password.message}</p>
             )}
-          </label>
+          </div>
 
-          <label className="g4d-auth-field">
-            <span className="g4d-auth-label-text">Confirmer le nouveau mot de passe</span>
+          <div className="space-y-1.5">
+            <label
+              htmlFor="reset-password-confirm"
+              className="block text-[13px] font-semibold tracking-tight text-slate-700"
+            >
+              Confirmer le nouveau mot de passe
+            </label>
             <input
+              id="reset-password-confirm"
               type={showPassword ? 'text' : 'password'}
               autoComplete="new-password"
               placeholder="••••••••"
-              className={`g4d-auth-input ${errors.passwordConfirmation ? 'g4d-auth-input--error' : ''}`}
+              aria-invalid={Boolean(errors.passwordConfirmation)}
+              className={`w-full h-12 rounded-xl border bg-slate-50/70 px-4 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-colors focus:bg-white focus:outline-none focus:ring-4 ${
+                errors.passwordConfirmation
+                  ? 'border-red-400 focus:border-red-500 focus:ring-red-500/10'
+                  : 'border-slate-300 focus:border-[#0284c7] focus:ring-[#0284c7]/15'
+              }`}
               {...register('passwordConfirmation')}
             />
             {errors.passwordConfirmation && (
-              <span style={{ fontSize: '12.5px', fontWeight: 500, color: '#EF4444' }}>
+              <p className="text-xs font-medium text-red-600 mt-1">
                 {errors.passwordConfirmation.message}
-              </span>
+              </p>
             )}
-          </label>
+          </div>
 
-          <button type="submit" disabled={isSubmitting} className="g4d-auth-submit">
-            {!isSubmitting ? 'Enregistrer le nouveau mot de passe' : 'Mise à jour…'}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="mt-2 inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-[#0284c7] via-[#0369a1] to-[#0c4a6e] px-6 text-sm font-bold tracking-wide text-white shadow-[0_8px_20px_-6px_rgba(2,132,199,0.45)] transition-all hover:brightness-105 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-6px_rgba(2,132,199,0.55)] active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0284c7] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-60 cursor-pointer"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                <span>Mise à jour…</span>
+              </>
+            ) : (
+              <>
+                <KeyRound className="h-4 w-4" aria-hidden="true" />
+                <span>Enregistrer le nouveau mot de passe</span>
+              </>
+            )}
           </button>
         </form>
       )}
-    </>
+    </div>
   );
 }

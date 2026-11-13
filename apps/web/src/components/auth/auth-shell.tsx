@@ -15,163 +15,13 @@ interface G4dAuthShellProps {
 
 export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShellProps) {
   return (
-    <div className="g4d-auth-root min-h-screen w-full flex flex-row max-[900px]:flex-col bg-white text-slate-900 font-sans antialiased">
-      <style>{`
-        .g4d-auth-root .g4d-auth-form {
-          display: flex;
-          flex-direction: column;
-          gap: 1.25rem;
-        }
-        .g4d-auth-root .g4d-auth-field {
-          display: flex;
-          flex-direction: column;
-          gap: 0.45rem;
-          margin: 0;
-        }
-        .g4d-auth-root .g4d-auth-label-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 0.75rem;
-        }
-        .g4d-auth-root .g4d-auth-label-text {
-          font-size: 0.8125rem;
-          font-weight: 600;
-          color: #1e293b;
-        }
-        .g4d-auth-root .g4d-auth-forgot {
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: #0284c7;
-          text-decoration: none;
-        }
-        .g4d-auth-root .g4d-auth-forgot:hover {
-          text-decoration: underline;
-        }
-        .g4d-auth-root .g4d-auth-input-wrap {
-          position: relative;
-          display: block;
-        }
-        .g4d-auth-root .g4d-auth-input {
-          width: 100%;
-          height: 2.875rem;
-          padding: 0 0.875rem;
-          font-size: 0.9375rem;
-          font-weight: 500;
-          font-family: inherit;
-          color: #0f172a;
-          background-color: #ffffff;
-          border: 1px solid #cbd5e1;
-          border-radius: 0.75rem;
-          outline: none;
-          transition: border-color 0.15s ease, box-shadow 0.15s ease;
-        }
-        .g4d-auth-root .g4d-auth-input--pw {
-          padding-right: 3rem;
-        }
-        .g4d-auth-root .g4d-auth-input::placeholder {
-          color: #94a3b8;
-        }
-        .g4d-auth-root .g4d-auth-input:focus-visible,
-        .g4d-auth-root .g4d-auth-input:focus {
-          border-color: #0284c7;
-          background-color: #ffffff;
-          box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.14);
-        }
-        .g4d-auth-root .g4d-auth-input--error {
-          border-color: #ef4444;
-        }
-        .g4d-auth-root .g4d-auth-input--error:focus-visible,
-        .g4d-auth-root .g4d-auth-input--error:focus {
-          border-color: #ef4444;
-          box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14);
-        }
-        .g4d-auth-root .g4d-auth-pw-toggle {
-          position: absolute;
-          top: 50%;
-          right: 0.5rem;
-          transform: translateY(-50%);
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          width: 2.125rem;
-          height: 2.125rem;
-          padding: 0;
-          background: transparent;
-          border: 0;
-          border-radius: 0.5rem;
-          cursor: pointer;
-          color: #64748b;
-          transition: color 0.15s ease, background-color 0.15s ease;
-        }
-        .g4d-auth-root .g4d-auth-pw-toggle:hover {
-          color: #0284c7;
-          background-color: #f1f5f9;
-        }
-        .g4d-auth-root .g4d-auth-pw-toggle:focus-visible {
-          outline: 2px solid #0284c7;
-          outline-offset: 2px;
-        }
-        .g4d-auth-root .g4d-auth-submit {
-          margin-top: 0.25rem;
-          height: 3rem;
-          width: 100%;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          font-size: 0.9375rem;
-          font-weight: 700;
-          font-family: inherit;
-          color: #ffffff;
-          border: 0;
-          border-radius: 0.75rem;
-          cursor: pointer;
-          background: linear-gradient(135deg, #1b9dd9 0%, #0284c7 60%, #0369a1 100%);
-          box-shadow: 0 10px 22px -10px rgba(2, 132, 199, 0.55);
-          transition: filter 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
-        }
-        .g4d-auth-root .g4d-auth-submit:hover:not(:disabled) {
-          filter: brightness(1.04);
-          transform: translateY(-1px);
-          box-shadow: 0 14px 26px -10px rgba(2, 132, 199, 0.65);
-        }
-        .g4d-auth-root .g4d-auth-submit:focus-visible {
-          outline: 2px solid #0284c7;
-          outline-offset: 2px;
-        }
-        .g4d-auth-root .g4d-auth-submit:disabled {
-          opacity: 0.7;
-          cursor: wait;
-        }
-        .g4d-auth-root .g4d-auth-footer-block {
-          margin-top: 1.5rem;
-          padding-top: 1.25rem;
-          border-top: 1px solid #f1f5f9;
-          text-align: center;
-          font-size: 0.8125rem;
-          font-weight: 500;
-          color: #64748b;
-        }
-        .g4d-auth-root .g4d-auth-link {
-          color: #0284c7;
-          font-weight: 600;
-          text-decoration: none;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.25rem;
-        }
-        .g4d-auth-root .g4d-auth-link:hover {
-          text-decoration: underline;
-        }
-      `}</style>
-
+    <div className="min-h-screen w-full flex flex-row max-[900px]:flex-col bg-white text-slate-900 font-sans antialiased">
       {/* Panneau Visuel G4D : 50% sur Desktop, bandeau haut 260px (<=900px) et 50px (<=480px) */}
       <aside className="relative overflow-hidden bg-[#06152d] flex-[0_0_50%] min-h-screen max-[900px]:order-[-1] max-[900px]:w-full max-[900px]:flex-[0_0_260px] max-[900px]:min-h-[260px] max-[480px]:flex-[0_0_50px] max-[480px]:min-h-[50px]">
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/brand/Gemini_Generated_Image_a6v3mga6v3mga6v3.jpg')" }}
+          style={{ backgroundImage: "url('/brand/g4d-login-bg.webp')" }}
         />
         <div
           aria-hidden="true"
@@ -182,7 +32,6 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
 
       {/* Panneau Formulaire : 50% Desktop (48px 56px), flex-1 (36px 24px <=900px, 28px 18px <=480px) */}
       <main className="relative z-[2] flex-[0_0_50%] flex flex-col justify-between items-center min-h-screen bg-white px-[56px] py-[48px] overflow-y-auto max-[900px]:flex-1 max-[900px]:w-full max-[900px]:min-h-0 max-[900px]:px-[24px] max-[900px]:py-[36px] max-[480px]:px-[18px] max-[480px]:py-[28px]">
-        {/* Barre supérieure discrète */}
         <header className="flex flex-wrap items-center justify-between gap-3 w-full">
           <a
             href="/"
@@ -193,7 +42,6 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
           </a>
         </header>
 
-        {/* Conteneur central respirant directement sur le fond blanc */}
         <div className="w-full max-w-[420px] mx-auto my-auto py-5 sm:py-8">
           <div className="flex flex-col items-center justify-center text-center mb-6 sm:mb-7">
             <G4dLogo
@@ -219,7 +67,6 @@ export function G4dAuthShell({ title, subtitle, children, footer }: G4dAuthShell
           {footer}
         </div>
 
-        {/* Pied de page discret */}
         <footer className="w-full flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100 text-xs text-slate-500">
           <div>
             Besoin d&apos;aide&nbsp;?{' '}

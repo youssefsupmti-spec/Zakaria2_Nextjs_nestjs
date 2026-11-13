@@ -3,8 +3,6 @@ import type { ReactNode } from 'react';
 export default function MarketingLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <link rel="stylesheet" href="/fonts/filament/filament/inter/index.css" precedence="default" />
-      <link rel="stylesheet" href="/fonts/wx/index.css" precedence="default" />
       <link rel="stylesheet" href="/assets/landing/css/bootstrap.min.css" precedence="default" />
       <link
         rel="stylesheet"
@@ -17,13 +15,6 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
       <link
         rel="stylesheet"
         href="/assets/landing/css/landing.css?v=20261112-7"
-        precedence="default"
-      />
-      <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-        crossOrigin=""
         precedence="default"
       />
       <style

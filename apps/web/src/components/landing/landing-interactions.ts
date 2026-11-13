@@ -23,7 +23,84 @@ const HUBS = [
   { city: 'Dakhla', lat: 23.6848, lng: -15.957, primary: false },
 ];
 
+interface SwiperInstance {
+  realIndex: number;
+  autoplay?: { stop: () => void; start: () => void };
+  slideToLoop: (index: number) => void;
+  destroy: (deleteInstance?: boolean, cleanStyles?: boolean) => void;
+}
+
+type SwiperConstructor = new (selector: string, options: Record<string, unknown>) => SwiperInstance;
+
+interface SwiperHostElement extends Element {
+  swiper?: SwiperInstance;
+}
+
+interface GsapTimeline {
+  from: (target: unknown, vars: Record<string, unknown>) => GsapTimeline;
+  fromTo: (
+    target: unknown,
+    fromVars: Record<string, unknown>,
+    toVars: Record<string, unknown>,
+  ) => GsapTimeline;
+}
+
+interface GsapInstance {
+  registerPlugin: (...plugins: unknown[]) => void;
+  config: (vars: Record<string, unknown>) => void;
+  to: (target: unknown, vars: Record<string, unknown>) => void;
+  killTweensOf: (target: unknown) => void;
+  quickSetter: (target: unknown, property: string) => (value: number) => void;
+  timeline: (vars?: Record<string, unknown>) => GsapTimeline;
+  utils: {
+    clamp: (min: number, max: number, value: number) => number;
+    mapRange: (
+      inMin: number,
+      inMax: number,
+      outMin: number,
+      outMax: number,
+      value: number,
+    ) => number;
+  };
+}
+
+interface SplitTextConstructor {
+  new (element: Element, vars: Record<string, unknown>): { chars: unknown };
+}
+
+interface LeafletLayer {
+  addTo: (map: LeafletMapInstance) => LeafletLayer;
+  bindPopup: (html: string) => LeafletLayer;
+}
+
+interface LeafletMapInstance {
+  invalidateSize: () => void;
+  remove: () => void;
+}
+
+interface LeafletNamespace {
+  map: (el: HTMLElement, options: Record<string, unknown>) => LeafletMapInstance;
+  tileLayer: (url: string, options: Record<string, unknown>) => LeafletLayer;
+  divIcon: (options: Record<string, unknown>) => unknown;
+  marker: (coords: [number, number], options: Record<string, unknown>) => LeafletLayer;
+}
+
+interface LeafletHostElement extends HTMLElement {
+  _leaflet_id?: number;
+}
+
+interface LandingWindow {
+  AOS?: { init: (options: Record<string, unknown>) => void };
+  Swiper?: SwiperConstructor;
+  gsap?: GsapInstance;
+  ScrollTrigger?: unknown;
+  SplitText?: SplitTextConstructor;
+  particlesJS?: (id: string, config: Record<string, unknown>) => void;
+  L?: LeafletNamespace;
+}
+
 const scriptCache = new Map<string, Promise<void>>();
+const styleCache = new Map<string, Promise<void>>();
 
 function loadScriptOnce(src: string): Promise<void> {
   if (scriptCache.has(src)) {
@@ -44,6 +121,32 @@ function loadScriptOnce(src: string): Promise<void> {
     document.body.appendChild(script);
   });
   scriptCache.set(src, promise);
+  return promise;
+}
+
+function loadStylesheetOnce(href: string, integrity?: string): Promise<void> {
+  if (styleCache.has(href)) {
+    return styleCache.get(href)!;
+  }
+  const promise = new Promise<void>((resolve) => {
+    const existing = document.querySelector(`link[data-g4d-href="${href}"]`);
+    if (existing) {
+      resolve();
+      return;
+    }
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    if (integrity) {
+      link.integrity = integrity;
+      link.crossOrigin = '';
+    }
+    link.setAttribute('data-g4d-href', href);
+    link.onload = () => resolve();
+    link.onerror = () => resolve();
+    document.head.appendChild(link);
+  });
+  styleCache.set(href, promise);
   return promise;
 }
 
@@ -68,7 +171,7 @@ export async function bootLandingInteractions(onMapReady: () => void): Promise<(
 
   if (disposed) return () => {};
 
-  const win = window as unknown as Record<string, any>;
+  const win = window as unknown as LandingWindow;
 
   // ── 1. Initialisation AOS ──────────────────────────────────────────────────
   if (win.AOS && typeof win.AOS.init === 'function') {
@@ -141,7 +244,7 @@ export async function bootLandingInteractions(onMapReady: () => void): Promise<(
     const Swiper = win.Swiper;
 
     // 3a. Hero Banner Slider
-    const bannerEl = document.querySelector('.banner-slider') as any;
+    const bannerEl = document.querySelector('.banner-slider') as SwiperHostElement | null;
     if (bannerEl && !bannerEl.swiper) {
       const bannerMenu = ['Livraison Nationale', 'Plateforme E-commerce', 'Support Client'];
       const bannerSwiper = new Swiper('.banner-slider', {
@@ -178,7 +281,7 @@ export async function bootLandingInteractions(onMapReady: () => void): Promise<(
     }
 
     // 3b. Aperçu Plateforme Swiper
-    const apercuEl = document.querySelector('.apercu-swiper') as any;
+    const apercuEl = document.querySelector('.apercu-swiper') as SwiperHostElement | null;
     if (apercuEl && !apercuEl.swiper) {
       const apercuSwiper = new Swiper('.apercu-swiper', {
         loop: true,
@@ -189,7 +292,7 @@ export async function bootLandingInteractions(onMapReady: () => void): Promise<(
           pauseOnMouseEnter: true,
         },
         on: {
-          slideChange: function (this: any) {
+          slideChange: function (this: SwiperInstance) {
             const idx = this.realIndex;
             const urls = [
               'app.g4d.ma/colis',
@@ -228,7 +331,7 @@ export async function bootLandingInteractions(onMapReady: () => void): Promise<(
     }
 
     // 3c. Testimonials Slider
-    const testiEl = document.querySelector('.testimonials-slider') as any;
+    const testiEl = document.querySelector('.testimonials-slider') as SwiperHostElement | null;
     if (testiEl && !testiEl.swiper) {
       const testiSwiper = new Swiper('.testimonials-slider', {
         grabCursor: true,
@@ -445,14 +548,15 @@ export async function bootLandingInteractions(onMapReady: () => void): Promise<(
     });
 
     // 5d. SplitText & ScrollTrigger Parallax (.splitTextStyleOne, .about-plane, .truck-head, .moon-shape)
-    if (win.SplitText && win.ScrollTrigger) {
+    const SplitTextCtor = win.SplitText;
+    if (SplitTextCtor && win.ScrollTrigger) {
       const splitHeadings = Array.from(
         document.querySelectorAll('.splitTextStyleOne:not([data-g4d-split])'),
       );
       splitHeadings.forEach((heading) => {
         heading.setAttribute('data-g4d-split', '1');
         try {
-          const split = new win.SplitText(heading, {
+          const split = new SplitTextCtor(heading, {
             type: 'chars, words',
             lineThreshold: 0.5,
           });
@@ -586,10 +690,16 @@ export async function bootLandingInteractions(onMapReady: () => void): Promise<(
   };
 
   const initCoverageMap = () => {
-    loadScriptOnce('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js').then(() => {
+    Promise.all([
+      loadStylesheetOnce(
+        'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+        'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=',
+      ),
+      loadScriptOnce('https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'),
+    ]).then(() => {
       if (disposed) return;
       if (win.L) {
-        const mapEl = document.getElementById('g4d-coverage-map') as any;
+        const mapEl = document.getElementById('g4d-coverage-map') as LeafletHostElement | null;
         if (mapEl && !mapEl._leaflet_id) {
           const L = win.L;
           const map = L.map(mapEl, {

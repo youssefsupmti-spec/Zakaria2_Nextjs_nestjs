@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { G4D_LOGO_PATH, G4D_LOGO_TRIM_PATH } from '@/lib/brand';
+import { G4D_LOGO_PATH } from '@/lib/brand';
 
 export interface G4dLogoProps {
   /**
@@ -25,8 +25,7 @@ export function G4dLogo({
   priority = false,
   showTagline = false,
 }: G4dLogoProps) {
-  const rawSrc = variant === 'light' ? G4D_LOGO_PATH : G4D_LOGO_PATH;
-  const src = rawSrc.split('?')[0] || rawSrc;
+  const src = G4D_LOGO_PATH.split('?')[0] || G4D_LOGO_PATH;
 
   const dimensions =
     variant === 'compact'
