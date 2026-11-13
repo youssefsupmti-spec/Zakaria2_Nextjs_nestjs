@@ -20,11 +20,11 @@ function getInternalApiBaseUrl(): string {
 
 export async function getServerAuthSession(): Promise<ServerAuthSession | null> {
   const cookieStore = await cookies();
-  const hostCookie = cookieStore.get('__Host-g4d.session');
-  const devCookie = cookieStore.get('g4d.session');
-  const activeCookie = hostCookie ?? devCookie;
+  const sessionCookies = cookieStore
+    .getAll()
+    .filter((c) => (c.name === '__Host-g4d.session' || c.name === 'g4d.session') && c.value);
 
-  if (!activeCookie?.value) {
+  if (sessionCookies.length === 0) {
     return null;
   }
 
@@ -32,26 +32,28 @@ export async function getServerAuthSession(): Promise<ServerAuthSession | null> 
   const userAgent = reqHeaders.get('user-agent') ?? '';
   const forwardedFor = reqHeaders.get('x-forwarded-for') ?? '';
 
-  try {
-    const response = await fetch(`${getInternalApiBaseUrl()}/api/v1/auth/me`, {
-      method: 'GET',
-      cache: 'no-store',
-      headers: {
-        accept: 'application/json',
-        cookie: `${activeCookie.name}=${activeCookie.value}`,
-        ...(userAgent ? { 'user-agent': userAgent } : {}),
-        ...(forwardedFor ? { 'x-forwarded-for': forwardedFor } : {}),
-      },
-    });
+  for (const activeCookie of sessionCookies) {
+    try {
+      const response = await fetch(`${getInternalApiBaseUrl()}/api/v1/auth/me`, {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          accept: 'application/json',
+          cookie: `${activeCookie.name}=${activeCookie.value}`,
+          ...(userAgent ? { 'user-agent': userAgent } : {}),
+          ...(forwardedFor ? { 'x-forwarded-for': forwardedFor } : {}),
+        },
+      });
 
-    if (!response.ok) {
-      return null;
+      if (response.ok) {
+        return (await response.json()) as ServerAuthSession;
+      }
+    } catch {
+      // Essayer le cookie suivant si disponible
     }
-
-    return (await response.json()) as ServerAuthSession;
-  } catch {
-    return null;
   }
+
+  return null;
 }
 
 export async function requireServerAuthSession(): Promise<ServerAuthSession> {

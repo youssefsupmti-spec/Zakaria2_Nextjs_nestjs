@@ -39,7 +39,14 @@ const TESTIMONIALS = [
   },
 ];
 
-export function Footer({ mapReady }: { mapReady: boolean }) {
+export function Footer({
+  mapReady,
+  isAuthenticated = false,
+}: {
+  mapReady: boolean;
+  isAuthenticated?: boolean;
+}) {
+  const authHref = isAuthenticated ? '/dashboard' : '/login';
   return (
     <>
       {/* ══════════════════════════════════════════════════════════════════════
@@ -127,13 +134,15 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
               </p>
               <div className="tw-mt-10 d-flex flex-wrap align-items-center tw-gap-7">
                 <a
-                  href="/login"
+                  href={authHref}
                   className="cursor-small btn btn-main-two rounded-0 tw-py-405 tw-px-12 d-inline-flex align-items-center tw-gap-4"
                   data-aos="fade-up"
                   data-aos-duration="1000"
                   data-aos-delay="300"
                 >
-                  <span>Rejoindre le réseau G4D</span>
+                  <span>
+                    {isAuthenticated ? 'Accéder à mon espace' : 'Rejoindre le réseau G4D'}
+                  </span>
                   <FeatherIcon name="arrow-right" />
                 </a>
                 <a
@@ -219,8 +228,8 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
               <p className="text-white opacity-75 cursor-small tw-mb-8">
                 Inscription gratuite. Sans engagement. Support inclus.
               </p>
-              <a href="/login" className="cursor-small btn btn-main rounded-0 tw-py-405 tw-px-10">
-                Créer mon compte gratuitement
+              <a href={authHref} className="cursor-small btn btn-main rounded-0 tw-py-405 tw-px-10">
+                {isAuthenticated ? 'Accéder à mon espace' : 'Créer mon compte gratuitement'}
               </a>
             </div>
           </div>
@@ -428,15 +437,15 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                 <ul className="d-flex flex-column tw-gap-4">
                   <li>
                     <a
-                      href="/login"
+                      href={authHref}
                       className="cursor-small hover--translate-x-2 position-relative text-neutral-500 hover-text-main-600 fw-semibold"
                     >
-                      Espace client
+                      {isAuthenticated ? 'Mon Espace' : 'Espace client'}
                     </a>
                   </li>
                   <li>
                     <a
-                      href="/login"
+                      href={authHref}
                       className="cursor-small hover--translate-x-2 position-relative text-neutral-500 hover-text-main-600 fw-semibold"
                     >
                       S&apos;inscrire
@@ -444,7 +453,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                   </li>
                   <li>
                     <a
-                      href="/login"
+                      href={authHref}
                       className="cursor-small hover--translate-x-2 position-relative text-neutral-500 hover-text-main-600 fw-semibold"
                     >
                       Compte client
@@ -452,7 +461,7 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                   </li>
                   <li>
                     <a
-                      href="/login"
+                      href={authHref}
                       className="cursor-small hover--translate-x-2 position-relative text-neutral-500 hover-text-main-600 fw-semibold"
                     >
                       Devenir livreur
@@ -501,10 +510,10 @@ export function Footer({ mapReady }: { mapReady: boolean }) {
                   </div>
                 </div>
                 <a
-                  href="/login"
+                  href={authHref}
                   className="cursor-small hover--translate-x-2 tw-mt-6 d-block fw-semibold text-main-600 tw-text-2xl hover-text-main-600"
                 >
-                  Démarrer gratuitement →
+                  {isAuthenticated ? 'Mon Espace →' : 'Démarrer gratuitement →'}
                 </a>
               </div>
             </div>

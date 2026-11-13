@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, type ReactNode } from 'react';
 import '../global.css';
 
 const MARKETING_STYLE_PATTERNS = [
@@ -29,6 +29,39 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
       disabledLinks.forEach((link) => {
         link.disabled = false;
       });
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const redirectIfAuthenticated = async () => {
+      try {
+        const response = await fetch('/api/v1/auth/me', {
+          method: 'GET',
+          credentials: 'include',
+          cache: 'no-store',
+        });
+        if (active && response.ok) {
+          window.location.replace('/dashboard');
+        }
+      } catch {
+        // Ignorer les erreurs réseau transitoires
+      }
+    };
+
+    void redirectIfAuthenticated();
+
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        void redirectIfAuthenticated();
+      }
+    };
+
+    window.addEventListener('pageshow', onPageShow);
+    return () => {
+      active = false;
+      window.removeEventListener('pageshow', onPageShow);
     };
   }, []);
 

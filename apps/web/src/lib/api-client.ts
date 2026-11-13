@@ -84,6 +84,15 @@ export async function apiFetch<T = unknown>(
     ({ message?: string | string[]; details?: unknown } & T) | null;
 
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== 'undefined') {
+      const p = window.location.pathname;
+      const isPublicPage =
+        p === '/' || p === '/login' || p === '/forgot-password' || p === '/reset-password';
+      if (!isPublicPage) {
+        const next = `${p}${window.location.search}`;
+        window.location.replace(`/login?next=${encodeURIComponent(next)}`);
+      }
+    }
     const rawMsg = payload && 'message' in payload ? payload.message : undefined;
     const msg = Array.isArray(rawMsg) ? rawMsg[0] : rawMsg || `Erreur API (${response.status})`;
     throw new ApiClientError(msg, response.status, payload?.details);

@@ -11,6 +11,45 @@ import { bootLandingInteractions } from '@/components/landing/landing-interactio
 export default function LandingPage() {
   const [preloaderHidden, setPreloaderHidden] = useState(false);
   const [mapReady, setMapReady] = useState(false);
+  const [authUser, setAuthUser] = useState<{ nomComplet?: string; email?: string } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/v1/auth/me', {
+          method: 'GET',
+          credentials: 'include',
+          cache: 'no-store',
+        });
+        if (!cancelled) {
+          if (res.ok) {
+            const data = (await res.json().catch(() => null)) as {
+              user?: { nomComplet?: string; email?: string };
+            } | null;
+            setAuthUser(data?.user ?? {});
+          } else {
+            setAuthUser(null);
+          }
+        }
+      } catch {
+        // Ignorer si l'API n'est pas joignable
+      }
+    };
+
+    void checkAuth();
+
+    const onPageShow = () => {
+      void checkAuth();
+    };
+    window.addEventListener('pageshow', onPageShow);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('pageshow', onPageShow);
+    };
+  }, []);
 
   useEffect(() => {
     let cleanupFn: (() => void) | undefined;
@@ -65,11 +104,13 @@ export default function LandingPage() {
     };
   }, []);
 
+  const isAuthenticated = authUser !== null;
+
   return (
     <div>
-      <Navbar preloaderHidden={preloaderHidden} />
-      <HeroSection />
-      <ServicesSection />
+      <Navbar preloaderHidden={preloaderHidden} authUser={authUser} />
+      <HeroSection isAuthenticated={isAuthenticated} />
+      <ServicesSection isAuthenticated={isAuthenticated} />
 
       {/* ══════════════════════════════════════════════════════════════════════
            TARIFICATION — PricingCalculator
@@ -104,7 +145,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <Footer mapReady={mapReady} />
+      <Footer mapReady={mapReady} isAuthenticated={isAuthenticated} />
     </div>
   );
 }

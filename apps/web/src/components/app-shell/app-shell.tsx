@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Building2, Handshake, KeyRound, LayoutDashboard, ShieldCheck, Users } from 'lucide-react';
-import { useLayoutEffect, useState, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
 import { G4D_LOGO_TRIM_PATH } from '@/lib/brand';
 import { useAuth } from '@/lib/client-rbac';
 import { cn } from '@/lib/utils';
@@ -36,6 +36,43 @@ export function AppShell({ children }: { children: ReactNode }) {
     document.body.style.overflow = '';
     document.body.style.paddingInlineEnd = '';
   }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const verifySession = async () => {
+      try {
+        const res = await fetch('/api/v1/auth/me', {
+          method: 'GET',
+          credentials: 'include',
+          cache: 'no-store',
+        });
+        if (active && (res.status === 401 || res.status === 403)) {
+          const next = `${window.location.pathname}${window.location.search}`;
+          window.location.replace(`/login?next=${encodeURIComponent(next)}`);
+        }
+      } catch {
+        // Ignorer les erreurs réseau transitoires
+      }
+    };
+
+    void verifySession();
+
+    const onPageShow = () => {
+      void verifySession();
+    };
+    const onFocus = () => {
+      void verifySession();
+    };
+
+    window.addEventListener('pageshow', onPageShow);
+    window.addEventListener('focus', onFocus);
+    return () => {
+      active = false;
+      window.removeEventListener('pageshow', onPageShow);
+      window.removeEventListener('focus', onFocus);
+    };
+  }, [pathname]);
 
   const isPlatformAdmin = Boolean(
     ctx?.isPlatformAdmin || user.isSuperAdmin || user.roles.includes('admin'),

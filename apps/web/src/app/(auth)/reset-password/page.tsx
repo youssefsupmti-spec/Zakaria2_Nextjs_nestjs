@@ -1,5 +1,7 @@
+import { redirect } from 'next/navigation';
 import { G4dAuthShell } from '@/components/auth/auth-shell';
 import { ResetPasswordForm } from '@/components/auth/reset-password-form';
+import { getServerAuthSession } from '@/lib/server-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +10,11 @@ export default async function ResetPasswordPage({
 }: {
   searchParams: Promise<{ token?: string; email?: string }>;
 }) {
+  const existingSession = await getServerAuthSession();
+  if (existingSession) {
+    redirect('/dashboard');
+  }
+
   const params = await searchParams;
 
   return (

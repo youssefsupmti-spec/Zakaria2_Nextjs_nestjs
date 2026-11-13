@@ -3,10 +3,12 @@
 import React, { useEffect } from 'react';
 import { FeatherIcon } from './feather-icon';
 
-export function HeroSection() {
+export function HeroSection({ isAuthenticated = false }: { isAuthenticated?: boolean }) {
   useEffect(() => {
     document.documentElement.style.setProperty('--g4d-banner-h', '820px');
   }, []);
+
+  const authHref = isAuthenticated ? '/dashboard' : '/login';
 
   return (
     <>
@@ -59,12 +61,14 @@ export function HeroSection() {
                           </p>
                           <div className="d-flex tw-gap-11 flex-wrap">
                             <a
-                              href="/login"
+                              href={authHref}
                               className="cursor-small btn btn-main-two hover-style-two button--stroke tw-py-405 d-inline-flex align-items-center justify-content-center tw-gap-5 group active--translate-y-2"
                               data-block="button"
                             >
                               <span className="button__flair"></span>
-                              <span className="button__label">Démarrer gratuitement</span>
+                              <span className="button__label">
+                                {isAuthenticated ? 'Accéder à mon espace' : 'Démarrer gratuitement'}
+                              </span>
                               <span className="tw-w-7 tw-h-7 bg-main-three-600 text-white tw-text-sm tw-rounded d-flex justify-content-center align-items-center position-relative group-hover-bg-main-600 group-hover-text-white tw-duration-500">
                                 <FeatherIcon name="arrow-right" />
                               </span>
@@ -133,12 +137,14 @@ export function HeroSection() {
                         </p>
                         <div className="d-flex tw-gap-11 flex-wrap">
                           <a
-                            href="/login"
+                            href={authHref}
                             className="cursor-small btn btn-main-two hover-style-two button--stroke tw-py-405 d-inline-flex align-items-center justify-content-center tw-gap-5 group active--translate-y-2"
                             data-block="button"
                           >
                             <span className="button__flair"></span>
-                            <span className="button__label">Créer mon compte</span>
+                            <span className="button__label">
+                              {isAuthenticated ? 'Mon Espace' : 'Créer mon compte'}
+                            </span>
                             <span className="tw-w-7 tw-h-7 bg-main-three-600 text-white tw-text-sm tw-rounded d-flex justify-content-center align-items-center position-relative group-hover-bg-main-600 group-hover-text-white tw-duration-500">
                               <FeatherIcon name="check" />
                             </span>

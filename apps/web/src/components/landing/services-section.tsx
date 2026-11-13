@@ -102,8 +102,9 @@ const PROCESS_STEPS = [
   },
 ];
 
-export function ServicesSection() {
+export function ServicesSection({ isAuthenticated = false }: { isAuthenticated?: boolean }) {
   const [activeServiceTab, setActiveServiceTab] = useState<string>('ramassage');
+  const authHref = isAuthenticated ? '/dashboard' : '/login';
 
   return (
     <>
@@ -263,7 +264,7 @@ export function ServicesSection() {
 
                 <div className="d-flex align-items-center tw-gap-56-px tw-mt-10 flex-wrap">
                   <a
-                    href="/login"
+                    href={authHref}
                     className="cursor-small btn btn-main-two hover-style-two button--stroke d-inline-flex align-items-center justify-content-center tw-gap-5 group active--translate-y-2 rounded-0"
                     data-block="button"
                     data-aos="fade-up"
@@ -271,7 +272,9 @@ export function ServicesSection() {
                     data-aos-delay="200"
                   >
                     <span className="button__flair"></span>
-                    <span className="button__label">Démarrer avec G4D</span>
+                    <span className="button__label">
+                      {isAuthenticated ? 'Mon Espace' : 'Démarrer avec G4D'}
+                    </span>
                     <span className="tw-w-7 tw-h-7 bg-main-three-600 text-white tw-text-sm tw-rounded d-flex justify-content-center align-items-center position-relative tw-duration-500">
                       <FeatherIcon name="arrow-right" />
                     </span>
@@ -1356,12 +1359,14 @@ export function ServicesSection() {
             data-aos-delay="300"
           >
             <a
-              href="/login"
+              href={authHref}
               className="cursor-small btn btn-main-two hover-style-two button--stroke tw-py-405 d-inline-flex align-items-center justify-content-center tw-gap-5 group active--translate-y-2 rounded-0"
               data-block="button"
             >
               <span className="button__flair"></span>
-              <span className="button__label">Accéder à la plateforme</span>
+              <span className="button__label">
+                {isAuthenticated ? 'Mon Espace' : 'Accéder à la plateforme'}
+              </span>
               <span className="tw-w-7 tw-h-7 bg-main-three-600 text-white tw-text-sm tw-rounded d-flex justify-content-center align-items-center position-relative group-hover-bg-main-600 group-hover-text-white tw-duration-500">
                 <FeatherIcon name="arrow-right" />
               </span>

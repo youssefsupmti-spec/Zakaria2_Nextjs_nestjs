@@ -1,7 +1,16 @@
+import { redirect } from 'next/navigation';
 import { G4dAuthShell } from '@/components/auth/auth-shell';
 import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
+import { getServerAuthSession } from '@/lib/server-auth';
 
-export default function ForgotPasswordPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function ForgotPasswordPage() {
+  const existingSession = await getServerAuthSession();
+  if (existingSession) {
+    redirect('/dashboard');
+  }
+
   return (
     <G4dAuthShell
       title="Mot de passe oublié"

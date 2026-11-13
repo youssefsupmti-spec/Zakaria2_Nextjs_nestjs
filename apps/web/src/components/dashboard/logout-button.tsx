@@ -13,7 +13,7 @@ export function LogoutButton() {
     } catch {
       // Ignorer si déjà déconnecté et rediriger vers /login
     } finally {
-      window.location.assign('/login');
+      window.location.replace('/login');
     }
   };
 

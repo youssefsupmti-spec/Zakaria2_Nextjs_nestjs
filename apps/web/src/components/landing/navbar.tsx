@@ -5,7 +5,18 @@ import Link from 'next/link';
 import { FeatherIcon } from './feather-icon';
 import { G4D_LOGO_PATH } from '@/lib/brand';
 
-export function Navbar({ preloaderHidden }: { preloaderHidden: boolean }) {
+export interface LandingAuthUser {
+  nomComplet?: string;
+  email?: string;
+}
+
+export function Navbar({
+  preloaderHidden,
+  authUser = null,
+}: {
+  preloaderHidden: boolean;
+  authUser?: LandingAuthUser | null;
+}) {
   return (
     <>
       {/* ══════════════════════════════════════════════════════════════════════
@@ -190,12 +201,34 @@ export function Navbar({ preloaderHidden }: { preloaderHidden: boolean }) {
               </li>
             </ul>
             <div className="d-flex flex-column tw-gap-4 tw-mt-8">
-              <a href="/login" className="btn btn-main-two rounded-0 tw-py-4 text-center">
-                Se connecter
-              </a>
-              <a href="/login" className="btn btn-main rounded-0 tw-py-4 text-center">
-                Devenir client
-              </a>
+              {authUser ? (
+                <a
+                  href="/dashboard"
+                  className="btn btn-main-two rounded-0 tw-py-4 text-center d-flex align-items-center justify-content-center tw-gap-2"
+                >
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '9999px',
+                      backgroundColor: '#22c55e',
+                      display: 'inline-block',
+                    }}
+                  />
+                  <span>Mon Espace</span>
+                  <FeatherIcon name="arrow-right" />
+                </a>
+              ) : (
+                <>
+                  <a href="/login" className="btn btn-main-two rounded-0 tw-py-4 text-center">
+                    Se connecter
+                  </a>
+                  <a href="/login" className="btn btn-main rounded-0 tw-py-4 text-center">
+                    Devenir client
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -350,18 +383,51 @@ export function Navbar({ preloaderHidden }: { preloaderHidden: boolean }) {
 
               {/* CTA Buttons Desktop */}
               <div className="d-lg-flex d-none align-items-center tw-gap-4 tw-px-6">
-                <a
-                  href="/login"
-                  className="cursor-small fw-semibold text-main-two-600 hover-text-main-600 tw-duration-200"
-                >
-                  Se connecter
-                </a>
-                <a
-                  href="/login"
-                  className="cursor-small btn btn-main-two rounded-0 tw-py-305 tw-px-8"
-                >
-                  Devenir client
-                </a>
+                {authUser ? (
+                  <a
+                    href="/dashboard"
+                    title={
+                      authUser.nomComplet
+                        ? `Connecté en tant que ${authUser.nomComplet}`
+                        : 'Accéder à mon espace G4D'
+                    }
+                    className="cursor-small btn btn-main-two rounded-pill tw-py-3 tw-px-6 d-inline-flex align-items-center tw-gap-3"
+                    style={{
+                      fontWeight: 700,
+                      letterSpacing: '0.01em',
+                      boxShadow: '0 8px 20px -6px rgba(12, 74, 110, 0.38)',
+                    }}
+                  >
+                    <span
+                      aria-hidden="true"
+                      style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '9999px',
+                        backgroundColor: '#22c55e',
+                        boxShadow: '0 0 0 3px rgba(34, 197, 94, 0.25)',
+                        display: 'inline-block',
+                      }}
+                    />
+                    <span>Mon Espace</span>
+                    <FeatherIcon name="arrow-right" />
+                  </a>
+                ) : (
+                  <>
+                    <a
+                      href="/login"
+                      className="cursor-small fw-semibold text-main-two-600 hover-text-main-600 tw-duration-200"
+                    >
+                      Se connecter
+                    </a>
+                    <a
+                      href="/login"
+                      className="cursor-small btn btn-main-two rounded-0 tw-py-305 tw-px-8"
+                    >
+                      Devenir client
+                    </a>
+                  </>
+                )}
               </div>
 
               {/* Social Icons Desktop */}
