@@ -53,15 +53,15 @@ export function DataTable<TData extends RowData>({
   const rows = table.getRowModel().rows;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="relative w-full max-w-sm">
-          <Search className="pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             value={globalFilter}
             onChange={(event) => setGlobalFilter(event.target.value)}
             placeholder={searchPlaceholder}
-            className="h-10 pl-10"
+            className="h-9 pl-9"
           />
         </div>
         <p className="text-xs font-medium text-slate-500">
@@ -69,9 +69,9 @@ export function DataTable<TData extends RowData>({
         </p>
       </div>
 
-      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-xs">
+      <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-xs">
         <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
-          <thead className="bg-slate-50">
+          <thead className="bg-slate-50/90">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -79,7 +79,7 @@ export function DataTable<TData extends RowData>({
                   return (
                     <th
                       key={header.id}
-                      className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-600"
+                      className="px-3.5 py-2.5 text-[11px] font-bold uppercase tracking-wider text-slate-600"
                     >
                       {header.isPlaceholder ? null : canSort ? (
                         <button
@@ -104,7 +104,7 @@ export function DataTable<TData extends RowData>({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-10 text-center text-sm text-slate-500"
+                  className="px-4 py-8 text-center text-sm text-slate-500"
                 >
                   {emptyMessage}
                 </td>
@@ -113,7 +113,7 @@ export function DataTable<TData extends RowData>({
               rows.map((row) => (
                 <tr key={row.id} className="transition hover:bg-slate-50/70">
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-3 align-middle text-slate-700">
+                    <td key={cell.id} className="px-3.5 py-2.5 align-middle text-slate-700">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
