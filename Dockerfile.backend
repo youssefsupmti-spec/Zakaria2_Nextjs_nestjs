@@ -19,6 +19,7 @@ COPY apps/api ./apps/api
 COPY apps/worker ./apps/worker
 
 RUN pnpm run db:generate && \
+    node -e "require('@node-rs/argon2')" && \
     pnpm exec tsc -p apps/api/tsconfig.json && \
     pnpm exec tsc -p apps/worker/tsconfig.json && \
     mkdir -p node_modules/@zakaria && \
@@ -26,8 +27,8 @@ RUN pnpm run db:generate && \
     ln -sf /app/dist/apps/api/libs/backend/config/src node_modules/@zakaria/backend-config && \
     ln -sf /app/dist/apps/api/libs/backend/database/src node_modules/@zakaria/backend-database
 
-# Script de démarrage combiné (API Fastify + Worker BullMQ optionnel)
-RUN printf '#!/bin/sh\nset -e\nif [ "${RUN_WORKER:-true}" = "true" ]; then\n  echo "⚙️  Démarrage du Worker BullMQ G4D en arrière-plan..."\n  node dist/apps/worker/apps/worker/src/main.js &\nfi\necho "🚀 Démarrage de l'\''API G4D NestJS/Fastify sur le port ${API_PORT:-3101}..."\nexec node dist/apps/api/apps/api/src/main.js\n' > /app/docker-entrypoint-backend.sh && \
+# Script de démarrage combiné (Prisma Migrate + API Fastify + Worker BullMQ optionnel)
+RUN printf '#!/bin/sh\nset -e\necho "🗄️  Application des migrations PostgreSQL Prisma..."\ni=0\nuntil pnpm run db:migrate:deploy; do\n  i=$((i+1))\n  if [ "$i" -ge 5 ]; then\n    echo "❌ Échec migrations Prisma après 5 tentatives."\n    exit 1\n  fi\n  echo "⏳ PostgreSQL non prêt, nouvelle tentative dans 3s ($i/5)..."\n  sleep 3\ndone\nif [ "${RUN_WORKER:-true}" = "true" ]; then\n  echo "⚙️  Démarrage du Worker BullMQ G4D en arrière-plan..."\n  node dist/apps/worker/apps/worker/src/main.js &\nfi\necho "🚀 Démarrage de l'\''API G4D NestJS/Fastify sur le port ${API_PORT:-3101}..."\nexec node dist/apps/api/apps/api/src/main.js\n' > /app/docker-entrypoint-backend.sh && \
     chmod +x /app/docker-entrypoint-backend.sh
 
 ENV NODE_ENV=production

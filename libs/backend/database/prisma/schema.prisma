@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -17,3 +18,198 @@ model AppBootCheck {
   @@map("app_boot_checks")
 }
 
+/// Référentiel des villes G4D (FK requise par users.ville_id, ID historique conservé)
+model Ville {
+  id              Int       @id
+  nameFr          String    @map("name_fr") @db.VarChar(255)
+  codeZone        String    @map("code_zone") @db.VarChar(255)
+  nameAr          String?   @map("name_ar") @db.VarChar(255)
+  zoneId          Int?      @map("zone_id")
+  standardTarifId Int?      @map("standard_tarif_id")
+  deletedAt       DateTime? @map("deleted_at") @db.Timestamptz(6)
+  createdAt       DateTime? @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime? @map("updated_at") @db.Timestamptz(6)
+
+  users User[]
+
+  @@index([nameFr])
+  @@index([zoneId])
+  @@map("villes")
+}
+
+/// Comptes utilisateurs G4D (ID entier historique conservé pour intégrité Sprints 03-20)
+model User {
+  id                        Int       @id @default(autoincrement())
+  nomComplet                String    @map("nom_complet") @db.VarChar(255)
+  civilite                  String?   @db.VarChar(20)
+  picture                   String    @default("") @db.VarChar(255)
+  email                     String    @db.Citext
+  password                  String    @db.VarChar(255)
+  passwordAlgo              String    @default("argon2id") @map("password_algo") @db.VarChar(20)
+  passwordResetAt           DateTime? @map("password_reset_at") @db.Timestamptz(6)
+  telephone                 String    @default("") @db.VarChar(255)
+  sav                       String    @default("") @db.VarChar(255)
+  villeName                 String    @default("") @map("ville_name") @db.VarChar(255)
+  villeId                   Int?      @map("ville_id")
+  cin                       String    @default("") @db.VarChar(255)
+  stockout                  String    @default("") @db.VarChar(255)
+  emailstockout             String    @default("") @db.VarChar(255)
+  active                    Boolean   @default(false)
+  ramassageLiv              Boolean   @default(false) @map("ramassage_liv")
+  affiliate                 String?   @db.VarChar(255)
+  lienLocalisationMaps      String    @default("") @map("lien_localisation_maps") @db.VarChar(500)
+  affictaion                String    @default("") @db.VarChar(255)
+  emailsend                 String    @default("non") @db.VarChar(50)
+  rememberToken             String?   @map("remember_token") @db.VarChar(100)
+  apiAbilities              Json?     @map("api_abilities")
+  inscriptionStatut         String?   @map("inscription_statut") @db.VarChar(20)
+  inscriptionTraiteePar     Int?      @map("inscription_traitee_par")
+  inscriptionTraiteeLe      DateTime? @map("inscription_traitee_le") @db.Timestamptz(6)
+  inscriptionMotif          String?   @map("inscription_motif") @db.VarChar(500)
+  inscriptionRefusNombre    Int       @default(0) @map("inscription_refus_nombre")
+  inscriptionDernierRefusLe DateTime? @map("inscription_dernier_refus_le") @db.Timestamptz(6)
+  parentId                  Int?      @map("parent_id")
+  deletedAt                 DateTime? @map("deleted_at") @db.Timestamptz(6)
+  createdAt                 DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                 DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  ville           Ville?              @relation(fields: [villeId], references: [id], onDelete: SetNull)
+  parent          User?               @relation("UserSubAccounts", fields: [parentId], references: [id], onDelete: Cascade)
+  subAccounts     User[]              @relation("UserSubAccounts")
+  userRoles       UserRole[]
+  userPermissions UserPermission[]
+  ownedRoles      Role[]              @relation("RoleOwner")
+  authSessions    AuthSession[]
+  authLogs        AuthenticationLog[]
+
+  @@index([email])
+  @@index([villeId])
+  @@index([parentId])
+  @@index([inscriptionStatut])
+  @@index([active, deletedAt])
+  @@map("users")
+}
+
+/// Rôles RBAC (globaux ou personnalisés C137 via owner_id/libelle)
+model Role {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(255)
+  guardName String    @default("web") @map("guard_name") @db.VarChar(255)
+  ownerId   Int?      @map("owner_id")
+  libelle   String?   @db.VarChar(100)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  owner           User?            @relation("RoleOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+
+  @@unique([name, guardName])
+  @@index([ownerId])
+  @@map("roles")
+}
+
+/// Catalogue des permissions granulaires G4D (Action:Ressource)
+model Permission {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(255)
+  guardName String    @default("web") @map("guard_name") @db.VarChar(255)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  rolePermissions RolePermission[]
+  userPermissions UserPermission[]
+
+  @@unique([name, guardName])
+  @@map("permissions")
+}
+
+/// Pivot rôles <-> permissions (issu de role_has_permissions)
+model RolePermission {
+  permissionId Int @map("permission_id")
+  roleId       Int @map("role_id")
+
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([permissionId, roleId])
+  @@index([roleId])
+  @@map("role_has_permissions")
+}
+
+/// Pivot utilisateurs <-> rôles (issu de model_has_roles avec model_type='user')
+model UserRole {
+  roleId Int @map("role_id")
+  userId Int @map("user_id")
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, userId])
+  @@index([userId])
+  @@map("user_roles")
+}
+
+/// Pivot utilisateurs <-> permissions directes (issu de model_has_permissions)
+model UserPermission {
+  permissionId Int @map("permission_id")
+  userId       Int @map("user_id")
+
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([permissionId, userId])
+  @@index([userId])
+  @@map("user_permissions")
+}
+
+/// Sessions opaques PostgreSQL (id = hash SHA-256 du jeton cookie __Host-g4d.session)
+model AuthSession {
+  id            String    @id @db.VarChar(64)
+  userId        Int       @map("user_id")
+  durationCode  String    @default("8h") @map("duration_code") @db.VarChar(8)
+  expiresAt     DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt     DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revokedReason String?   @map("revoked_reason") @db.VarChar(64)
+  ipAddress     String?   @map("ip_address") @db.VarChar(45)
+  userAgent     String?   @map("user_agent") @db.Text
+  lastActiveAt  DateTime  @default(now()) @map("last_active_at") @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+  @@map("auth_sessions")
+}
+
+/// Jetons de réinitialisation de mot de passe (hash SHA-256, validité 60 min)
+model PasswordResetToken {
+  email     String    @id @db.Citext
+  token     String    @db.VarChar(255)
+  expiresAt DateTime? @map("expires_at") @db.Timestamptz(6)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@map("password_reset_tokens")
+}
+
+/// Journal d'audit des authentifications (login, logout, login_failed, password_reset)
+model AuthenticationLog {
+  id        BigInt    @id @default(autoincrement())
+  userId    Int?      @map("user_id")
+  event     String    @db.VarChar(255)
+  ipAddress String?   @map("ip_address") @db.VarChar(45)
+  userAgent String?   @map("user_agent") @db.Text
+  location  String?   @db.VarChar(255)
+  device    String?   @db.VarChar(255)
+  browser   String?   @db.VarChar(255)
+  platform  String?   @db.VarChar(255)
+  createdAt DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([event])
+  @@index([createdAt])
+  @@map("authentication_logs")
+}

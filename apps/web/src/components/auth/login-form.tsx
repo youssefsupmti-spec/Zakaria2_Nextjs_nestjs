@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LoginRequestSchema, type LoginRequestDto } from '@zakaria/shared-contracts';
+import {
+  LoginRequestSchema,
+  SESSION_DURATION_OPTIONS,
+  type LoginRequestDto,
+  type LoginResponseDto,
+} from '@zakaria/shared-contracts';
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,30 +26,51 @@ export function LoginForm() {
     defaultValues: {
       email: '',
       password: '',
-      rememberMe: false,
+      sessionDuration: '8h',
     },
   });
 
   const onSubmit = async (values: LoginRequestDto) => {
     setAuthFeedback(null);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3101/api/v1';
-      const res = await fetch(`${apiUrl}/health`, {
-        method: 'GET',
-        headers: { Accept: 'application/json' },
-      }).catch(() => null);
-
-      const apiOnline = Boolean(res?.ok);
-      setAuthFeedback({
-        type: 'info',
-        message: apiOnline
-          ? `Identifiants validés pour « ${values.email} » (API G4D connectée). L'authentification complète sera activée au Sprint 02.`
-          : `Identifiants validés pour « ${values.email} ». L'authentification complète sera activée au Sprint 02.`,
+      const response = await fetch('/api/v1/auth/login', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          email: values.email,
+          password: values.password,
+          sessionDuration: values.sessionDuration ?? '8h',
+        }),
       });
+
+      const body = (await response.json().catch(() => null)) as
+        | LoginResponseDto
+        | { message?: string | string[] }
+        | null;
+
+      if (!response.ok) {
+        const rawMsg = body && 'message' in body ? body.message : undefined;
+        const message = Array.isArray(rawMsg)
+          ? rawMsg[0]
+          : rawMsg || 'Identifiants invalides ou accès refusé.';
+        setAuthFeedback({
+          type: 'error',
+          message,
+        });
+        return;
+      }
+
+      const redirectTo =
+        body && 'redirectTo' in body && body.redirectTo ? body.redirectTo : '/dashboard';
+      window.location.assign(redirectTo);
     } catch {
       setAuthFeedback({
         type: 'error',
-        message: 'Une erreur est survenue lors de la tentative de connexion.',
+        message: 'Impossible de joindre le serveur d’authentification G4D.',
       });
     }
   };
@@ -96,7 +122,6 @@ export function LoginForm() {
         className="g4d-auth-form flex flex-col gap-[18px]"
         noValidate
       >
-        {/* Adresse e-mail */}
         <label className="g4d-auth-field flex flex-col gap-2">
           <span className="g4d-auth-label-text text-[13px] font-bold text-[#334155]">
             Adresse e-mail
@@ -121,14 +146,13 @@ export function LoginForm() {
           )}
         </label>
 
-        {/* Mot de passe */}
         <label className="g4d-auth-field flex flex-col gap-2">
           <span className="g4d-auth-label-row flex items-center justify-between">
             <span className="g4d-auth-label-text text-[13px] font-bold text-[#334155]">
               Mot de passe
             </span>
             <a
-              href="mailto:Contact@g4d.ma?subject=R%C3%A9initialisation%20mot%20de%20passe%20G4D"
+              href="/forgot-password"
               className="g4d-auth-forgot text-[12.5px] font-bold text-[#1B9DD9] bg-transparent border-0 cursor-pointer p-0 hover:underline"
             >
               Mot de passe oublié ?
@@ -193,34 +217,42 @@ export function LoginForm() {
           )}
         </label>
 
-        {/* Rester connecté */}
-        <label className="g4d-auth-remember flex items-center gap-[10px] cursor-pointer select-none -mt-[2px]">
-          <input
-            type="checkbox"
-            className="g4d-auth-checkbox w-[19px] h-[19px] m-0 border-[1.5px] border-[#CBD5E1] rounded-none bg-white cursor-pointer shrink-0 accent-[#1B9DD9]"
-            {...register('rememberMe')}
-          />
-          <span
-            className="text-[14px] font-semibold text-[#475569]"
-            style={{ fontSize: '14px', fontWeight: 600, color: '#475569' }}
-          >
-            Rester connecté
+        {/* Sélecteur de durée de session ("Rester connecté") */}
+        <label className="g4d-auth-field flex flex-col gap-2">
+          <span className="g4d-auth-label-text text-[13px] font-bold text-[#334155]">
+            Garder ma session active
           </span>
+          <select
+            aria-label="Durée de la session"
+            className="g4d-auth-select"
+            {...register('sessionDuration')}
+          >
+            {SESSION_DURATION_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </label>
 
-        {/* Bouton de connexion */}
         <button
           type="submit"
           disabled={isSubmitting}
           className="g4d-auth-submit"
         >
           {!isSubmitting ? (
-            <span className="inline-flex items-center gap-[9px]" style={{ display: 'inline-flex', alignItems: 'center', gap: '9px' }}>
+            <span
+              className="inline-flex items-center gap-[9px]"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '9px' }}
+            >
               Se connecter
               <span className="text-[18px] leading-none -translate-y-px">&rarr;</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-2" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <span
+              className="inline-flex items-center gap-2"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+            >
               <span className="w-[18px] h-[18px] border-2 border-white/40 border-t-white rounded-full animate-spin" />
               Connexion…
             </span>
