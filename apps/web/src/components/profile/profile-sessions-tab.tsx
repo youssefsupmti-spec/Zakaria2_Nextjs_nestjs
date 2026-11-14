@@ -5,6 +5,7 @@ import type { ActiveSessionItemDto } from '@zakaria/shared-contracts';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { OPERATION_LABELS } from '@/components/ui/operation-feedback';
 import '@/components/ui/solar-icons';
 import { formatDateTimeFr, parseUserAgent } from './profile-types';
 
@@ -70,7 +71,7 @@ export function ProfileSessionsTab({
                   setConfirmOthers(false);
                 }}
               >
-                {isRevokingOthers ? 'Révocation…' : 'Confirmer'}
+                {isRevokingOthers ? OPERATION_LABELS.deleting : 'Confirmer'}
               </Button>
               <Button
                 type="button"
@@ -88,7 +89,7 @@ export function ProfileSessionsTab({
       {/* Liste des sessions */}
       {isLoading ? (
         <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
-          Chargement des sessions actives…
+          {OPERATION_LABELS.loading}
         </div>
       ) : sessions.length === 0 ? (
         <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">

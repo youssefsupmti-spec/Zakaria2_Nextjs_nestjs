@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { DatabaseService } from '@zakaria/backend-database';
 import {
+  BulkBanqueStatusSchema,
+  BulkIdsSchema,
   CreateBanqueSchema,
   UpdateBanqueSchema,
   type AuthUserDto,
@@ -61,36 +63,54 @@ export class BanquesService {
   }
 
   /** Liste les banques marocaines non supprimées avec leurs codes RIB à 3 chiffres. */
-  async list(actor: AuthUserDto, search?: string) {
+  async list(
+    actor: AuthUserDto,
+    searchOrFilters?: string | { search?: string; status?: string; codePrefix?: string },
+  ) {
     this.assertPermission(actor, 'ViewAny:Banque');
-    const q = search?.trim();
+    const filters =
+      typeof searchOrFilters === 'string' ? { search: searchOrFilters } : (searchOrFilters ?? {});
+    const q = filters.search?.trim();
+    const statusFilter =
+      filters.status === 'active' || filters.status === 'inactive' ? filters.status : undefined;
+    const codePrefix = filters.codePrefix?.trim();
 
-    const banques = await this.database.prisma.banque.findMany({
-      where: {
-        deletedAt: null,
-        ...(q
-          ? {
-              OR: [
-                { name: { contains: q, mode: 'insensitive' } },
-                { swiftCode: { contains: q, mode: 'insensitive' } },
-                { codes: { some: { code: { contains: q } } } },
-              ],
-            }
-          : {}),
-      },
-      include: {
-        codes: {
-          select: { id: true, code: true },
-          orderBy: { code: 'asc' },
+    const baseWhere = {
+      deletedAt: null,
+      ...(q
+        ? {
+            OR: [
+              { name: { contains: q, mode: 'insensitive' as const } },
+              { swiftCode: { contains: q, mode: 'insensitive' as const } },
+              { codes: { some: { code: { contains: q } } } },
+            ],
+          }
+        : {}),
+      ...(codePrefix ? { codes: { some: { code: { contains: codePrefix } } } } : {}),
+    };
+
+    const [banques, totalAll, totalActive] = await Promise.all([
+      this.database.prisma.banque.findMany({
+        where: {
+          ...baseWhere,
+          ...(statusFilter ? { status: statusFilter } : {}),
         },
-        _count: {
-          select: {
-            comptesBancaires: { where: { deletedAt: null } },
+        include: {
+          codes: {
+            select: { id: true, code: true },
+            orderBy: { code: 'asc' },
+          },
+          _count: {
+            select: {
+              comptesBancaires: { where: { deletedAt: null } },
+            },
           },
         },
-      },
-      orderBy: [{ status: 'asc' }, { name: 'asc' }],
-    });
+        orderBy: [{ status: 'asc' }, { name: 'asc' }],
+      }),
+      this.database.prisma.banque.count({ where: { deletedAt: null } }),
+      this.database.prisma.banque.count({ where: { deletedAt: null, status: 'active' } }),
+    ]);
 
     return {
       canCreate:
@@ -99,6 +119,11 @@ export class BanquesService {
         this.policy.isPlatformAdmin(actor) || this.policy.hasPermission(actor, 'Update:Banque'),
       canDelete:
         this.policy.isPlatformAdmin(actor) || this.policy.hasPermission(actor, 'Delete:Banque'),
+      counts: {
+        total: totalAll,
+        active: totalActive,
+        inactive: Math.max(0, totalAll - totalActive),
+      },
       items: banques.map((b) => ({
         id: b.id,
         name: b.name,
@@ -225,5 +250,98 @@ export class BanquesService {
     ]);
 
     return { ok: true, id: banqueId };
+  }
+
+  /** Met à jour le statut (active/inactive) d'un lot de banques. */
+  async bulkUpdateStatus(actor: AuthUserDto, rawPayload: unknown) {
+    this.assertPermission(actor, 'Update:Banque');
+    const dto = parseOrThrowZod(
+      BulkBanqueStatusSchema,
+      rawPayload,
+      'Paramètres de mise à jour groupée des banques invalides.',
+    );
+    const uniqueIds = [...new Set(dto.ids)];
+
+    const result = await this.database.prisma.banque.updateMany({
+      where: { id: { in: uniqueIds }, deletedAt: null },
+      data: { status: dto.status },
+    });
+
+    return {
+      ok: true,
+      updatedCount: result.count,
+      skippedCount: Math.max(0, uniqueIds.length - result.count),
+      message: `${result.count} banque(s) mise(s) à jour (${dto.status === 'active' ? 'activée(s)' : 'désactivée(s)'}).`,
+    };
+  }
+
+  /** Archive un lot de banques en ignorant celles liées à au moins un compte bancaire actif. */
+  async bulkArchive(actor: AuthUserDto, rawPayload: unknown) {
+    this.assertPermission(actor, 'Delete:Banque');
+    const dto = parseOrThrowZod(
+      BulkIdsSchema,
+      rawPayload,
+      'Sélection de banques à archiver invalide.',
+    );
+    const uniqueIds = [...new Set(dto.ids)];
+
+    const existing = await this.database.prisma.banque.findMany({
+      where: { id: { in: uniqueIds }, deletedAt: null },
+      select: { id: true, name: true },
+    });
+    const existingMap = new Map(existing.map((b) => [b.id, b.name]));
+
+    const linkedGroups = await this.database.prisma.compteBancaire.groupBy({
+      by: ['banqueId'],
+      where: { banqueId: { in: existing.map((b) => b.id) }, deletedAt: null },
+      _count: { _all: true },
+    });
+    const linkedCountById = new Map<number, number>();
+    for (const g of linkedGroups) {
+      if (g.banqueId !== null) {
+        linkedCountById.set(g.banqueId, g._count._all);
+      }
+    }
+
+    const archivableIds: number[] = [];
+    const errors: Array<{ id: number; message: string }> = [];
+
+    for (const id of uniqueIds) {
+      const name = existingMap.get(id);
+      if (!name) {
+        errors.push({ id, message: 'Banque introuvable ou déjà archivée.' });
+        continue;
+      }
+      const linked = linkedCountById.get(id) ?? 0;
+      if (linked > 0) {
+        errors.push({
+          id,
+          message: `${name} : ${linked} compte(s) bancaire(s) actif(s) rattaché(s).`,
+        });
+        continue;
+      }
+      archivableIds.push(id);
+    }
+
+    if (archivableIds.length > 0) {
+      await this.database.prisma.$transaction([
+        this.database.prisma.banqueCode.deleteMany({ where: { bankId: { in: archivableIds } } }),
+        this.database.prisma.banque.updateMany({
+          where: { id: { in: archivableIds }, deletedAt: null },
+          data: { status: 'inactive', deletedAt: new Date() },
+        }),
+      ]);
+    }
+
+    return {
+      ok: true,
+      archivedCount: archivableIds.length,
+      skippedCount: errors.length,
+      errors,
+      message:
+        errors.length > 0
+          ? `${archivableIds.length} banque(s) archivée(s), ${errors.length} ignorée(s) (comptes liés).`
+          : `${archivableIds.length} banque(s) archivée(s).`,
+    };
   }
 }

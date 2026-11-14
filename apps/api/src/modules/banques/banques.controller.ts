@@ -26,8 +26,27 @@ export class BanquesController {
 
   @Get()
   @ApiOperation({ summary: 'Liste les banques et leurs préfixes RIB à 3 chiffres' })
-  list(@CurrentAuth() auth: AuthContext, @Query('search') search?: string) {
-    return this.banquesService.list(auth.user, search);
+  list(
+    @CurrentAuth() auth: AuthContext,
+    @Query('search') search?: string,
+    @Query('status') status?: string,
+    @Query('codePrefix') codePrefix?: string,
+  ) {
+    return this.banquesService.list(auth.user, { search, status, codePrefix });
+  }
+
+  @Post('bulk-status')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Active ou désactive un lot de banques' })
+  bulkStatus(@CurrentAuth() auth: AuthContext, @Body() body: unknown) {
+    return this.banquesService.bulkUpdateStatus(auth.user, body);
+  }
+
+  @Post('bulk-archive')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Archive un lot de banques sans comptes bancaires liés' })
+  bulkArchive(@CurrentAuth() auth: AuthContext, @Body() body: unknown) {
+    return this.banquesService.bulkArchive(auth.user, body);
   }
 
   @Post()

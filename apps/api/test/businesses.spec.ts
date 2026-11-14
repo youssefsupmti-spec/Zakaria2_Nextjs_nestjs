@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import type { AuthUserDto } from '@zakaria/shared-contracts';
 import { describe, expect, it } from 'vitest';
 import { PolicyService } from '../src/modules/access-control/policy.service';
@@ -223,5 +223,122 @@ describe('Vendeurs, Business & Couverture Agence', () => {
     );
 
     await expect(service.deleteCompte(ADMIN_ACTOR, 42, 77)).rejects.toThrow(BadRequestException);
+  });
+
+  it('BusinessesService.bulkUpdateStatus : active/désactive en lot les enseignes accessibles', async () => {
+    const policy = new PolicyService();
+    let updatedCount = 0;
+    const fakeDb = {
+      prisma: {
+        business: {
+          findFirst: async ({ where }: { where: { id: number } }) => ({
+            id: where.id,
+            userId: 10,
+            name: `Boutique #${where.id}`,
+            agencyId: 1,
+            modePaiement: 'espece',
+            user: {
+              id: 10,
+              nomComplet: 'Test',
+              email: 't@g4d.ma',
+              telephone: '0600',
+              active: true,
+              inscriptionStatut: 'acceptee',
+            },
+            ville: null,
+            returnVille: null,
+            agency: null,
+          }),
+          updateMany: async ({ data }: { data: { isActive: boolean } }) => {
+            updatedCount = data.isActive ? 0 : 2;
+            return { count: 2 };
+          },
+        },
+      },
+    };
+
+    const service = new BusinessesService(
+      fakeDb as never,
+      policy,
+      new AgenceRamassageService(fakeDb as never, policy),
+      new InvoiceBankResolverService(fakeDb as never),
+    );
+
+    const res = await service.bulkUpdateStatus(ADMIN_ACTOR, {
+      ids: [11, 12, 11],
+      isActive: false,
+    });
+    expect(updatedCount).toBe(2);
+    expect(res).toMatchObject({ ok: true, updatedCount: 2, skippedCount: 0 });
+  });
+
+  it('BusinessesService.bulkArchive : refuse un acteur client et archive enseignes + comptes en transaction pour un admin', async () => {
+    const policy = new PolicyService();
+    const txOps: unknown[] = [];
+    const fakeDb = {
+      prisma: {
+        business: {
+          findFirst: async ({ where }: { where: { id: number } }) => ({
+            id: where.id,
+            userId: 10,
+            name: `Boutique #${where.id}`,
+            agencyId: 1,
+            modePaiement: 'espece',
+            user: {
+              id: 10,
+              nomComplet: 'Test',
+              email: 't@g4d.ma',
+              telephone: '0600',
+              active: true,
+              inscriptionStatut: 'acceptee',
+            },
+            ville: null,
+            returnVille: null,
+            agency: null,
+          }),
+          updateMany: (args: unknown) => ({ op: 'business.updateMany', args, count: 2 }),
+        },
+        compteBancaire: {
+          updateMany: (args: unknown) => ({ op: 'compte.updateMany', args, count: 3 }),
+        },
+        $transaction: async (ops: unknown[]) => {
+          txOps.push(...ops);
+          return [{ count: 3 }, { count: 2 }];
+        },
+      },
+    };
+
+    const service = new BusinessesService(
+      fakeDb as never,
+      policy,
+      new AgenceRamassageService(fakeDb as never, policy),
+      new InvoiceBankResolverService(fakeDb as never),
+    );
+
+    const clientActor: AuthUserDto = {
+      ...ADMIN_ACTOR,
+      id: 4806,
+      titulaireId: 4806,
+      isSuperAdmin: false,
+      roles: ['client'],
+      accessContext: {
+        primaryScope: 'client',
+        titulaireId: 4806,
+        isSuperAdmin: false,
+        isPlatformAdmin: false,
+        selectedAgenceId: null,
+        agenceMemberships: [],
+        managedAgenceIds: [],
+        partenaireMemberships: [],
+      },
+    };
+
+    await expect(service.bulkArchive(clientActor, { ids: [11] })).rejects.toThrow(
+      ForbiddenException,
+    );
+
+    const okRes = await service.bulkArchive(ADMIN_ACTOR, { ids: [11, 12] });
+    expect(txOps).toHaveLength(2);
+    expect(okRes).toMatchObject({ ok: true, archivedCount: 2 });
   });
 });

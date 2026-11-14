@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { DatabaseService, type Prisma } from '@zakaria/backend-database';
 import {
+  BulkIdsSchema,
   INSCRIPTION_STATUT_VALUES,
   RefuserInscriptionSchema,
   type AuthUserDto,
@@ -334,6 +335,51 @@ export class InscriptionsService {
       id: clientId,
       statut: 'refusee',
       message: "La demande d'inscription a été refusée et archivée.",
+    };
+  }
+
+  /** Accepte en lot plusieurs demandes d'inscription en réutilisant les gardes FOR UPDATE. */
+  async bulkAccepter(actor: AuthUserDto, rawPayload: unknown, meta: RequestMeta) {
+    this.assertCanDecision(actor, 'Approve:DemandeInscription');
+    const dto = parseOrThrowZod(
+      BulkIdsSchema,
+      rawPayload,
+      'Sélection de demandes d’inscription invalide.',
+    );
+    const uniqueIds = [...new Set(dto.ids)];
+
+    let acceptedCount = 0;
+    const errors: Array<{ id: number; message: string }> = [];
+    let firstForbidden: ForbiddenException | null = null;
+
+    for (const id of uniqueIds) {
+      try {
+        await this.accepter(actor, id, meta);
+        acceptedCount += 1;
+      } catch (err) {
+        if (err instanceof ForbiddenException && !firstForbidden) {
+          firstForbidden = err;
+        }
+        errors.push({
+          id,
+          message: err instanceof Error ? err.message : 'Validation impossible sur cette demande.',
+        });
+      }
+    }
+
+    if (acceptedCount === 0 && firstForbidden) {
+      throw firstForbidden;
+    }
+
+    return {
+      ok: true,
+      acceptedCount,
+      skippedCount: errors.length,
+      errors,
+      message:
+        errors.length > 0
+          ? `${acceptedCount} demande(s) acceptée(s), ${errors.length} ignorée(s).`
+          : `${acceptedCount} demande(s) acceptée(s) et activée(s).`,
     };
   }
 }

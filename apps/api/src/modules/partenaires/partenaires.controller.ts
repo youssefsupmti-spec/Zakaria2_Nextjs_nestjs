@@ -36,6 +36,13 @@ export class PartenairesController {
     return this.partenairesService.createPartenaire(auth.user, body);
   }
 
+  @Post('bulk-status')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Active ou désactive un lot de partenaires B2B' })
+  bulkStatus(@CurrentAuth() auth: AuthContext, @Body() body: unknown) {
+    return this.partenairesService.bulkUpdateStatus(auth.user, body);
+  }
+
   @Patch(':id')
   @ApiOperation({ summary: 'Met à jour une société partenaire B2B' })
   updatePartenaire(

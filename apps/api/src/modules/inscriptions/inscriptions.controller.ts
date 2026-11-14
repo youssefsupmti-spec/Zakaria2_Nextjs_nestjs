@@ -60,6 +60,17 @@ export class InscriptionsController {
     return this.inscriptionsService.accepter(auth.user, id, this.extractMeta(request));
   }
 
+  @Post('bulk-accepter')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Accepte un lot de demandes d’inscription en attente' })
+  bulkAccepter(
+    @CurrentAuth() auth: AuthContext,
+    @Body() body: unknown,
+    @Req() request: FastifyRequest,
+  ) {
+    return this.inscriptionsService.bulkAccepter(auth.user, body, this.extractMeta(request));
+  }
+
   @Post(':id/refuser')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refuse une demande d’inscription avec motif obligatoire (FOR UPDATE)' })

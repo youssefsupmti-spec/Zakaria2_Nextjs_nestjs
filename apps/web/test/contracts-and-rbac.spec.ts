@@ -3,6 +3,11 @@ import { resolve } from 'node:path';
 import { getIcon } from '@iconify/react';
 import { describe, expect, it } from 'vitest';
 import {
+  BulkActifStatusSchema,
+  BulkActiveStatusSchema,
+  BulkBanqueStatusSchema,
+  BulkIdsSchema,
+  BulkIsActiveStatusSchema,
   CreateAgenceSchema,
   CreateBanqueSchema,
   CreateCompteBancaireSchema,
@@ -12,6 +17,7 @@ import {
   RegisterClientSchema,
   SESSION_DURATION_OPTIONS,
 } from '@zakaria/shared-contracts';
+import { buildCsvContent, OPERATION_LABELS } from '../src/components/ui/operation-feedback-utils';
 import '../src/components/ui/solar-icons';
 import { ApiClientError } from '../src/lib/api-client';
 
@@ -170,10 +176,37 @@ describe('Contrats Front/Back, Design System & RBAC', () => {
       'solar:banknote-2-bold-duotone',
       'solar:card-2-bold-duotone',
       'solar:user-circle-bold-duotone',
+      'solar:clock-circle-bold-duotone',
+      'solar:verified-check-bold-duotone',
+      'solar:laptop-bold-duotone',
+      'solar:shield-check-bold-duotone',
     ];
 
     for (const iconName of requiredSolarIcons) {
       expect(getIcon(iconName), `Icône manquante: ${iconName}`).toBeTruthy();
     }
+  });
+
+  it('valide les contrats Bulk G4D et les libellés OPERATION_LABELS / export CSV', () => {
+    expect(BulkIdsSchema.safeParse({ ids: [] }).success).toBe(false);
+    expect(BulkIdsSchema.safeParse({ ids: [1, 2] }).success).toBe(true);
+    expect(BulkBanqueStatusSchema.safeParse({ ids: [1], status: 'active' }).success).toBe(true);
+    expect(BulkIsActiveStatusSchema.safeParse({ ids: [1], isActive: false }).success).toBe(true);
+    expect(BulkActifStatusSchema.safeParse({ ids: [1], actif: true }).success).toBe(true);
+    expect(BulkActiveStatusSchema.safeParse({ ids: [1], active: false }).success).toBe(true);
+
+    expect(OPERATION_LABELS).toEqual({
+      loading: 'Chargement...',
+      refreshing: 'Actualisation...',
+      saving: 'Enregistrement...',
+      updating: 'Mise à jour...',
+      deleting: 'Suppression...',
+      exporting: 'Exportation...',
+    });
+
+    const csv = buildCsvContent(['Nom', 'Statut'], [['Banque "A"\nTest', 'Actif']]);
+    expect(csv.startsWith('\uFEFF')).toBe(true);
+    expect(csv).toContain('"Nom";"Statut"');
+    expect(csv).toContain('"Banque ""A"" Test";"Actif"');
   });
 });

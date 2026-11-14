@@ -604,3 +604,41 @@ export interface InvoiceBankResolutionDto {
   estBanqueCustom: boolean;
   source: 'banque_relation' | 'banque_nom_custom' | 'rib_prefix' | 'indetermine';
 }
+
+export const BulkIdsSchema = z.object({
+  ids: z
+    .array(z.number().int().positive())
+    .min(1, 'Sélectionnez au moins un élément.')
+    .max(200, 'Vous pouvez traiter au maximum 200 éléments par lot.'),
+});
+export type BulkIdsDto = z.infer<typeof BulkIdsSchema>;
+
+export const BulkActiveStatusSchema = BulkIdsSchema.extend({
+  active: z.boolean(),
+});
+export type BulkActiveStatusDto = z.infer<typeof BulkActiveStatusSchema>;
+
+export const BulkActifStatusSchema = BulkIdsSchema.extend({
+  actif: z.boolean(),
+});
+export type BulkActifStatusDto = z.infer<typeof BulkActifStatusSchema>;
+
+export const BulkIsActiveStatusSchema = BulkIdsSchema.extend({
+  isActive: z.boolean(),
+});
+export type BulkIsActiveStatusDto = z.infer<typeof BulkIsActiveStatusSchema>;
+
+export const BulkBanqueStatusSchema = BulkIdsSchema.extend({
+  status: BanqueStatusSchema,
+});
+export type BulkBanqueStatusDto = z.infer<typeof BulkBanqueStatusSchema>;
+
+export interface BulkActionResultDto {
+  ok: boolean;
+  updatedCount?: number;
+  archivedCount?: number;
+  acceptedCount?: number;
+  skippedCount?: number;
+  errors?: Array<{ id: number; message: string }>;
+  message?: string;
+}

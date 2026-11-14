@@ -2,15 +2,33 @@
 
 import { Icon } from '@iconify/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { Download, Pencil, Plus, Power, PowerOff, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import {
   BusinessEditorModal,
   type BusinessItemDto,
   type BusinessOptionsDto,
 } from '@/components/businesses/business-editor-modal';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ConfirmActionDialog } from '@/components/ui/confirm-action-dialog';
+import {
+  DataTable,
+  type DataTableBulkAction,
+  type DataTableColumnDef,
+} from '@/components/ui/data-table';
+import { FILTER_SELECT_CLASS, FilterCard, FilterField } from '@/components/ui/filter-card';
 import { Input } from '@/components/ui/input';
+import {
+  OPERATION_LABELS,
+  OperationFeedbackBanner,
+  exportRowsToCsv,
+  type OperationMessage,
+} from '@/components/ui/operation-feedback';
+import { PageContent } from '@/components/ui/page-content';
+import { PageTabs, type PageTabItem } from '@/components/ui/page-tabs';
 import '@/components/ui/solar-icons';
+import { StatusBadge } from '@/components/ui/status-badge';
 import { apiFetch } from '@/lib/api-client';
 
 interface BusinessesListResponse {
@@ -19,6 +37,7 @@ interface BusinessesListResponse {
   stats: {
     total: number;
     actifs: number;
+    inactifs?: number;
     virement: number;
     espece: number;
     rattaches: number;
@@ -30,286 +49,609 @@ interface BusinessesListResponse {
   options: BusinessOptionsDto;
 }
 
-const COUVERTURE_BADGE: Record<string, string> = {
-  rattache: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300',
-  couvert_par_zone: 'bg-sky-100 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300',
-  hors_zone: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300',
-  orphelin_sans_ville: 'bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300',
-};
+type BusinessTab = 'toutes' | 'actifs' | 'inactifs' | 'couvertes' | 'alertes';
 
 export default function BusinessesPage() {
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState('');
-  const [couverture, setCouverture] = useState('');
-  const [modePaiement, setModePaiement] = useState('');
-  const [feedback, setFeedback] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedBusinessId, setSelectedBusinessId] = useState<number | null>(null);
+  const [tab, setTab] = useState<BusinessTab>('toutes');
+  const [searchFilter, setSearchFilter] = useState('');
+  const [agencyIdFilter, setAgencyIdFilter] = useState('');
+  const [villeIdFilter, setVilleIdFilter] = useState('');
+  const [modePaiementFilter, setModePaiementFilter] = useState('');
+  const [couvertureFilter, setCouvertureFilter] = useState('');
+  const [tableSearch, setTableSearch] = useState('');
 
-  const query = useQuery({
-    queryKey: ['businesses', search, couverture, modePaiement],
-    queryFn: () => {
-      const params = new URLSearchParams();
-      if (search.trim()) params.set('search', search.trim());
-      if (couverture) params.set('couverture', couverture);
-      if (modePaiement) params.set('modePaiement', modePaiement);
-      const qs = params.toString();
-      return apiFetch<BusinessesListResponse>(`/businesses${qs ? `?${qs}` : ''}`);
-    },
+  const [feedback, setFeedback] = useState<OperationMessage | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [selectedBusiness, setSelectedBusiness] = useState<BusinessItemDto | null>(null);
+
+  const [archiveTarget, setArchiveTarget] = useState<BusinessItemDto | null>(null);
+  const [bulkArchiveSelection, setBulkArchiveSelection] = useState<{
+    rows: BusinessItemDto[];
+    clear: () => void;
+  } | null>(null);
+
+  const queryParams = useMemo(() => {
+    const p = new URLSearchParams();
+    if (searchFilter.trim()) p.set('search', searchFilter.trim());
+    if (agencyIdFilter) p.set('agencyId', agencyIdFilter);
+    if (villeIdFilter) p.set('villeId', villeIdFilter);
+    if (modePaiementFilter) p.set('modePaiement', modePaiementFilter);
+    if (couvertureFilter) p.set('couverture', couvertureFilter);
+    return p.toString();
+  }, [searchFilter, agencyIdFilter, villeIdFilter, modePaiementFilter, couvertureFilter]);
+
+  const businessesQuery = useQuery({
+    queryKey: ['businesses', queryParams],
+    queryFn: () =>
+      apiFetch<BusinessesListResponse>(queryParams ? `/businesses?${queryParams}` : '/businesses'),
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => apiFetch(`/businesses/${id}`, { method: 'DELETE' }),
-    onSuccess: () => {
-      setFeedback({ type: 'ok', text: 'Enseigne archivée avec ses comptes bancaires.' });
+  const isClientView = businessesQuery.data?.isClientView ?? false;
+  const canDeleteBusiness = businessesQuery.data?.canDeleteBusiness ?? false;
+  const options = businessesQuery.data?.options ?? { agences: [], villes: [], banques: [] };
+  const allItems = businessesQuery.data?.items ?? [];
+
+  const stats = businessesQuery.data?.stats ?? {
+    total: allItems.length,
+    actifs: allItems.filter((b) => b.isActive).length,
+    inactifs: allItems.filter((b) => !b.isActive).length,
+    virement: allItems.filter((b) => b.modePaiement === 'virement_bancaire').length,
+    espece: allItems.filter((b) => b.modePaiement === 'espece').length,
+    rattaches: allItems.filter((b) => b.couverture.statut === 'rattache').length,
+    couvertsParZone: allItems.filter((b) => b.couverture.statut === 'couvert_par_zone').length,
+    orphelins: allItems.filter((b) => b.couverture.statut === 'orphelin_sans_ville').length,
+    horsZone: allItems.filter((b) => b.couverture.statut === 'hors_zone').length,
+  };
+
+  const inactifsCount = stats.inactifs ?? Math.max(0, stats.total - stats.actifs);
+
+  const displayedItems = useMemo(() => {
+    let rows = allItems;
+    if (tab === 'actifs') rows = rows.filter((b) => b.isActive);
+    else if (tab === 'inactifs') rows = rows.filter((b) => !b.isActive);
+    else if (tab === 'couvertes') {
+      rows = rows.filter(
+        (b) => b.couverture.statut === 'rattache' || b.couverture.statut === 'couvert_par_zone',
+      );
+    } else if (tab === 'alertes') {
+      rows = rows.filter(
+        (b) => b.couverture.statut === 'hors_zone' || b.couverture.statut === 'orphelin_sans_ville',
+      );
+    }
+
+    const q = tableSearch.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter(
+      (b) =>
+        b.name.toLowerCase().includes(q) ||
+        b.user.nomComplet.toLowerCase().includes(q) ||
+        (b.user.telephone ?? '').toLowerCase().includes(q) ||
+        (b.ville?.nameFr ?? '').toLowerCase().includes(q) ||
+        (b.activeCompte?.rib ?? '').toLowerCase().includes(q),
+    );
+  }, [allItems, tab, tableSearch]);
+
+  const archiveMutation = useMutation({
+    mutationFn: (id: number) =>
+      apiFetch<{ message?: string }>(`/businesses/${id}`, { method: 'DELETE' }),
+    onSuccess: (res) => {
       void queryClient.invalidateQueries({ queryKey: ['businesses'] });
+      setFeedback({ type: 'ok', text: res.message ?? 'Enseigne archivée.' });
+      setArchiveTarget(null);
     },
     onError: (err) => {
       setFeedback({
         type: 'err',
-        text: err instanceof Error ? err.message : "Erreur lors de l'archivage.",
+        text: err instanceof Error ? err.message : 'Archivage refusé.',
+      });
+      setArchiveTarget(null);
+    },
+  });
+
+  const bulkStatusMutation = useMutation({
+    mutationFn: ({ ids, isActive }: { ids: number[]; isActive: boolean }) =>
+      apiFetch<{ message: string }>('/businesses/bulk-status', {
+        method: 'POST',
+        body: { ids, isActive },
+      }),
+    onSuccess: (res) => {
+      void queryClient.invalidateQueries({ queryKey: ['businesses'] });
+      setFeedback({ type: 'ok', text: res.message });
+    },
+    onError: (err) => {
+      setFeedback({
+        type: 'err',
+        text: err instanceof Error ? err.message : 'Mise à jour groupée impossible.',
       });
     },
   });
 
-  const data = query.data;
-  const activeModalBusiness =
-    selectedBusinessId !== null
-      ? (data?.items.find((b) => b.id === selectedBusinessId) ?? null)
-      : null;
+  const bulkArchiveMutation = useMutation({
+    mutationFn: (ids: number[]) =>
+      apiFetch<{ message: string }>('/businesses/bulk-archive', {
+        method: 'POST',
+        body: { ids },
+      }),
+    onSuccess: (res) => {
+      void queryClient.invalidateQueries({ queryKey: ['businesses'] });
+      setFeedback({ type: 'ok', text: res.message });
+      setBulkArchiveSelection(null);
+    },
+    onError: (err) => {
+      setFeedback({
+        type: 'err',
+        text: err instanceof Error ? err.message : 'Archivage groupé refusé.',
+      });
+      setBulkArchiveSelection(null);
+    },
+  });
+
+  const resetFilters = () => {
+    setTab('toutes');
+    setSearchFilter('');
+    setAgencyIdFilter('');
+    setVilleIdFilter('');
+    setModePaiementFilter('');
+    setCouvertureFilter('');
+    setTableSearch('');
+  };
+
+  const activeFiltersCount =
+    (tab !== 'toutes' ? 1 : 0) +
+    (searchFilter.trim() ? 1 : 0) +
+    (agencyIdFilter ? 1 : 0) +
+    (villeIdFilter ? 1 : 0) +
+    (modePaiementFilter ? 1 : 0) +
+    (couvertureFilter ? 1 : 0);
+
+  const tabs: PageTabItem<BusinessTab>[] = [
+    { key: 'toutes', label: 'Toutes', count: stats.total, icon: 'solar:shop-2-bold-duotone' },
+    {
+      key: 'actifs',
+      label: 'Actives',
+      count: stats.actifs,
+      icon: 'solar:check-circle-bold-duotone',
+    },
+    {
+      key: 'inactifs',
+      label: 'Inactives',
+      count: inactifsCount,
+      icon: 'solar:close-circle-bold-duotone',
+    },
+    {
+      key: 'couvertes',
+      label: 'Couvertes',
+      count: stats.rattaches + stats.couvertsParZone,
+      icon: 'solar:verified-check-bold-duotone',
+    },
+    {
+      key: 'alertes',
+      label: 'Hors zone / Orphelines',
+      count: stats.horsZone + stats.orphelins,
+      icon: 'solar:danger-triangle-bold-duotone',
+    },
+  ];
+
+  const columns: DataTableColumnDef<BusinessItemDto>[] = [
+    {
+      accessorKey: 'name',
+      header: 'Enseigne',
+      cell: ({ row }) => {
+        const b = row.original;
+        return (
+          <div className="flex items-start gap-2.5">
+            <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#1B9DD9]/10 text-[#1B9DD9] dark:bg-sky-950/70">
+              <Icon icon="solar:shop-2-bold-duotone" className="size-4.5" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-slate-900 dark:text-slate-100">{b.name}</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                {b.type || 'Activité standard'}
+                {b.ice ? ` · ICE ${b.ice}` : ''}
+              </p>
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      id: 'vendeur',
+      header: 'Vendeur / Client',
+      accessorFn: (row) => `${row.user.nomComplet} ${row.user.telephone ?? ''}`,
+      cell: ({ row }) => {
+        const u = row.original.user;
+        return (
+          <div className="min-w-0">
+            <p className="font-medium text-slate-900 dark:text-slate-100">{u.nomComplet}</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              {u.telephone || u.email}
+            </p>
+          </div>
+        );
+      },
+    },
+    {
+      id: 'ville',
+      header: 'Ville & Couverture',
+      accessorFn: (row) => `${row.ville?.nameFr ?? 'Sans ville'} ${row.couverture.label}`,
+      cell: ({ row }) => {
+        const b = row.original;
+        return (
+          <div className="space-y-1">
+            <p className="text-xs font-medium text-slate-800 dark:text-slate-200">
+              {b.ville?.nameFr ?? 'Aucune ville'}
+            </p>
+            <StatusBadge status={b.couverture.statut} />
+          </div>
+        );
+      },
+    },
+    {
+      id: 'agency',
+      header: 'Agence ramassage',
+      accessorFn: (row) => row.agency?.nom ?? 'Auto zone',
+      cell: ({ row }) => {
+        const a = row.original.agency;
+        if (!a) return <span className="text-xs text-slate-400">Par zone / Auto</span>;
+        return (
+          <div className="text-xs">
+            <p className="font-semibold text-slate-800 dark:text-slate-200">{a.nom}</p>
+            <p className="font-mono text-[11px] text-slate-500 dark:text-slate-400">{a.code}</p>
+          </div>
+        );
+      },
+    },
+    {
+      id: 'paiement',
+      header: 'Paiement & RIB actif',
+      accessorFn: (row) => row.activeCompte?.rib ?? row.modePaiement ?? '',
+      cell: ({ row }) => {
+        const b = row.original;
+        return (
+          <div className="space-y-1 text-xs">
+            <div className="flex items-center gap-1.5">
+              <Badge variant={b.modePaiement === 'virement_bancaire' ? 'default' : 'secondary'}>
+                {b.modePaiement === 'virement_bancaire' ? 'Virement' : 'Espèce'}
+              </Badge>
+              <span className="tabular-nums text-[11px] text-slate-500 dark:text-slate-400">
+                {b.comptesCount} RIB
+              </span>
+            </div>
+            {b.activeCompte ? (
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="font-medium text-slate-700 dark:text-slate-300">
+                  {b.activeCompte.resolvedBank.banqueNom}
+                </span>
+                {b.activeCompte.resolvedBank.estBanqueCustom && (
+                  <StatusBadge status="custom" label="Custom" />
+                )}
+              </div>
+            ) : (
+              <span className="text-[11px] text-slate-400">Aucun compte actif</span>
+            )}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'isActive',
+      header: 'Statut',
+      cell: ({ row }) => <StatusBadge status={row.original.isActive ? 'active' : 'inactive'} />,
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      enableSorting: false,
+      cell: ({ row }) => {
+        const b = row.original;
+        return (
+          <div className="flex items-center gap-1.5">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="h-7 px-2 text-xs"
+              onClick={() => {
+                setSelectedBusiness(b);
+                setEditorOpen(true);
+              }}
+            >
+              <Pencil className="size-3" />
+              Gérer
+            </Button>
+            {!isClientView && canDeleteBusiness && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-7 px-2 text-xs text-red-600 hover:border-red-300 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40"
+                onClick={() => setArchiveTarget(b)}
+              >
+                <Trash2 className="size-3" />
+                Archiver
+              </Button>
+            )}
+          </div>
+        );
+      },
+    },
+  ];
+
+  const bulkActions: DataTableBulkAction<BusinessItemDto>[] = [
+    {
+      key: 'activate',
+      label: bulkStatusMutation.isPending ? OPERATION_LABELS.updating : 'Activer',
+      icon: <Power className="size-3.5" />,
+      variant: 'outline',
+      disabled: bulkStatusMutation.isPending,
+      onClick: (rows, clear) => {
+        bulkStatusMutation.mutate(
+          { ids: rows.map((r) => r.id), isActive: true },
+          { onSuccess: () => clear() },
+        );
+      },
+    },
+    {
+      key: 'deactivate',
+      label: bulkStatusMutation.isPending ? OPERATION_LABELS.updating : 'Désactiver',
+      icon: <PowerOff className="size-3.5" />,
+      variant: 'outline',
+      disabled: bulkStatusMutation.isPending,
+      onClick: (rows, clear) => {
+        bulkStatusMutation.mutate(
+          { ids: rows.map((r) => r.id), isActive: false },
+          { onSuccess: () => clear() },
+        );
+      },
+    },
+  ];
+
+  if (!isClientView && canDeleteBusiness) {
+    bulkActions.push({
+      key: 'archive',
+      label: 'Archiver',
+      icon: <Trash2 className="size-3.5" />,
+      variant: 'destructive',
+      disabled: bulkArchiveMutation.isPending,
+      onClick: (rows, clear) => setBulkArchiveSelection({ rows, clear }),
+    });
+  }
+
+  bulkActions.push({
+    key: 'export',
+    label: 'Exportation CSV',
+    icon: <Download className="size-3.5" />,
+    variant: 'outline',
+    onClick: (rows) => {
+      exportRowsToCsv(
+        'g4d-enseignes-selection.csv',
+        [
+          'ID',
+          'Enseigne',
+          'Vendeur',
+          'Téléphone',
+          'Ville',
+          'Agence',
+          'Paiement',
+          'Banque active',
+          'RIB',
+          'Statut',
+        ],
+        rows.map((r) => [
+          r.id,
+          r.name,
+          r.user.nomComplet,
+          r.user.telephone,
+          r.ville?.nameFr ?? '',
+          r.agency?.nom ?? '',
+          r.modePaiement ?? '',
+          r.activeCompte?.resolvedBank.banqueNom ?? '',
+          r.activeCompte?.rib ?? '',
+          r.isActive ? 'Active' : 'Inactive',
+        ]),
+      );
+      setFeedback({ type: 'ok', text: `${rows.length} enseigne(s) exportée(s) en CSV.` });
+    },
+  });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-            {data?.isClientView
-              ? 'Mes enseignes & comptes bancaires'
-              : 'Administration des enseignes (Business)'}
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Gestion multi-enseignes, couverture de ramassage par agence et comptes RIB de règlement.
-          </p>
-        </div>
-        <Button
-          size="sm"
-          onClick={() => {
-            setSelectedBusinessId(null);
-            setModalOpen(true);
-          }}
-        >
-          + Nouvelle enseigne
-        </Button>
-      </div>
+    <PageContent>
+      <OperationFeedbackBanner feedback={feedback} onDismiss={() => setFeedback(null)} />
 
-      {/* KPI synthèse */}
-      {data && (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-900">
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              Total enseignes
-            </p>
-            <p className="mt-1 text-2xl font-extrabold tabular-nums text-slate-900 dark:text-slate-100">
-              {data.stats.total}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-900">
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              Virement bancaire
-            </p>
-            <p className="mt-1 text-2xl font-extrabold tabular-nums text-primary">
-              {data.stats.virement}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-900">
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              Couvertes (agence/zone)
-            </p>
-            <p className="mt-1 text-2xl font-extrabold tabular-nums text-emerald-600 dark:text-emerald-400">
-              {data.stats.rattaches + data.stats.couvertsParZone}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-3.5 dark:border-slate-800 dark:bg-slate-900">
-            <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-              Orphelines / Hors zone
-            </p>
-            <p className="mt-1 text-2xl font-extrabold tabular-nums text-amber-600 dark:text-amber-400">
-              {data.stats.orphelins + data.stats.horsZone}
-            </p>
-          </div>
-        </div>
-      )}
+      {/* 1. Tabs statut & couverture */}
+      <PageTabs tabs={tabs} value={tab} onChange={setTab} />
 
-      {feedback && (
-        <div
-          className={`flex items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium ${
-            feedback.type === 'ok'
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-300'
-              : 'border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-800/60 dark:bg-rose-950/40 dark:text-rose-300'
-          }`}
-        >
-          <span>{feedback.text}</span>
-          <button
-            type="button"
-            onClick={() => setFeedback(null)}
-            className="text-xs underline cursor-pointer"
-          >
-            Fermer
-          </button>
-        </div>
-      )}
-
-      {/* Filtres */}
-      <div className="flex flex-wrap items-center gap-2.5">
-        <Input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Nom enseigne, vendeur, ICE, téléphone…"
-          className="h-9 w-full bg-white sm:w-72 dark:bg-slate-900"
-        />
-        {!data?.isClientView && (
-          <select
-            value={couverture}
-            onChange={(e) => setCouverture(e.target.value)}
-            className="h-9 rounded-md border border-slate-200 bg-white px-2.5 text-xs font-medium dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-          >
-            <option value="">Toutes couvertures</option>
-            <option value="rattache">Rattaché explicitement</option>
-            <option value="couvert_par_zone">Couvert par zone</option>
-            <option value="hors_zone">Hors zone ramassage</option>
-            <option value="orphelin_sans_ville">Orphelin sans ville</option>
-          </select>
-        )}
-        <select
-          value={modePaiement}
-          onChange={(e) => setModePaiement(e.target.value)}
-          className="h-9 rounded-md border border-slate-200 bg-white px-2.5 text-xs font-medium dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
-        >
-          <option value="">Tous modes de paiement</option>
-          <option value="virement_bancaire">Virement bancaire</option>
-          <option value="espece">Espèce</option>
-        </select>
-      </div>
-
-      {/* Liste */}
-      {query.isLoading ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900">
-          Chargement des enseignes…
-        </div>
-      ) : !data?.items.length ? (
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center dark:border-slate-700 dark:bg-slate-900">
-          <Icon
-            icon="solar:shop-2-bold-duotone"
-            width={36}
-            height={36}
-            className="mx-auto mb-2 text-slate-400"
+      {/* 2. Card de filtrage contextuelle */}
+      <FilterCard
+        columns={isClientView ? 3 : 5}
+        activeCount={activeFiltersCount}
+        onReset={resetFilters}
+      >
+        <FilterField label="Vendeur / Enseigne / Tél." htmlFor="filter-biz-search">
+          <Input
+            id="filter-biz-search"
+            value={searchFilter}
+            onChange={(e) => setSearchFilter(e.target.value)}
+            placeholder="Nom boutique, vendeur, ICE..."
           />
-          <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-            Aucune enseigne trouvée
-          </p>
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {data.items.map((biz) => (
-            <div
-              key={biz.id}
-              className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900"
+        </FilterField>
+
+        <FilterField label="Ville de ramassage" htmlFor="filter-biz-ville">
+          <select
+            id="filter-biz-ville"
+            value={villeIdFilter}
+            onChange={(e) => setVilleIdFilter(e.target.value)}
+            className={FILTER_SELECT_CLASS}
+          >
+            <option value="">Toutes les villes</option>
+            {options.villes.map((v) => (
+              <option key={v.id} value={v.id}>
+                {v.nameFr}
+              </option>
+            ))}
+          </select>
+        </FilterField>
+
+        {!isClientView && (
+          <FilterField label="Agence" htmlFor="filter-biz-agency">
+            <select
+              id="filter-biz-agency"
+              value={agencyIdFilter}
+              onChange={(e) => setAgencyIdFilter(e.target.value)}
+              className={FILTER_SELECT_CLASS}
             >
-              <div className="space-y-2.5">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                        {biz.name}
-                      </h2>
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                          biz.isActive
-                            ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                            : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
-                        }`}
-                      >
-                        {biz.isActive ? 'Actif' : 'Inactif'}
-                      </span>
-                    </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      {biz.type || 'Activité standard'} · Vendeur : {biz.user.nomComplet}
-                    </p>
-                  </div>
-                  <span
-                    className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
-                      COUVERTURE_BADGE[biz.couverture.statut] ?? ''
-                    }`}
-                  >
-                    {biz.couverture.label}
-                  </span>
-                </div>
+              <option value="">Toutes les agences</option>
+              {options.agences.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.nom} ({a.code})
+                </option>
+              ))}
+            </select>
+          </FilterField>
+        )}
 
-                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600 dark:text-slate-300">
-                  <span>Ville : {biz.ville?.nameFr ?? 'Non définie'}</span>
-                  <span>Tél : {biz.telephone || '—'}</span>
-                  <span>
-                    Règlement :{' '}
-                    {biz.modePaiement === 'virement_bancaire'
-                      ? 'Virement bancaire'
-                      : biz.modePaiement === 'espece'
-                        ? 'Espèce'
-                        : 'Non défini'}
-                  </span>
-                </div>
+        <FilterField label="Mode paiement" htmlFor="filter-biz-mode">
+          <select
+            id="filter-biz-mode"
+            value={modePaiementFilter}
+            onChange={(e) => setModePaiementFilter(e.target.value)}
+            className={FILTER_SELECT_CLASS}
+          >
+            <option value="">Tous les modes</option>
+            <option value="virement_bancaire">Virement bancaire</option>
+            <option value="espece">Espèce</option>
+          </select>
+        </FilterField>
 
-                {biz.activeCompte && (
-                  <div className="rounded-xl bg-slate-50 px-3 py-2 text-xs dark:bg-slate-800/70">
-                    <span className="font-semibold text-slate-700 dark:text-slate-200">
-                      RIB principal ({biz.activeCompte.resolvedBank.banqueNom}) :{' '}
-                    </span>
-                    <span className="font-mono text-slate-600 dark:text-slate-300">
-                      {biz.activeCompte.resolvedBank.rib}
-                    </span>
-                  </div>
-                )}
-              </div>
+        {!isClientView && (
+          <FilterField label="Couverture ramassage" htmlFor="filter-biz-couv">
+            <select
+              id="filter-biz-couv"
+              value={couvertureFilter}
+              onChange={(e) => setCouvertureFilter(e.target.value)}
+              className={FILTER_SELECT_CLASS}
+            >
+              <option value="">Toutes couvertures</option>
+              <option value="rattache">Rattachée directement</option>
+              <option value="couvert_par_zone">Couverte par zone</option>
+              <option value="hors_zone">Hors zone</option>
+              <option value="orphelin_sans_ville">Orpheline sans ville</option>
+            </select>
+          </FilterField>
+        )}
+      </FilterCard>
 
-              <div className="mt-4 flex justify-end gap-2 border-t border-slate-100 pt-3 dark:border-slate-800">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedBusinessId(biz.id);
-                    setModalOpen(true);
-                  }}
-                >
-                  Configurer &amp; RIB ({biz.comptesCount})
-                </Button>
-                {data.canDeleteBusiness && !data.isClientView && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={deleteMutation.isPending}
-                    onClick={() => deleteMutation.mutate(biz.id)}
-                    className="border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-rose-900 dark:text-rose-400"
-                  >
-                    Archiver
-                  </Button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* 3 & 4. DataTable unifiée avec checkbox gauche et bulk actions */}
+      <DataTable
+        data={displayedItems}
+        columns={columns}
+        searchValue={tableSearch}
+        onSearchChange={setTableSearch}
+        searchPlaceholder="Filtrer rapidement dans le tableau (enseigne, vendeur, RIB)..."
+        isLoading={businessesQuery.isLoading}
+        isRefreshing={businessesQuery.isFetching && !businessesQuery.isLoading}
+        enableSelection
+        bulkActions={bulkActions}
+        emptyMessage="Aucune enseigne commerciale trouvée."
+        toolbarActions={
+          <>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              disabled={displayedItems.length === 0}
+              onClick={() => {
+                exportRowsToCsv(
+                  'g4d-enseignes.csv',
+                  [
+                    'ID',
+                    'Enseigne',
+                    'Vendeur',
+                    'Téléphone',
+                    'Ville',
+                    'Agence',
+                    'Paiement',
+                    'RIB actif',
+                    'Statut',
+                  ],
+                  displayedItems.map((r) => [
+                    r.id,
+                    r.name,
+                    r.user.nomComplet,
+                    r.user.telephone,
+                    r.ville?.nameFr ?? '',
+                    r.agency?.nom ?? '',
+                    r.modePaiement ?? '',
+                    r.activeCompte?.rib ?? '',
+                    r.isActive ? 'Active' : 'Inactive',
+                  ]),
+                );
+                setFeedback({
+                  type: 'ok',
+                  text: `${displayedItems.length} enseigne(s) exportée(s) en CSV.`,
+                });
+              }}
+            >
+              <Download className="size-3.5" />
+              Exportation CSV
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => {
+                setSelectedBusiness(null);
+                setEditorOpen(true);
+              }}
+            >
+              <Plus className="size-3.5" />
+              Nouvelle enseigne
+            </Button>
+          </>
+        }
+      />
 
-      {data && (
-        <BusinessEditorModal
-          open={modalOpen}
-          isClientView={data.isClientView}
-          business={activeModalBusiness}
-          options={data.options}
-          onClose={() => setModalOpen(false)}
-          onFeedback={setFeedback}
-        />
-      )}
-    </div>
+      <BusinessEditorModal
+        open={editorOpen}
+        isClientView={isClientView}
+        business={selectedBusiness}
+        options={options}
+        onClose={() => setEditorOpen(false)}
+        onFeedback={(msg) => setFeedback(msg)}
+      />
+
+      <ConfirmActionDialog
+        open={Boolean(archiveTarget)}
+        title={`Archiver ${archiveTarget?.name ?? 'cette enseigne'} ?`}
+        description="L'enseigne et ses comptes bancaires associés seront désactivés et archivés."
+        confirmLabel="Archiver"
+        variant="destructive"
+        isPending={archiveMutation.isPending}
+        pendingLabel={OPERATION_LABELS.deleting}
+        onCancel={() => setArchiveTarget(null)}
+        onConfirm={() => {
+          if (archiveTarget) archiveMutation.mutate(archiveTarget.id);
+        }}
+      />
+
+      <ConfirmActionDialog
+        open={Boolean(bulkArchiveSelection)}
+        title={`Archiver ${bulkArchiveSelection?.rows.length ?? 0} enseigne(s) ?`}
+        description="Toutes les enseignes sélectionnées et leurs comptes bancaires rattachés seront désactivés et archivés."
+        confirmLabel="Confirmer l'archivage"
+        variant="destructive"
+        isPending={bulkArchiveMutation.isPending}
+        pendingLabel={OPERATION_LABELS.deleting}
+        onCancel={() => setBulkArchiveSelection(null)}
+        onConfirm={() => {
+          if (!bulkArchiveSelection) return;
+          bulkArchiveMutation.mutate(
+            bulkArchiveSelection.rows.map((r) => r.id),
+            { onSuccess: () => bulkArchiveSelection.clear() },
+          );
+        }}
+      />
+    </PageContent>
   );
 }

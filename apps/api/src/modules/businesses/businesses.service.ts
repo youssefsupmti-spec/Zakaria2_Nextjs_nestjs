@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { DatabaseService, type Prisma } from '@zakaria/backend-database';
 import {
+  BulkIdsSchema,
+  BulkIsActiveStatusSchema,
   CreateBusinessSchema,
   CreateCompteBancaireSchema,
   UpdateBusinessSchema,
@@ -21,6 +23,7 @@ export interface BusinessListQuery {
   search?: string;
   couverture?: string;
   agencyId?: string;
+  villeId?: string;
   modePaiement?: string;
   isActive?: string;
 }
@@ -130,6 +133,10 @@ export class BusinessesService {
       andClauses.push({ agencyId: Number(query.agencyId) });
     }
 
+    if (query.villeId && Number.isInteger(Number(query.villeId)) && Number(query.villeId) > 0) {
+      andClauses.push({ villeId: Number(query.villeId) });
+    }
+
     const [businesses, zonesIndex, prefixMap, agences, villes, banques] = await Promise.all([
       this.database.prisma.business.findMany({
         where: { AND: andClauses },
@@ -217,6 +224,7 @@ export class BusinessesService {
     const stats = {
       total: enriched.length,
       actifs: enriched.filter((b) => b.isActive).length,
+      inactifs: enriched.filter((b) => !b.isActive).length,
       virement: enriched.filter((b) => b.modePaiement === 'virement_bancaire').length,
       espece: enriched.filter((b) => b.modePaiement === 'espece').length,
       rattaches: enriched.filter((b) => b.couverture.statut === 'rattache').length,
@@ -456,6 +464,65 @@ export class BusinessesService {
     ]);
 
     return { ok: true, id: businessId, message: 'Enseigne archivée avec ses comptes bancaires.' };
+  }
+
+  /** Active ou désactive un lot d'enseignes autorisées pour l'acteur courant. */
+  async bulkUpdateStatus(actor: AuthUserDto, rawPayload: unknown) {
+    const dto = parseOrThrowZod(
+      BulkIsActiveStatusSchema,
+      rawPayload,
+      'Paramètres de mise à jour groupée invalides.',
+    );
+    const uniqueIds = [...new Set(dto.ids)];
+
+    for (const id of uniqueIds) {
+      await this.loadAndAssertBusinessAccess(actor, id, 'Update:Business');
+    }
+
+    const result = await this.database.prisma.business.updateMany({
+      where: { id: { in: uniqueIds }, deletedAt: null },
+      data: { isActive: dto.isActive },
+    });
+
+    return {
+      ok: true,
+      updatedCount: result.count,
+      skippedCount: Math.max(0, uniqueIds.length - result.count),
+      message: `${result.count} enseigne(s) ${dto.isActive ? 'activée(s)' : 'désactivée(s)'}.`,
+    };
+  }
+
+  /** Archive en lot des enseignes commerciales (réservé au staff / administration G4D). */
+  async bulkArchive(actor: AuthUserDto, rawPayload: unknown) {
+    if (this.agenceRamassage.isClientActor(actor)) {
+      throw new ForbiddenException(
+        "La suppression d'enseignes est réservée à l'administration G4D.",
+      );
+    }
+    const dto = parseOrThrowZod(BulkIdsSchema, rawPayload, 'Sélection d’enseignes invalide.');
+    const uniqueIds = [...new Set(dto.ids)];
+
+    for (const id of uniqueIds) {
+      await this.loadAndAssertBusinessAccess(actor, id, 'Delete:Business');
+    }
+
+    const now = new Date();
+    const [, updated] = await this.database.prisma.$transaction([
+      this.database.prisma.compteBancaire.updateMany({
+        where: { ownerType: 'BUSINESS', ownerId: { in: uniqueIds }, deletedAt: null },
+        data: { isActive: false, deletedAt: now },
+      }),
+      this.database.prisma.business.updateMany({
+        where: { id: { in: uniqueIds }, deletedAt: null },
+        data: { isActive: false, deletedAt: now },
+      }),
+    ]);
+
+    return {
+      ok: true,
+      archivedCount: updated.count,
+      message: `${updated.count} enseigne(s) archivée(s) avec leurs comptes bancaires.`,
+    };
   }
 
   /** Liste les comptes bancaires d'un business avec résolution bancaire 3 niveaux. */

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -8,6 +9,7 @@ import { DatabaseService } from '@zakaria/backend-database';
 import {
   AssignAgenceMembreSchema,
   AssignMembreZoneSchema,
+  BulkActifStatusSchema,
   CreateAgenceSchema,
   CreateZoneSchema,
   UpdateAgenceSchema,
@@ -223,5 +225,56 @@ export class AgencesService {
       },
       include: { zone: { select: { id: true, nom: true, code: true } } },
     });
+  }
+
+  async bulkUpdateAgenceStatus(actor: AuthUserDto, rawBody: unknown) {
+    const dto = parseOrThrowZod(
+      BulkActifStatusSchema,
+      rawBody,
+      'Paramètres de mise à jour groupée des agences invalides.',
+    );
+    const uniqueIds = [...new Set(dto.ids)];
+
+    for (const id of uniqueIds) {
+      this.policy.assertCanManageAgence(actor, id);
+    }
+
+    const result = await this.database.prisma.agence.updateMany({
+      where: { id: { in: uniqueIds }, deletedAt: null },
+      data: { actif: dto.actif },
+    });
+
+    return {
+      ok: true,
+      updatedCount: result.count,
+      skippedCount: Math.max(0, uniqueIds.length - result.count),
+      message: `${result.count} agence(s) ${dto.actif ? 'activée(s)' : 'désactivée(s)'}.`,
+    };
+  }
+
+  async bulkUpdateZoneStatus(actor: AuthUserDto, rawBody: unknown) {
+    if (!this.policy.isPlatformAdmin(actor)) {
+      throw new ForbiddenException(
+        'Seul un administrateur plateforme peut modifier le statut des zones.',
+      );
+    }
+    const dto = parseOrThrowZod(
+      BulkActifStatusSchema,
+      rawBody,
+      'Paramètres de mise à jour groupée des zones invalides.',
+    );
+    const uniqueIds = [...new Set(dto.ids)];
+
+    const result = await this.database.prisma.zone.updateMany({
+      where: { id: { in: uniqueIds }, deletedAt: null },
+      data: { actif: dto.actif },
+    });
+
+    return {
+      ok: true,
+      updatedCount: result.count,
+      skippedCount: Math.max(0, uniqueIds.length - result.count),
+      message: `${result.count} zone(s) ${dto.actif ? 'activée(s)' : 'désactivée(s)'}.`,
+    };
   }
 }

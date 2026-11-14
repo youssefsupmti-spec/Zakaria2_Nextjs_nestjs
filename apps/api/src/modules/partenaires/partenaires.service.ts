@@ -11,6 +11,7 @@ import { DatabaseService } from '@zakaria/backend-database';
 import {
   AssignAgencePartenaireSchema,
   AssignPartenaireZoneSchema,
+  BulkActifStatusSchema,
   CreateApiIdentifiantSchema,
   CreatePartenaireCoursierSchema,
   CreatePartenaireMembreSchema,
@@ -369,5 +370,31 @@ export class PartenairesService {
       data: { actif: false, revokedAt: new Date() },
       select: { id: true, clePublique: true, actif: true, revokedAt: true },
     });
+  }
+
+  async bulkUpdateStatus(actor: AuthUserDto, rawBody: unknown) {
+    if (!this.policy.isPlatformAdmin(actor)) {
+      throw new ForbiddenException(
+        'Seul un administrateur plateforme peut modifier le statut des partenaires en lot.',
+      );
+    }
+    const dto = parseOrThrowZod(
+      BulkActifStatusSchema,
+      rawBody,
+      'Paramètres de mise à jour groupée des partenaires invalides.',
+    );
+    const uniqueIds = [...new Set(dto.ids)];
+
+    const result = await this.database.prisma.partenaire.updateMany({
+      where: { id: { in: uniqueIds }, deletedAt: null },
+      data: { actif: dto.actif },
+    });
+
+    return {
+      ok: true,
+      updatedCount: result.count,
+      skippedCount: Math.max(0, uniqueIds.length - result.count),
+      message: `${result.count} partenaire(s) ${dto.actif ? 'activé(s)' : 'désactivé(s)'}.`,
+    };
   }
 }

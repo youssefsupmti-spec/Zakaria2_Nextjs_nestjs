@@ -1,4 +1,15 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AuthContext } from '../auth/auth.types';
 import { CurrentAuth } from '../auth/decorators/auth.decorators';
@@ -43,5 +54,12 @@ export class UsersController {
     @Body() body: unknown,
   ) {
     return this.usersService.setUserStatus(auth.user, id, body);
+  }
+
+  @Post('bulk-status')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Active ou désactive un lot de comptes avec cascade sous-comptes D-06' })
+  bulkSetStatus(@CurrentAuth() auth: AuthContext, @Body() body: unknown) {
+    return this.usersService.bulkSetStatus(auth.user, body);
   }
 }

@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -33,6 +35,13 @@ export class AgencesController {
     return this.agencesService.createZone(auth.user, body);
   }
 
+  @Post('zones/bulk-status')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Active ou désactive un lot de zones territoriales' })
+  bulkZoneStatus(@CurrentAuth() auth: AuthContext, @Body() body: unknown) {
+    return this.agencesService.bulkUpdateZoneStatus(auth.user, body);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Liste les agences accessibles à l’utilisateur connecté' })
   listAgences(@CurrentAuth() auth: AuthContext) {
@@ -43,6 +52,13 @@ export class AgencesController {
   @ApiOperation({ summary: 'Crée une agence physique G4D (admin plateforme)' })
   createAgence(@CurrentAuth() auth: AuthContext, @Body() body: unknown) {
     return this.agencesService.createAgence(auth.user, body);
+  }
+
+  @Post('bulk-status')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Active ou désactive un lot d’agences' })
+  bulkAgenceStatus(@CurrentAuth() auth: AuthContext, @Body() body: unknown) {
+    return this.agencesService.bulkUpdateAgenceStatus(auth.user, body);
   }
 
   @Patch(':id')

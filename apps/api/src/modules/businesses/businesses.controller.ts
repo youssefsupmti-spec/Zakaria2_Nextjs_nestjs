@@ -33,6 +33,7 @@ export class BusinessesController {
     @Query('search') search?: string,
     @Query('couverture') couverture?: string,
     @Query('agencyId') agencyId?: string,
+    @Query('villeId') villeId?: string,
     @Query('modePaiement') modePaiement?: string,
     @Query('isActive') isActive?: string,
   ) {
@@ -40,9 +41,24 @@ export class BusinessesController {
       search,
       couverture,
       agencyId,
+      villeId,
       modePaiement,
       isActive,
     });
+  }
+
+  @Post('bulk-status')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Active ou désactive un lot d’enseignes commerciales' })
+  bulkStatus(@CurrentAuth() auth: AuthContext, @Body() body: unknown) {
+    return this.businessesService.bulkUpdateStatus(auth.user, body);
+  }
+
+  @Post('bulk-archive')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Archive un lot d’enseignes commerciales (administration G4D)' })
+  bulkArchive(@CurrentAuth() auth: AuthContext, @Body() body: unknown) {
+    return this.businessesService.bulkArchive(auth.user, body);
   }
 
   @Get(':id')

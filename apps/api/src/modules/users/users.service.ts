@@ -6,7 +6,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DatabaseService } from '@zakaria/backend-database';
-import { CreateUserSchema, UpdateUserSchema, type AuthUserDto } from '@zakaria/shared-contracts';
+import {
+  BulkActiveStatusSchema,
+  CreateUserSchema,
+  UpdateUserSchema,
+  type AuthUserDto,
+} from '@zakaria/shared-contracts';
 import { z } from 'zod';
 import { parseOrThrowZod } from '../../common/validation/zod-validation';
 import { AccessContextService } from '../access-control/access-context.service';
@@ -328,5 +333,53 @@ export class UsersService {
         this.accessContextService.invalidateUser(sub.id),
       ]),
     );
+  }
+
+  /** Active ou désactive un lot de comptes via setUserStatus (cascade D-06 préservée). */
+  async bulkSetStatus(actor: AuthUserDto, rawBody: unknown) {
+    const dto = parseOrThrowZod(
+      BulkActiveStatusSchema,
+      rawBody,
+      'Paramètres de mise à jour groupée des utilisateurs invalides.',
+    );
+    const uniqueIds = [...new Set(dto.ids)];
+
+    let updatedCount = 0;
+    const errors: Array<{ id: number; message: string }> = [];
+    let firstForbidden: ForbiddenException | null = null;
+
+    for (const id of uniqueIds) {
+      if (id === actor.id) {
+        errors.push({ id, message: 'Votre propre compte connecté ne peut pas être désactivé.' });
+        continue;
+      }
+      try {
+        await this.setUserStatus(actor, id, { active: dto.active });
+        updatedCount += 1;
+      } catch (err) {
+        if (err instanceof ForbiddenException && !firstForbidden) {
+          firstForbidden = err;
+        }
+        errors.push({
+          id,
+          message: err instanceof Error ? err.message : 'Action impossible sur ce compte.',
+        });
+      }
+    }
+
+    if (updatedCount === 0 && firstForbidden) {
+      throw firstForbidden;
+    }
+
+    return {
+      ok: true,
+      updatedCount,
+      skippedCount: errors.length,
+      errors,
+      message:
+        errors.length > 0
+          ? `${updatedCount} compte(s) ${dto.active ? 'activé(s)' : 'désactivé(s)'}, ${errors.length} ignoré(s).`
+          : `${updatedCount} compte(s) ${dto.active ? 'activé(s)' : 'désactivé(s)'}.`,
+    };
   }
 }
