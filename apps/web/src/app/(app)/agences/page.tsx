@@ -1,13 +1,12 @@
 'use client';
 
-import { Icon } from '@iconify/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   CreateAgenceSchema,
   CreateZoneSchema,
   type VilleOptionDto,
 } from '@zakaria/shared-contracts';
-import { Download, Plus, Power, PowerOff, X } from 'lucide-react';
+import { Building2, Download, Globe, MapPin, Plus, Power, PowerOff, X } from 'lucide-react';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,7 +26,6 @@ import {
 } from '@/components/ui/operation-feedback';
 import { PageContent } from '@/components/ui/page-content';
 import { PageTabs, type PageTabItem } from '@/components/ui/page-tabs';
-import '@/components/ui/solar-icons';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { apiFetch } from '@/lib/api-client';
 import { useAuth } from '@/lib/client-rbac';
@@ -308,19 +306,19 @@ export default function AgencesPage() {
       key: 'agences',
       label: 'Agences',
       count: agences.length,
-      icon: 'solar:buildings-2-bold-duotone',
+      icon: Building2,
     },
     {
       key: 'zones',
       label: 'Zones territoriales',
       count: zones.length,
-      icon: 'solar:map-point-bold-duotone',
+      icon: MapPin,
     },
     {
       key: 'villes',
       label: 'Villes',
       count: villes.length,
-      icon: 'solar:global-bold-duotone',
+      icon: Globe,
     },
   ];
 
@@ -331,7 +329,7 @@ export default function AgencesPage() {
       cell: ({ row }) => (
         <div className="flex items-center gap-2.5">
           <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#1B9DD9]/10 text-[#1B9DD9] dark:bg-sky-950/70">
-            <Icon icon="solar:buildings-2-bold-duotone" className="size-4.5" />
+            <Building2 className="size-4.5" />
           </div>
           <div>
             <p className="font-semibold text-slate-900 dark:text-slate-100">{row.original.nom}</p>

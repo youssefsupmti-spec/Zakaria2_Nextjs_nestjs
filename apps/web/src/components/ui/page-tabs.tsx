@@ -1,14 +1,13 @@
 'use client';
 
-import { Icon } from '@iconify/react';
+import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import './solar-icons';
 
 export interface PageTabItem<T extends string = string> {
   key: T;
   label: string;
   count?: number;
-  icon?: string;
+  icon?: LucideIcon;
   disabled?: boolean;
 }
 
@@ -54,7 +53,7 @@ export function PageTabs<T extends string>({
                   : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/80 dark:hover:text-slate-100',
               )}
             >
-              {tab.icon && <Icon icon={tab.icon} className="size-4 shrink-0" />}
+              {tab.icon && <tab.icon className="size-4 shrink-0" />}
               <span>{tab.label}</span>
               {typeof tab.count === 'number' && (
                 <span

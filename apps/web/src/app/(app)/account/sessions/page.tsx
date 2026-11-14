@@ -1,9 +1,17 @@
 'use client';
 
-import { Icon } from '@iconify/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ActiveSessionItemDto } from '@zakaria/shared-contracts';
-import { Download, LogOut, Trash2 } from 'lucide-react';
+import {
+  BadgeCheck,
+  Download,
+  Laptop,
+  LogOut,
+  MonitorSmartphone,
+  Smartphone,
+  Trash2,
+  UserCheck,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { formatDateTimeFr, parseUserAgent } from '@/components/profile/profile-types';
@@ -25,7 +33,6 @@ import {
 } from '@/components/ui/operation-feedback';
 import { PageContent } from '@/components/ui/page-content';
 import { PageTabs, type PageTabItem } from '@/components/ui/page-tabs';
-import '@/components/ui/solar-icons';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { apiFetch } from '@/lib/api-client';
 
@@ -228,19 +235,19 @@ export default function ActiveSessionsPage() {
       key: 'toutes',
       label: 'Toutes',
       count: counts.total,
-      icon: 'solar:devices-bold-duotone',
+      icon: MonitorSmartphone,
     },
     {
       key: 'courante',
       label: 'Cet appareil',
       count: counts.courante,
-      icon: 'solar:verified-check-bold-duotone',
+      icon: BadgeCheck,
     },
     {
       key: 'autres',
       label: 'Autres appareils',
       count: counts.autres,
-      icon: 'solar:laptop-bold-duotone',
+      icon: Laptop,
     },
   ];
 
@@ -252,10 +259,7 @@ export default function ActiveSessionsPage() {
       cell: ({ row }) => {
         const s = row.original;
         const parsed = parseUserAgent(s.userAgent);
-        const iconName =
-          parsed.deviceType === 'mobile'
-            ? 'solar:smartphone-bold-duotone'
-            : 'solar:laptop-bold-duotone';
+        const DeviceIcon = parsed.deviceType === 'mobile' ? Smartphone : Laptop;
         return (
           <div className="flex items-center gap-3">
             <div
@@ -265,7 +269,7 @@ export default function ActiveSessionsPage() {
                   : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
               }`}
             >
-              <Icon icon={iconName} className="size-4.5" />
+              <DeviceIcon className="size-4.5" />
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-slate-900 dark:text-slate-100">{parsed.label}</p>
@@ -399,7 +403,7 @@ export default function ActiveSessionsPage() {
             href="/profil?tab=sessions"
             className={buttonVariants({ variant: 'outline', size: 'sm' })}
           >
-            <Icon icon="solar:user-id-bold-duotone" className="size-4 text-[#1B9DD9]" />
+            <UserCheck className="size-4 text-[#1B9DD9]" />
             Mon Profil &amp; Sécurité
           </Link>
         }

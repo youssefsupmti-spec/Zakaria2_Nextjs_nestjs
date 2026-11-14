@@ -1,10 +1,9 @@
 'use client';
 
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { useEffect } from 'react';
-import { Icon } from '@iconify/react';
 import { Button } from '@/components/ui/button';
 import { OPERATION_LABELS } from '@/components/ui/operation-feedback';
-import './solar-icons';
 
 export interface ConfirmActionDialogProps {
   open: boolean;
@@ -68,14 +67,11 @@ export function ConfirmActionDialog({
                 : 'flex size-10 shrink-0 items-center justify-center rounded-lg bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400'
             }
           >
-            <Icon
-              icon={
-                variant === 'destructive'
-                  ? 'solar:danger-triangle-bold-duotone'
-                  : 'solar:check-circle-bold-duotone'
-              }
-              className="size-5"
-            />
+            {variant === 'destructive' ? (
+              <AlertTriangle className="size-5" />
+            ) : (
+              <CheckCircle2 className="size-5" />
+            )}
           </div>
           <div className="min-w-0 flex-1">
             <h3

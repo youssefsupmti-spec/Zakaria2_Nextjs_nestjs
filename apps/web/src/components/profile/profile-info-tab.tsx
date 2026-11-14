@@ -1,13 +1,12 @@
 'use client';
 
-import { Icon } from '@iconify/react';
+import { CheckCircle2, Lock, SquarePen, Trash2 } from 'lucide-react';
 import { CIVILITE_VALUES, type VilleOptionDto } from '@zakaria/shared-contracts';
 import { useEffect, useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import '@/components/ui/solar-icons';
 import { formatDateTimeFr, type ContactChangeRequestItem, type ProfileUser } from './profile-types';
 
 export function ProfileInfoTab({
@@ -155,7 +154,7 @@ export function ProfileInfoTab({
               disabled={isDeletingAvatar}
               onClick={onDeleteAvatar}
             >
-              <Icon icon="solar:trash-bin-trash-bold-duotone" className="size-4 text-red-500" />
+              <Trash2 className="size-4 text-red-500" />
               {isDeletingAvatar ? 'Suppression…' : 'Supprimer'}
             </Button>
           </div>
@@ -272,7 +271,7 @@ export function ProfileInfoTab({
             </Button>
           )}
           <Button type="submit" disabled={isSavingProfile || !isDirty}>
-            <Icon icon="solar:check-circle-bold-duotone" className="size-4" />
+            <CheckCircle2 className="size-4" />
             {isSavingProfile ? 'Enregistrement…' : 'Enregistrer les informations'}
           </Button>
         </div>
@@ -296,7 +295,7 @@ export function ProfileInfoTab({
           <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-800 dark:bg-slate-800/40">
             <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
               <span>E-mail de connexion</span>
-              <Icon icon="solar:lock-keyhole-bold-duotone" className="size-4 text-slate-400" />
+              <Lock className="size-4 text-slate-400" />
             </div>
             <p className="mt-1 font-semibold text-slate-900 dark:text-slate-100">{profile.email}</p>
           </div>
@@ -304,7 +303,7 @@ export function ProfileInfoTab({
           <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-800 dark:bg-slate-800/40">
             <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
               <span>Téléphone principal</span>
-              <Icon icon="solar:lock-keyhole-bold-duotone" className="size-4 text-slate-400" />
+              <Lock className="size-4 text-slate-400" />
             </div>
             <p className="mt-1 font-semibold text-slate-900 tabular-nums dark:text-slate-100">
               {profile.telephone || 'Non renseigné'}
@@ -314,7 +313,7 @@ export function ProfileInfoTab({
           <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-3 dark:border-slate-800 dark:bg-slate-800/40">
             <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
               <span>Ville principale</span>
-              <Icon icon="solar:lock-keyhole-bold-duotone" className="size-4 text-slate-400" />
+              <Lock className="size-4 text-slate-400" />
             </div>
             <p className="mt-1 font-semibold text-slate-900 dark:text-slate-100">
               {profile.ville?.nameFr ?? (profile.villeName || 'Non renseignée')}
@@ -328,7 +327,7 @@ export function ProfileInfoTab({
           className="w-full"
           onClick={() => setModalOpen((prev) => !prev)}
         >
-          <Icon icon="solar:pen-new-square-bold-duotone" className="size-4 text-primary" />
+          <SquarePen className="size-4 text-primary" />
           {modalOpen ? 'Fermer le formulaire de demande' : 'Demander une modification'}
         </Button>
 

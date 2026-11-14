@@ -1,6 +1,6 @@
 'use client';
 
-import { Icon } from '@iconify/react';
+import { CreditCard } from 'lucide-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type FormEvent } from 'react';
 import {
@@ -12,7 +12,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import '@/components/ui/solar-icons';
 import { apiFetch } from '@/lib/api-client';
 
 export interface BusinessCompteItem {
@@ -619,12 +618,7 @@ export function BusinessEditorModal({
                     >
                       <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <Icon
-                            icon="solar:card-2-bold-duotone"
-                            width={18}
-                            height={18}
-                            className="text-primary"
-                          />
+                          <CreditCard className="size-4.5 text-primary" />
                           <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                             {compte.resolvedBank.banqueNom}
                           </span>

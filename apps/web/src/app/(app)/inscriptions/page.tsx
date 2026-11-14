@@ -1,7 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle2, Download, X, XCircle } from 'lucide-react';
+import { CheckCircle2, Clock, Download, UserPlus, X, XCircle } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,7 +22,6 @@ import {
 } from '@/components/ui/operation-feedback';
 import { PageContent } from '@/components/ui/page-content';
 import { PageTabs, type PageTabItem } from '@/components/ui/page-tabs';
-import '@/components/ui/solar-icons';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { apiFetch } from '@/lib/api-client';
 
@@ -291,25 +290,25 @@ export default function InscriptionsPage() {
       key: 'toutes',
       label: 'Toutes',
       count: totalCount,
-      icon: 'solar:user-plus-bold-duotone',
+      icon: UserPlus,
     },
     {
       key: 'en_attente',
       label: 'En attente',
       count: counts.enAttente,
-      icon: 'solar:clock-circle-bold-duotone',
+      icon: Clock,
     },
     {
       key: 'acceptee',
       label: 'Acceptées',
       count: counts.acceptee,
-      icon: 'solar:check-circle-bold-duotone',
+      icon: CheckCircle2,
     },
     {
       key: 'refusee',
       label: 'Refusées',
       count: counts.refusee,
-      icon: 'solar:close-circle-bold-duotone',
+      icon: XCircle,
     },
   ];
 

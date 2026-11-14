@@ -1,6 +1,14 @@
 'use client';
 
-import { Icon } from '@iconify/react';
+import {
+  LayoutGrid,
+  MonitorSmartphone,
+  Palette,
+  Shield,
+  UserCheck,
+  XCircle,
+  type LucideIcon,
+} from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ActiveSessionItemDto, VilleOptionDto } from '@zakaria/shared-contracts';
 import { useRouter } from 'next/navigation';
@@ -16,20 +24,19 @@ import {
   type ProfileResponse,
   type ProfileTabKey,
 } from '@/components/profile/profile-types';
-import '@/components/ui/solar-icons';
 import { apiFetch } from '@/lib/api-client';
 import { useAuth } from '@/lib/client-rbac';
 
 const PROFILE_TABS: Array<{
   key: ProfileTabKey;
   label: string;
-  icon: string;
+  icon: LucideIcon;
 }> = [
-  { key: 'apercu', label: 'Aperçu & Périmètre', icon: 'solar:widget-2-bold-duotone' },
-  { key: 'informations', label: 'Informations & Coordonnées', icon: 'solar:user-id-bold-duotone' },
-  { key: 'securite', label: 'Sécurité du compte', icon: 'solar:shield-keyhole-bold-duotone' },
-  { key: 'sessions', label: 'Sessions & Appareils', icon: 'solar:devices-bold-duotone' },
-  { key: 'preferences', label: 'Préférences & Apparence', icon: 'solar:palette-2-bold-duotone' },
+  { key: 'apercu', label: 'Aperçu & Périmètre', icon: LayoutGrid },
+  { key: 'informations', label: 'Informations & Coordonnées', icon: UserCheck },
+  { key: 'securite', label: 'Sécurité du compte', icon: Shield },
+  { key: 'sessions', label: 'Sessions & Appareils', icon: MonitorSmartphone },
+  { key: 'preferences', label: 'Préférences & Apparence', icon: Palette },
 ];
 
 export default function ProfilPage() {
@@ -255,11 +262,10 @@ export default function ProfilPage() {
       {feedback && (
         <div
           role="status"
-          className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm font-semibold ${
-            feedback.type === 'ok'
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/70 dark:bg-emerald-950/50 dark:text-emerald-300'
-              : 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/70 dark:bg-red-950/50 dark:text-red-300'
-          }`}
+          className={`flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-sm font-semibold ${feedback.type === 'ok'
+            ? 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900/70 dark:bg-emerald-950/50 dark:text-emerald-300'
+            : 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/70 dark:bg-red-950/50 dark:text-red-300'
+            }`}
         >
           <span>{feedback.text}</span>
           <button
@@ -268,7 +274,7 @@ export default function ProfilPage() {
             className="cursor-pointer rounded-md p-1 opacity-75 hover:opacity-100"
             aria-label="Fermer la notification"
           >
-            <Icon icon="solar:close-circle-bold-duotone" className="size-4" />
+            <XCircle className="size-4" />
           </button>
         </div>
       )}
@@ -288,24 +294,21 @@ export default function ProfilPage() {
               role="tab"
               aria-selected={isActive}
               onClick={() => handleSelectTab(tab.key)}
-              className={`inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all sm:text-[13px] ${
-                isActive
-                  ? 'bg-primary text-white shadow-xs'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
-              }`}
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all sm:text-[13px] ${isActive
+                ? 'bg-primary text-white shadow-xs'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
+                }`}
             >
-              <Icon
-                icon={tab.icon}
+              <tab.icon
                 className={`size-4 shrink-0 ${isActive ? 'text-white' : 'text-primary'}`}
               />
               <span>{tab.label}</span>
               {tab.key === 'sessions' && sessions.length > 0 && (
                 <span
-                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-extrabold tabular-nums ${
-                    isActive
-                      ? 'bg-white/20 text-white'
-                      : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200'
-                  }`}
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-extrabold tabular-nums ${isActive
+                    ? 'bg-white/20 text-white'
+                    : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200'
+                    }`}
                 >
                   {sessions.length}
                 </span>

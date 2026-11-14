@@ -1,10 +1,24 @@
 'use client';
 
-import { Icon } from '@iconify/react';
+import {
+  ArrowUpRight,
+  BadgeCheck,
+  Banknote,
+  Building2,
+  CreditCard,
+  KeyRound,
+  MapPin,
+  MonitorSmartphone,
+  Shield,
+  ShieldCheck,
+  Store,
+  Truck,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button, buttonVariants } from '@/components/ui/button';
-import '@/components/ui/solar-icons';
 import {
   formatDateTimeFr,
   type PrimaryProfileRole,
@@ -17,7 +31,7 @@ interface KpiCard {
   label: string;
   value: string;
   helper: string;
-  icon: string;
+  icon: LucideIcon;
   accent: string;
 }
 
@@ -33,7 +47,7 @@ function buildRoleKpis(
         label: 'Périmètre d’administration',
         value: 'Global Plateforme',
         helper: `${roleSummary.roles.length} rôle(s) · ${roleSummary.permissionsCount} permissions`,
-        icon: 'solar:shield-check-bold-duotone',
+        icon: ShieldCheck,
         accent: 'text-primary bg-primary/10',
       },
       {
@@ -42,21 +56,21 @@ function buildRoleKpis(
         helper: profile.passwordResetAt
           ? `Modifié le ${formatDateTimeFr(profile.passwordResetAt, false)}`
           : 'Aucun changement récent',
-        icon: 'solar:key-bold-duotone',
+        icon: KeyRound,
         accent: 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/60',
       },
       {
         label: 'Sessions actives',
         value: String(activeSessionsCount),
         helper: 'Appareils actuellement connectés',
-        icon: 'solar:devices-bold-duotone',
+        icon: MonitorSmartphone,
         accent: 'text-sky-600 bg-sky-50 dark:text-sky-400 dark:bg-sky-950/60',
       },
       {
         label: 'Statut du compte',
         value: profile.active ? 'Opérationnel' : 'Suspendu',
         helper: `ID #${profile.id}`,
-        icon: 'solar:verified-check-bold-duotone',
+        icon: BadgeCheck,
         accent: 'text-[#f7901e] bg-amber-50 dark:text-amber-400 dark:bg-amber-950/60',
       },
     ];
@@ -73,28 +87,28 @@ function buildRoleKpis(
         label: 'Agence de rattachement',
         value: primaryAgence,
         helper: `${roleSummary.agenceMemberships.length} rattachement(s) actif(s)`,
-        icon: 'solar:buildings-2-bold-duotone',
+        icon: Building2,
         accent: 'text-primary bg-primary/10',
       },
       {
         label: 'Périmètre RBAC',
         value: `${roleSummary.permissionsCount} droits`,
         helper: `${roleSummary.roles.length} rôle(s) attribué(s)`,
-        icon: 'solar:shield-keyhole-bold-duotone',
+        icon: Shield,
         accent: 'text-indigo-600 bg-indigo-50 dark:text-indigo-400 dark:bg-indigo-950/60',
       },
       {
         label: 'Zones assignées',
         value: String(zonesCount),
         helper: 'Couverture distribution / ramassage',
-        icon: 'solar:map-point-bold-duotone',
+        icon: MapPin,
         accent: 'text-[#f7901e] bg-amber-50 dark:text-amber-400 dark:bg-amber-950/60',
       },
       {
         label: 'Sessions actives',
         value: String(activeSessionsCount),
         helper: 'Appareils connectés',
-        icon: 'solar:devices-bold-duotone',
+        icon: MonitorSmartphone,
         accent: 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/60',
       },
     ];
@@ -111,28 +125,28 @@ function buildRoleKpis(
         label: 'Rattachement terrain',
         value: agenceNom,
         helper: roleSummary.partenaireCoursier ? 'Coursier partenaire' : 'Équipe agence G4D',
-        icon: 'solar:delivery-bold-duotone',
+        icon: Truck,
         accent: 'text-primary bg-primary/10',
       },
       {
         label: 'Zones de tournée',
         value: String(zonesCount),
         helper: 'Livraison & ramassage actifs',
-        icon: 'solar:map-point-bold-duotone',
+        icon: MapPin,
         accent: 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/60',
       },
       {
         label: 'Mode tarif ramassage',
         value: profile.ramassageLiv ? 'Activé' : 'Standard',
         helper: profile.ville?.nameFr ?? (profile.villeName || 'Ville non définie'),
-        icon: 'solar:banknote-2-bold-duotone',
+        icon: Banknote,
         accent: 'text-[#f7901e] bg-amber-50 dark:text-amber-400 dark:bg-amber-950/60',
       },
       {
         label: 'Sessions actives',
         value: String(activeSessionsCount),
         helper: 'Appareils connectés',
-        icon: 'solar:devices-bold-duotone',
+        icon: MonitorSmartphone,
         accent: 'text-sky-600 bg-sky-50 dark:text-sky-400 dark:bg-sky-950/60',
       },
     ];
@@ -146,28 +160,28 @@ function buildRoleKpis(
       label: 'Enseignes actives',
       value: `${activeBusinesses} / ${roleSummary.businesses.length}`,
       helper: 'Boutiques gérées sur G4D',
-      icon: 'solar:shop-2-bold-duotone',
+      icon: Store,
       accent: 'text-primary bg-primary/10',
     },
     {
       label: 'Comptes bancaires (RIB)',
       value: String(totalRibs),
       helper: totalRibs > 0 ? 'RIB actif(s) pour virements CRBT' : 'Aucun RIB actif configuré',
-      icon: 'solar:card-2-bold-duotone',
+      icon: CreditCard,
       accent: 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/60',
     },
     {
       label: 'Ville d’expédition',
       value: profile.ville?.nameFr ?? (profile.villeName || 'Non renseignée'),
       helper: profile.ville?.codeZone ? `Zone ${profile.ville.codeZone}` : 'Coordonnée protégée',
-      icon: 'solar:map-point-bold-duotone',
+      icon: MapPin,
       accent: 'text-[#f7901e] bg-amber-50 dark:text-amber-400 dark:bg-amber-950/60',
     },
     {
       label: 'Sessions & Sous-comptes',
       value: `${activeSessionsCount} / ${roleSummary.subAccountsCount}`,
       helper: 'Sessions actives / Équipe vendeur',
-      icon: 'solar:users-group-rounded-bold-duotone',
+      icon: Users,
       accent: 'text-sky-600 bg-sky-50 dark:text-sky-400 dark:bg-sky-950/60',
     },
   ];
@@ -212,7 +226,7 @@ export function ProfileOverviewTab({
               <div
                 className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${kpi.accent}`}
               >
-                <Icon icon={kpi.icon} className="size-5" />
+                <kpi.icon className="size-5" />
               </div>
             </div>
           </div>
@@ -305,7 +319,7 @@ export function ProfileOverviewTab({
                     className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
                   >
                     Ouvrir dans Google Maps
-                    <Icon icon="solar:arrow-right-up-linear" className="size-3.5" />
+                    <ArrowUpRight className="size-3.5" />
                   </a>
                 ) : (
                   <span className="text-slate-400">Non renseignée</span>

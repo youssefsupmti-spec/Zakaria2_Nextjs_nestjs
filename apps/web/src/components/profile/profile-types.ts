@@ -305,70 +305,82 @@ export function formatRoleMeta(roleName: string): { label: string; className: st
   }
 }
 
+export type SecurityEventIconKey =
+  | 'shield_check'
+  | 'logout'
+  | 'key'
+  | 'lock'
+  | 'user'
+  | 'camera'
+  | 'edit'
+  | 'devices'
+  | 'alert'
+  | 'history';
+
 export function formatSecurityEvent(event: string): {
   label: string;
-  icon: string;
+  icon: SecurityEventIconKey;
   toneClass: string;
 } {
   switch (event) {
     case 'login':
       return {
         label: 'Connexion réussie',
-        icon: 'solar:shield-check-bold-duotone',
+        icon: 'shield_check',
         toneClass: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300',
       };
     case 'logout':
       return {
         label: 'Déconnexion',
-        icon: 'solar:logout-3-bold-duotone',
+        icon: 'logout',
         toneClass: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
       };
     case 'password_changed':
       return {
         label: 'Mot de passe modifié',
-        icon: 'solar:key-bold-duotone',
+        icon: 'key',
         toneClass: 'bg-sky-50 text-sky-600 dark:bg-sky-950/60 dark:text-sky-300',
       };
     case 'password_reset':
       return {
         label: 'Mot de passe réinitialisé',
-        icon: 'solar:lock-keyhole-bold-duotone',
+        icon: 'lock',
         toneClass: 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300',
       };
     case 'profile_updated':
       return {
         label: 'Profil mis à jour',
-        icon: 'solar:user-id-bold-duotone',
+        icon: 'user',
         toneClass: 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300',
       };
     case 'avatar_updated':
       return {
         label: 'Photo de profil modifiée',
-        icon: 'solar:camera-bold-duotone',
+        icon: 'camera',
         toneClass: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300',
       };
     case 'contact_change_requested':
       return {
         label: 'Demande de modification coordonnées',
-        icon: 'solar:pen-new-square-bold-duotone',
+        icon: 'edit',
         toneClass: 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300',
       };
     case 'sessions_revoked_others':
       return {
         label: 'Autres appareils déconnectés',
-        icon: 'solar:devices-bold-duotone',
+        icon: 'devices',
         toneClass: 'bg-purple-50 text-purple-600 dark:bg-purple-950/60 dark:text-purple-300',
       };
     case 'login_failed':
       return {
         label: 'Tentative de connexion refusée',
-        icon: 'solar:danger-triangle-bold-duotone',
+        icon: 'alert',
         toneClass: 'bg-red-50 text-red-600 dark:bg-red-950/60 dark:text-red-300',
       };
     default:
       return {
         label: event,
-        icon: 'solar:history-bold-duotone',
+        icon: 'history',
         toneClass: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300',
       };
   }

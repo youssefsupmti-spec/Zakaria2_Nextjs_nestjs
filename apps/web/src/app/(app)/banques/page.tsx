@@ -1,9 +1,19 @@
 'use client';
 
-import { Icon } from '@iconify/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CreateBanqueSchema } from '@zakaria/shared-contracts';
-import { Download, Pencil, Plus, Power, PowerOff, Trash2, X } from 'lucide-react';
+import {
+  CheckCircle2,
+  Download,
+  Landmark,
+  Pencil,
+  Plus,
+  Power,
+  PowerOff,
+  Trash2,
+  X,
+  XCircle,
+} from 'lucide-react';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,7 +34,6 @@ import {
 } from '@/components/ui/operation-feedback';
 import { PageContent } from '@/components/ui/page-content';
 import { PageTabs, type PageTabItem } from '@/components/ui/page-tabs';
-import '@/components/ui/solar-icons';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { apiFetch } from '@/lib/api-client';
 
@@ -289,19 +298,19 @@ export default function BanquesPage() {
       key: 'toutes',
       label: 'Toutes',
       count: counts.total,
-      icon: 'solar:banknote-2-bold-duotone',
+      icon: Landmark,
     },
     {
       key: 'active',
       label: 'Actives',
       count: counts.active,
-      icon: 'solar:check-circle-bold-duotone',
+      icon: CheckCircle2,
     },
     {
       key: 'inactive',
       label: 'Inactives',
       count: counts.inactive,
-      icon: 'solar:close-circle-bold-duotone',
+      icon: XCircle,
     },
   ];
 
@@ -314,7 +323,7 @@ export default function BanquesPage() {
         return (
           <div className="flex items-center gap-2.5">
             <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#1B9DD9]/10 text-[#1B9DD9] dark:bg-sky-950/70">
-              <Icon icon="solar:banknote-2-bold-duotone" className="size-4.5" />
+              <Landmark className="size-4.5" />
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-slate-900 dark:text-slate-100">{b.name}</p>

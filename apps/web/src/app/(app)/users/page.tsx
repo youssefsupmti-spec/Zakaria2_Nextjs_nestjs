@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CreateUserSchema } from '@zakaria/shared-contracts';
-import { Download, Plus, Power, PowerOff, X } from 'lucide-react';
+import { CheckCircle2, Download, Plus, Power, PowerOff, Users, X, XCircle } from 'lucide-react';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/operation-feedback';
 import { PageContent } from '@/components/ui/page-content';
 import { PageTabs, type PageTabItem } from '@/components/ui/page-tabs';
-import '@/components/ui/solar-icons';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { apiFetch } from '@/lib/api-client';
 import { useAuth } from '@/lib/client-rbac';
@@ -303,19 +302,19 @@ export default function UsersPage() {
       key: 'tous',
       label: 'Tous',
       count: counts.total,
-      icon: 'solar:users-group-rounded-bold-duotone',
+      icon: Users,
     },
     {
       key: 'actifs',
       label: 'Actifs',
       count: counts.actifs,
-      icon: 'solar:check-circle-bold-duotone',
+      icon: CheckCircle2,
     },
     {
       key: 'desactives',
       label: 'Désactivés',
       count: counts.desactives,
-      icon: 'solar:close-circle-bold-duotone',
+      icon: XCircle,
     },
   ];
 

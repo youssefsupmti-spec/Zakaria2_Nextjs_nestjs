@@ -1,12 +1,11 @@
 'use client';
 
-import { Icon } from '@iconify/react';
+import { Laptop, LogOut, Smartphone, Trash2 } from 'lucide-react';
 import type { ActiveSessionItemDto } from '@zakaria/shared-contracts';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { OPERATION_LABELS } from '@/components/ui/operation-feedback';
-import '@/components/ui/solar-icons';
 import { formatDateTimeFr, parseUserAgent } from './profile-types';
 
 export function ProfileSessionsTab({
@@ -53,7 +52,7 @@ export function ProfileSessionsTab({
               disabled={otherSessionsCount === 0 || isRevokingOthers}
               onClick={() => setConfirmOthers(true)}
             >
-              <Icon icon="solar:logout-3-bold-duotone" className="size-4 text-red-500" />
+              <LogOut className="size-4 text-red-500" />
               Déconnecter toutes les autres sessions ({otherSessionsCount})
             </Button>
           ) : (
@@ -99,10 +98,7 @@ export function ProfileSessionsTab({
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {sessions.map((sess) => {
             const parsed = parseUserAgent(sess.userAgent);
-            const deviceIcon =
-              parsed.deviceType === 'mobile'
-                ? 'solar:smartphone-bold-duotone'
-                : 'solar:laptop-bold-duotone';
+            const DeviceIcon = parsed.deviceType === 'mobile' ? Smartphone : Laptop;
 
             return (
               <div
@@ -122,7 +118,7 @@ export function ProfileSessionsTab({
                           : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
                       }`}
                     >
-                      <Icon icon={deviceIcon} className="size-6" />
+                      <DeviceIcon className="size-6" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
@@ -153,10 +149,7 @@ export function ProfileSessionsTab({
                     }
                     onClick={() => onRevokeSession(sess.id)}
                   >
-                    <Icon
-                      icon="solar:trash-bin-trash-bold-duotone"
-                      className="size-4 text-red-500"
-                    />
+                    <Trash2 className="size-4 text-red-500" />
                     {sess.isCurrent ? 'Active' : 'Révoquer'}
                   </Button>
                 </div>

@@ -1,12 +1,27 @@
 'use client';
 
-import { Icon } from '@iconify/react';
+import {
+  AlertTriangle,
+  Camera,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  History,
+  KeyRound,
+  Lock,
+  LogOut,
+  MonitorSmartphone,
+  Shield,
+  ShieldCheck,
+  SquarePen,
+  UserCheck,
+  type LucideIcon,
+} from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import '@/components/ui/solar-icons';
 import {
   evaluatePasswordStrength,
   formatDateTimeFr,
@@ -109,10 +124,7 @@ export function ProfileSecurityTab({
                 onClick={() => setShowCurrent((v) => !v)}
                 className="absolute inset-y-0 right-0 flex w-10 cursor-pointer items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               >
-                <Icon
-                  icon={showCurrent ? 'solar:eye-closed-bold-duotone' : 'solar:eye-bold-duotone'}
-                  className="size-4"
-                />
+                {showCurrent ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
           </div>
@@ -142,10 +154,7 @@ export function ProfileSecurityTab({
                 onClick={() => setShowNew((v) => !v)}
                 className="absolute inset-y-0 right-0 flex w-10 cursor-pointer items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               >
-                <Icon
-                  icon={showNew ? 'solar:eye-closed-bold-duotone' : 'solar:eye-bold-duotone'}
-                  className="size-4"
-                />
+                {showNew ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
 
@@ -177,8 +186,7 @@ export function ProfileSecurityTab({
                       : 'text-slate-500 dark:text-slate-400'
                   }`}
                 >
-                  <Icon
-                    icon="solar:check-circle-bold-duotone"
+                  <CheckCircle2
                     className={`size-3.5 shrink-0 ${
                       item.ok ? 'text-emerald-500' : 'text-slate-300 dark:text-slate-600'
                     }`}
@@ -209,10 +217,7 @@ export function ProfileSecurityTab({
                 onClick={() => setShowConfirm((v) => !v)}
                 className="absolute inset-y-0 right-0 flex w-10 cursor-pointer items-center justify-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               >
-                <Icon
-                  icon={showConfirm ? 'solar:eye-closed-bold-duotone' : 'solar:eye-bold-duotone'}
-                  className="size-4"
-                />
+                {showConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
             {newPasswordConfirmation.length > 0 && !passwordsMatch && (
@@ -244,7 +249,7 @@ export function ProfileSecurityTab({
 
         <div className="flex justify-end border-t border-slate-100 pt-4 dark:border-slate-800">
           <Button type="submit" disabled={isChangingPassword || !passwordsMatch}>
-            <Icon icon="solar:shield-keyhole-bold-duotone" className="size-4" />
+            <Shield className="size-4" />
             {isChangingPassword ? 'Mise à jour…' : 'Mettre à jour le mot de passe'}
           </Button>
         </div>
@@ -257,7 +262,7 @@ export function ProfileSecurityTab({
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Icon icon="solar:shield-check-bold-duotone" className="size-5" />
+                <ShieldCheck className="size-5" />
               </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">
@@ -297,6 +302,20 @@ export function ProfileSecurityTab({
               {securityLogs.map((log) => {
                 const meta = formatSecurityEvent(log.event);
                 const parsedUa = parseUserAgent(log.userAgent);
+                const iconMap: Record<ReturnType<typeof formatSecurityEvent>['icon'], LucideIcon> =
+                  {
+                    shield_check: ShieldCheck,
+                    logout: LogOut,
+                    key: KeyRound,
+                    lock: Lock,
+                    user: UserCheck,
+                    camera: Camera,
+                    edit: SquarePen,
+                    devices: MonitorSmartphone,
+                    alert: AlertTriangle,
+                    history: History,
+                  };
+                const SecurityEventIcon = iconMap[meta.icon];
                 return (
                   <div
                     key={log.id}
@@ -306,7 +325,7 @@ export function ProfileSecurityTab({
                       <div
                         className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg ${meta.toneClass}`}
                       >
-                        <Icon icon={meta.icon} className="size-4" />
+                        <SecurityEventIcon className="size-4" />
                       </div>
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-slate-900 dark:text-slate-100">

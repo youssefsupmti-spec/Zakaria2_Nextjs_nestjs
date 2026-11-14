@@ -1,9 +1,19 @@
 'use client';
 
-import { Icon } from '@iconify/react';
+import {
+  Building2,
+  Calendar,
+  Camera,
+  Loader2,
+  Mail,
+  MapPin,
+  MonitorSmartphone,
+  Phone,
+  SquarePen,
+  UserCheck,
+} from 'lucide-react';
 import { useRef, useState, type ChangeEvent } from 'react';
 import { Button } from '@/components/ui/button';
-import '@/components/ui/solar-icons';
 import {
   extractInitials,
   formatDateTimeFr,
@@ -122,7 +132,7 @@ export function ProfileHeader({
         <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2.5">
             <span className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 text-xs font-semibold text-white/90 backdrop-blur-xs">
-              <Icon icon="solar:user-id-bold-duotone" className="size-4 text-[#3fb4e8]" />
+              <UserCheck className="size-4 text-[#3fb4e8]" />
               Espace Mon Compte &amp; Sécurité
             </span>
             <span className="rounded-lg border border-white/15 bg-white/10 px-2.5 py-1 font-mono text-xs font-bold text-white/95 backdrop-blur-xs">
@@ -190,14 +200,11 @@ export function ProfileHeader({
                 title="Changer la photo de profil"
                 className="absolute -right-1.5 -bottom-1.5 flex size-8 cursor-pointer items-center justify-center rounded-xl border border-white/30 bg-[#f7901e] text-white shadow-md transition-transform hover:scale-105 hover:bg-[#e08a2b] disabled:opacity-60"
               >
-                <Icon
-                  icon={
-                    isUploadingAvatar
-                      ? 'solar:refresh-circle-bold-duotone'
-                      : 'solar:camera-bold-duotone'
-                  }
-                  className={`size-4 ${isUploadingAvatar ? 'animate-spin' : ''}`}
-                />
+                {isUploadingAvatar ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Camera className="size-4" />
+                )}
               </button>
             </div>
 
@@ -225,30 +232,30 @@ export function ProfileHeader({
 
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-medium text-slate-100/90 sm:text-sm">
                 <span className="inline-flex items-center gap-1.5">
-                  <Icon icon="solar:letter-bold-duotone" className="size-4 text-[#3fb4e8]" />
+                  <Mail className="size-4 text-[#3fb4e8]" />
                   {profile.email}
                 </span>
                 {profile.telephone && (
                   <span className="inline-flex items-center gap-1.5 tabular-nums">
-                    <Icon icon="solar:phone-bold-duotone" className="size-4 text-[#3fb4e8]" />
+                    <Phone className="size-4 text-[#3fb4e8]" />
                     {profile.telephone}
                   </span>
                 )}
                 {(profile.ville?.nameFr || profile.villeName) && (
                   <span className="inline-flex items-center gap-1.5">
-                    <Icon icon="solar:map-point-bold-duotone" className="size-4 text-[#f9a03f]" />
+                    <MapPin className="size-4 text-[#f9a03f]" />
                     {profile.ville?.nameFr ?? profile.villeName}
                   </span>
                 )}
                 {primaryOrgLabel && (
                   <span className="inline-flex items-center gap-1.5">
-                    <Icon icon="solar:buildings-2-bold-duotone" className="size-4 text-[#f9a03f]" />
+                    <Building2 className="size-4 text-[#f9a03f]" />
                     {primaryOrgLabel}
                   </span>
                 )}
                 {profile.createdAt && (
                   <span className="inline-flex items-center gap-1.5 text-slate-200/80">
-                    <Icon icon="solar:calendar-bold-duotone" className="size-4 text-slate-300" />
+                    <Calendar className="size-4 text-slate-300" />
                     Membre depuis le {formatDateTimeFr(profile.createdAt, false)}
                   </span>
                 )}
@@ -264,7 +271,7 @@ export function ProfileHeader({
               onClick={() => onSelectTab('informations')}
               className="border border-white/25 bg-white text-[#12476c] shadow-sm hover:bg-slate-100"
             >
-              <Icon icon="solar:pen-new-square-bold-duotone" className="size-4" />
+              <SquarePen className="size-4" />
               Modifier le profil
             </Button>
             <Button
@@ -274,7 +281,7 @@ export function ProfileHeader({
               onClick={() => onSelectTab('sessions')}
               className="border-white/30 bg-white/10 text-white backdrop-blur-xs hover:bg-white/20 hover:text-white"
             >
-              <Icon icon="solar:devices-bold-duotone" className="size-4 text-[#3fb4e8]" />
+              <MonitorSmartphone className="size-4 text-[#3fb4e8]" />
               {activeSessionsCount} session{activeSessionsCount > 1 ? 's' : ''} active
               {activeSessionsCount > 1 ? 's' : ''}
             </Button>

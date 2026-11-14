@@ -1,6 +1,6 @@
 'use client';
 
-import { Icon } from '@iconify/react';
+import { Clock, Moon, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import {
   applyDocumentTheme,
@@ -8,7 +8,6 @@ import {
   type ThemeMode,
 } from '@/components/app-shell/theme-toggle';
 import { Badge } from '@/components/ui/badge';
-import '@/components/ui/solar-icons';
 
 export type BadgeStyleVariant = 'soft' | 'solid' | 'outline';
 
@@ -18,42 +17,42 @@ const BADGE_PREVIEW_ITEMS: Array<{
   solid: string;
   outline: string;
 }> = [
-  {
-    label: 'Livré',
-    soft: 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70',
-    solid: 'bg-emerald-600 text-white border border-emerald-600',
-    outline:
-      'bg-transparent text-emerald-700 border-2 border-emerald-600 dark:text-emerald-400 dark:border-emerald-500',
-  },
-  {
-    label: 'En cours',
-    soft: 'bg-sky-50 text-sky-700 border border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800/70',
-    solid: 'bg-[#1b9dd9] text-white border border-[#1b9dd9]',
-    outline:
-      'bg-transparent text-[#1b9dd9] border-2 border-[#1b9dd9] dark:text-[#3fb4e8] dark:border-[#3fb4e8]',
-  },
-  {
-    label: 'Reporté',
-    soft: 'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70',
-    solid: 'bg-amber-500 text-white border border-amber-500',
-    outline:
-      'bg-transparent text-amber-700 border-2 border-amber-500 dark:text-amber-300 dark:border-amber-400',
-  },
-  {
-    label: 'Refusé',
-    soft: 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/70',
-    solid: 'bg-rose-600 text-white border border-rose-600',
-    outline:
-      'bg-transparent text-rose-700 border-2 border-rose-600 dark:text-rose-400 dark:border-rose-500',
-  },
-  {
-    label: 'Retourné',
-    soft: 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800/70',
-    solid: 'bg-red-600 text-white border border-red-600',
-    outline:
-      'bg-transparent text-red-700 border-2 border-red-600 dark:text-red-400 dark:border-red-500',
-  },
-];
+    {
+      label: 'Livré',
+      soft: 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/70',
+      solid: 'bg-emerald-600 text-white border border-emerald-600',
+      outline:
+        'bg-transparent text-emerald-700 border-2 border-emerald-600 dark:text-emerald-400 dark:border-emerald-500',
+    },
+    {
+      label: 'En cours',
+      soft: 'bg-sky-50 text-sky-700 border border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800/70',
+      solid: 'bg-[#1b9dd9] text-white border border-[#1b9dd9]',
+      outline:
+        'bg-transparent text-[#1b9dd9] border-2 border-[#1b9dd9] dark:text-[#3fb4e8] dark:border-[#3fb4e8]',
+    },
+    {
+      label: 'Reporté',
+      soft: 'bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/70',
+      solid: 'bg-amber-500 text-white border border-amber-500',
+      outline:
+        'bg-transparent text-amber-700 border-2 border-amber-500 dark:text-amber-300 dark:border-amber-400',
+    },
+    {
+      label: 'Refusé',
+      soft: 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/70',
+      solid: 'bg-rose-600 text-white border border-rose-600',
+      outline:
+        'bg-transparent text-rose-700 border-2 border-rose-600 dark:text-rose-400 dark:border-rose-500',
+    },
+    {
+      label: 'Retourné',
+      soft: 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/60 dark:text-red-300 dark:border-red-800/70',
+      solid: 'bg-red-600 text-white border border-red-600',
+      outline:
+        'bg-transparent text-red-700 border-2 border-red-600 dark:text-red-400 dark:border-red-500',
+    },
+  ];
 
 export function ProfilePreferencesTab() {
   const [theme, setTheme] = useState<ThemeMode>('light');
@@ -124,14 +123,13 @@ export function ProfilePreferencesTab() {
             <button
               type="button"
               onClick={() => handleSelectTheme('light')}
-              className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-left transition-all ${
-                theme === 'light'
-                  ? 'border-primary bg-primary/[0.06] ring-2 ring-primary/20'
-                  : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
-              }`}
+              className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-left transition-all ${theme === 'light'
+                ? 'border-primary bg-primary/[0.06] ring-2 ring-primary/20'
+                : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
+                }`}
             >
               <div className="flex size-10 items-center justify-center rounded-xl bg-amber-50 text-[#f7901e]">
-                <Icon icon="solar:sun-2-bold-duotone" className="size-5" />
+                <Sun className="size-5" />
               </div>
               <div>
                 <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Mode Clair</p>
@@ -144,14 +142,13 @@ export function ProfilePreferencesTab() {
             <button
               type="button"
               onClick={() => handleSelectTheme('dark')}
-              className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-left transition-all ${
-                theme === 'dark'
-                  ? 'border-primary bg-primary/[0.1] ring-2 ring-primary/25'
-                  : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
-              }`}
+              className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-left transition-all ${theme === 'dark'
+                ? 'border-primary bg-primary/[0.1] ring-2 ring-primary/25'
+                : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
+                }`}
             >
               <div className="flex size-10 items-center justify-center rounded-xl bg-slate-800 text-sky-400">
-                <Icon icon="solar:moon-bold-duotone" className="size-5" />
+                <Moon className="size-5" />
               </div>
               <div>
                 <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Mode Sombre</p>
@@ -178,11 +175,10 @@ export function ProfilePreferencesTab() {
                 key={opt.key}
                 type="button"
                 onClick={() => handleSelectBadgeVariant(opt.key)}
-                className={`flex cursor-pointer flex-col items-start rounded-xl border p-3.5 text-left transition-all ${
-                  badgeVariant === opt.key
-                    ? 'border-primary bg-primary/[0.06] ring-2 ring-primary/20'
-                    : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
-                }`}
+                className={`flex cursor-pointer flex-col items-start rounded-xl border p-3.5 text-left transition-all ${badgeVariant === opt.key
+                  ? 'border-primary bg-primary/[0.06] ring-2 ring-primary/20'
+                  : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
+                  }`}
               >
                 <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                   {opt.title}
@@ -244,7 +240,7 @@ export function ProfilePreferencesTab() {
                 Africa/Casablanca (UTC+1)
               </p>
             </div>
-            <Icon icon="solar:clock-circle-bold-duotone" className="size-5 text-primary" />
+            <Clock className="size-5 text-primary" />
           </div>
 
           <div className="flex items-center justify-between rounded-xl border border-slate-200/80 bg-slate-50/70 px-4 py-3 dark:border-slate-800 dark:bg-slate-800/40">
@@ -263,3 +259,4 @@ export function ProfilePreferencesTab() {
     </div>
   );
 }
+

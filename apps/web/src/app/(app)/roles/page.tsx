@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CreateRoleSchema, ROLE_SCOPE_VALUES, type RoleScope } from '@zakaria/shared-contracts';
-import { Download, Plus, Trash2, X } from 'lucide-react';
+import { Building2, Download, Plus, Shield, ShieldCheck, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/operation-feedback';
 import { PageContent } from '@/components/ui/page-content';
 import { PageTabs, type PageTabItem } from '@/components/ui/page-tabs';
-import '@/components/ui/solar-icons';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { apiFetch } from '@/lib/api-client';
 import { useAuth } from '@/lib/client-rbac';
@@ -251,19 +250,19 @@ export default function RolesPage() {
       key: 'tous',
       label: 'Tous',
       count: counts.total,
-      icon: 'solar:shield-keyhole-bold-duotone',
+      icon: Shield,
     },
     {
       key: 'plateforme',
       label: 'Plateforme',
       count: counts.plateforme,
-      icon: 'solar:shield-check-bold-duotone',
+      icon: ShieldCheck,
     },
     {
       key: 'agence',
       label: 'Agence',
       count: counts.agence,
-      icon: 'solar:buildings-2-bold-duotone',
+      icon: Building2,
     },
   ];
 

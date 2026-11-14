@@ -1,8 +1,19 @@
 'use client';
 
-import { Icon } from '@iconify/react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Download, Pencil, Plus, Power, PowerOff, Trash2 } from 'lucide-react';
+import {
+  AlertTriangle,
+  BadgeCheck,
+  CheckCircle2,
+  Download,
+  Pencil,
+  Plus,
+  Power,
+  PowerOff,
+  Store,
+  Trash2,
+  XCircle,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import {
   BusinessEditorModal,
@@ -27,7 +38,6 @@ import {
 } from '@/components/ui/operation-feedback';
 import { PageContent } from '@/components/ui/page-content';
 import { PageTabs, type PageTabItem } from '@/components/ui/page-tabs';
-import '@/components/ui/solar-icons';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { apiFetch } from '@/lib/api-client';
 
@@ -207,30 +217,30 @@ export default function BusinessesPage() {
     (couvertureFilter ? 1 : 0);
 
   const tabs: PageTabItem<BusinessTab>[] = [
-    { key: 'toutes', label: 'Toutes', count: stats.total, icon: 'solar:shop-2-bold-duotone' },
+    { key: 'toutes', label: 'Toutes', count: stats.total, icon: Store },
     {
       key: 'actifs',
       label: 'Actives',
       count: stats.actifs,
-      icon: 'solar:check-circle-bold-duotone',
+      icon: CheckCircle2,
     },
     {
       key: 'inactifs',
       label: 'Inactives',
       count: inactifsCount,
-      icon: 'solar:close-circle-bold-duotone',
+      icon: XCircle,
     },
     {
       key: 'couvertes',
       label: 'Couvertes',
       count: stats.rattaches + stats.couvertsParZone,
-      icon: 'solar:verified-check-bold-duotone',
+      icon: BadgeCheck,
     },
     {
       key: 'alertes',
       label: 'Hors zone / Orphelines',
       count: stats.horsZone + stats.orphelins,
-      icon: 'solar:danger-triangle-bold-duotone',
+      icon: AlertTriangle,
     },
   ];
 
@@ -243,7 +253,7 @@ export default function BusinessesPage() {
         return (
           <div className="flex items-start gap-2.5">
             <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#1B9DD9]/10 text-[#1B9DD9] dark:bg-sky-950/70">
-              <Icon icon="solar:shop-2-bold-duotone" className="size-4.5" />
+              <Store className="size-4.5" />
             </div>
             <div className="min-w-0">
               <p className="font-semibold text-slate-900 dark:text-slate-100">{b.name}</p>

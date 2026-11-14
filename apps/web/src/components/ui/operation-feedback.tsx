@@ -1,14 +1,12 @@
 'use client';
 
-import { Icon } from '@iconify/react';
-import { Loader2, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Loader2, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   OPERATION_LABELS,
   type OperationLabelKey,
   type OperationMessage,
 } from './operation-feedback-utils';
-import './solar-icons';
 
 export * from './operation-feedback-utils';
 
@@ -36,13 +34,11 @@ export function OperationFeedbackBanner({
       )}
     >
       <div className="flex min-w-0 items-center gap-2.5">
-        <Icon
-          icon={isOk ? 'solar:check-circle-bold-duotone' : 'solar:danger-triangle-bold-duotone'}
-          className={cn(
-            'size-4.5 shrink-0',
-            isOk ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400',
-          )}
-        />
+        {isOk ? (
+          <CheckCircle2 className="size-4.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+        ) : (
+          <AlertTriangle className="size-4.5 shrink-0 text-red-600 dark:text-red-400" />
+        )}
         <span className="font-medium break-words">{feedback.text}</span>
       </div>
       {onDismiss && (
