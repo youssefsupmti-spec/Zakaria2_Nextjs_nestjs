@@ -42,10 +42,15 @@ export function AppSidebar() {
   const ctx = user.accessContext;
 
   const isNetworkRoute = pathname.startsWith('/agences') || pathname.startsWith('/partenaires');
+  const isCommercialRoute =
+    pathname.startsWith('/inscriptions') ||
+    pathname.startsWith('/businesses') ||
+    pathname.startsWith('/banques');
   const isAdminRoute = pathname.startsWith('/users') || pathname.startsWith('/roles');
 
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [networkExpanded, setNetworkExpanded] = useState(isNetworkRoute);
+  const [commercialExpanded, setCommercialExpanded] = useState(isCommercialRoute);
   const [adminExpanded, setAdminExpanded] = useState(isAdminRoute);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -80,6 +85,26 @@ export function AppSidebar() {
     (ctx?.agenceMemberships.length ?? 0) > 0 ||
     (ctx?.partenaireMemberships.length ?? 0) > 0;
   const hasNetworkAccess = hasAgenceAccess || hasPartenaireAccess;
+  const isClientAccount =
+    !isPlatformAdmin &&
+    (ctx?.primaryScope ? ctx.primaryScope === 'client' : user.roles.includes('client'));
+  const canViewInscriptions =
+    !isClientAccount &&
+    (isPlatformAdmin ||
+      (ctx?.managedAgenceIds.length ?? 0) > 0 ||
+      (ctx?.agenceMemberships.length ?? 0) > 0 ||
+      user.permissions.includes('Approve:DemandeInscription') ||
+      user.permissions.includes('Reject:DemandeInscription') ||
+      user.permissions.includes('View:PendingClientsAlert'));
+  const canViewBusinesses =
+    isClientAccount ||
+    isPlatformAdmin ||
+    (ctx?.agenceMemberships.length ?? 0) > 0 ||
+    user.permissions.includes('ViewAny:Business') ||
+    user.permissions.includes('View:BusinessesAdministration');
+  const canViewBanques =
+    !isClientAccount && (isPlatformAdmin || user.permissions.includes('ViewAny:Banque'));
+  const hasCommercialAccess = canViewInscriptions || canViewBusinesses || canViewBanques;
   const canManageTeam =
     isPlatformAdmin ||
     (ctx?.managedAgenceIds.length ?? 0) > 0 ||
@@ -232,6 +257,128 @@ export function AppSidebar() {
                   )}
                 </SidebarMenuItem>
               ))}
+
+            {hasCommercialAccess &&
+              (isCollapsed ? (
+                <>
+                  {canViewInscriptions && (
+                    <SidebarMenuItem>
+                      <SidebarMenuLink
+                        href="/inscriptions"
+                        isActive={pathname.startsWith('/inscriptions')}
+                        tooltip="Demandes d’inscription"
+                      >
+                        <Icon
+                          icon="solar:user-plus-bold-duotone"
+                          width={20}
+                          height={20}
+                          aria-hidden="true"
+                        />
+                        <span>Demandes d&apos;inscription</span>
+                      </SidebarMenuLink>
+                    </SidebarMenuItem>
+                  )}
+                  {canViewBusinesses && (
+                    <SidebarMenuItem>
+                      <SidebarMenuLink
+                        href="/businesses"
+                        isActive={pathname.startsWith('/businesses')}
+                        tooltip={isClientAccount ? 'Mes Business' : 'Enseignes & Business'}
+                      >
+                        <Icon
+                          icon="solar:shop-2-bold-duotone"
+                          width={20}
+                          height={20}
+                          aria-hidden="true"
+                        />
+                        <span>{isClientAccount ? 'Mes Business' : 'Enseignes & Business'}</span>
+                      </SidebarMenuLink>
+                    </SidebarMenuItem>
+                  )}
+                  {canViewBanques && (
+                    <SidebarMenuItem>
+                      <SidebarMenuLink
+                        href="/banques"
+                        isActive={pathname.startsWith('/banques')}
+                        tooltip="Banques & Codes RIB"
+                      >
+                        <Icon
+                          icon="solar:banknote-2-bold-duotone"
+                          width={20}
+                          height={20}
+                          aria-hidden="true"
+                        />
+                        <span>Banques &amp; Codes RIB</span>
+                      </SidebarMenuLink>
+                    </SidebarMenuItem>
+                  )}
+                </>
+              ) : (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    isActive={!commercialExpanded && isCommercialRoute}
+                    aria-expanded={commercialExpanded}
+                    onClick={() => setCommercialExpanded((prev) => !prev)}
+                    className={cn(
+                      commercialExpanded &&
+                        isCommercialRoute &&
+                        'bg-white/[0.08] font-semibold text-white [&>svg:first-child]:text-white',
+                    )}
+                  >
+                    <Icon
+                      icon="solar:shop-2-bold-duotone"
+                      width={20}
+                      height={20}
+                      aria-hidden="true"
+                    />
+                    <span>Vendeurs &amp; Enseignes</span>
+                    <Icon
+                      icon="solar:alt-arrow-down-bold-duotone"
+                      width={16}
+                      height={16}
+                      aria-hidden="true"
+                      className={cn(
+                        'ml-auto size-4! shrink-0 text-white/60 transition-transform duration-200',
+                        commercialExpanded ? 'rotate-0 text-white' : '-rotate-90',
+                      )}
+                    />
+                  </SidebarMenuButton>
+                  {commercialExpanded && (
+                    <SidebarMenuSub>
+                      {canViewInscriptions && (
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            href="/inscriptions"
+                            isActive={pathname.startsWith('/inscriptions')}
+                          >
+                            <span>Demandes d&apos;inscription</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )}
+                      {canViewBusinesses && (
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            href="/businesses"
+                            isActive={pathname.startsWith('/businesses')}
+                          >
+                            <span>{isClientAccount ? 'Mes Business' : 'Enseignes & Business'}</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )}
+                      {canViewBanques && (
+                        <SidebarMenuSubItem>
+                          <SidebarMenuSubButton
+                            href="/banques"
+                            isActive={pathname.startsWith('/banques')}
+                          >
+                            <span>Banques &amp; Codes RIB</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      )}
+                    </SidebarMenuSub>
+                  )}
+                </SidebarMenuItem>
+              ))}
           </SidebarMenu>
         </SidebarGroup>
 
@@ -329,6 +476,22 @@ export function AppSidebar() {
 
             <SidebarMenuItem>
               <SidebarMenuLink
+                href="/profil"
+                isActive={pathname.startsWith('/profil')}
+                tooltip="Mon Profil"
+              >
+                <Icon
+                  icon="solar:user-circle-bold-duotone"
+                  width={20}
+                  height={20}
+                  aria-hidden="true"
+                />
+                <span>Mon Profil</span>
+              </SidebarMenuLink>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuLink
                 href="/account/sessions"
                 isActive={pathname.startsWith('/account/sessions')}
                 tooltip="Sessions & Appareils"
@@ -406,6 +569,23 @@ export function AppSidebar() {
               </div>
 
               <div className="py-1">
+                <Link
+                  href="/profil"
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    if (isMobile) setOpenMobile(false);
+                  }}
+                  className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 transition-colors duration-200 hover:bg-slate-50 hover:text-[#16517f] dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-sky-300"
+                >
+                  <Icon
+                    icon="solar:user-circle-bold-duotone"
+                    width={17}
+                    height={17}
+                    className="text-[#1a5fa0] dark:text-sky-400"
+                    aria-hidden="true"
+                  />
+                  <span>Mon Profil</span>
+                </Link>
                 <Link
                   href="/account/sessions"
                   onClick={() => {

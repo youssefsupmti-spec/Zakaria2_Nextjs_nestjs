@@ -85,7 +85,7 @@ export function ThemeToggle({
       title={label}
       onClick={toggleTheme}
       className={cn(
-        'group/theme relative inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-[9px] border border-slate-200/85 bg-white text-[#12476c] shadow-2xs transition-all duration-200 hover:border-[#1a5fa0]/30 hover:bg-[#1a5fa0]/[0.07] hover:text-[#1a5fa0] active:translate-y-[0.5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1b9dd9]/40 focus-visible:ring-offset-1 dark:border-slate-700 dark:bg-slate-800/90 dark:text-[#f9a03f] dark:hover:border-slate-600 dark:hover:bg-slate-700/80 dark:hover:text-[#ffb45e]',
+        'group/theme relative inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-[9px] border border-slate-200/85 bg-white text-primary shadow-2xs transition-all duration-200 hover:border-primary/30 hover:bg-primary/[0.08] hover:text-primary active:translate-y-[0.5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 dark:border-slate-700 dark:bg-slate-800/90 dark:text-primary dark:hover:border-primary/40 dark:hover:bg-primary/[0.12] dark:hover:text-primary',
         className,
       )}
     >
@@ -94,7 +94,7 @@ export function ThemeToggle({
         width={19}
         height={19}
         aria-hidden="true"
-        className="size-[19px] shrink-0 transition-transform duration-200 group-hover/theme:scale-105"
+        className="size-[19px] shrink-0 text-primary transition-transform duration-200 group-hover/theme:scale-105"
       />
       <span
         role="tooltip"

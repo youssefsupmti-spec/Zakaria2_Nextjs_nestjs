@@ -25,6 +25,7 @@ import { SessionService } from './session.service';
     PermissionsGuard,
   ],
   exports: [
+    AuthAuditService,
     PermissionResolverService,
     SessionService,
     SessionAuthGuard,

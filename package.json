@@ -22,6 +22,7 @@
     "db:migrate:deploy": "prisma migrate deploy --config=libs/backend/database/prisma.config.ts",
     "db:migrate:status": "prisma migrate status --config=libs/backend/database/prisma.config.ts",
     "db:seed:prod-users": "tsx --tsconfig tsconfig.base.json libs/backend/database/scripts/migrate-prod-mysql-to-pg.ts",
+    "db:seed:prod-sprint03": "tsx --tsconfig tsconfig.base.json libs/backend/database/scripts/migrate-prod-sprint03-to-pg.ts",
     "db:rbac:reconcile": "tsx --tsconfig tsconfig.base.json libs/backend/database/scripts/reconcile-rbac-d07-d15.ts",
     "test:auth": "vitest run apps/api/test/auth.spec.ts"
   },

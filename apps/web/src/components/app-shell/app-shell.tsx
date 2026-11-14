@@ -21,8 +21,12 @@ const ROUTE_TITLES: Record<string, { section: string; page: string }> = {
   '/dashboard': { section: 'Pilotage & Réseau', page: 'Tableau de bord' },
   '/agences': { section: 'Réseau Logistique', page: 'Agences & Zones' },
   '/partenaires': { section: 'Réseau Logistique', page: 'Partenaires & API' },
+  '/inscriptions': { section: 'Vendeurs & Enseignes', page: 'Demandes d’inscription' },
+  '/businesses': { section: 'Vendeurs & Enseignes', page: 'Enseignes & Business' },
+  '/banques': { section: 'Vendeurs & Enseignes', page: 'Banques & Codes RIB' },
   '/users': { section: 'Accès & Équipe', page: 'Utilisateurs & Comptes' },
   '/roles': { section: 'Accès & Équipe', page: 'Rôles & Permissions' },
+  '/profil': { section: 'Mon Compte', page: 'Mon Profil' },
   '/account/sessions': { section: 'Gouvernance & Sécurité', page: 'Sessions & Appareils' },
 };
 

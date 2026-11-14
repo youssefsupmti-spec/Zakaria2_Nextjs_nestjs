@@ -400,3 +400,195 @@ export const UpdateUserSchema = z.object({
   roleId: z.number().int().positive().optional(),
 });
 export type UpdateUserDto = z.infer<typeof UpdateUserSchema>;
+
+// ============================================================================
+// Sprint 03 : Vendeurs, Business, Banques, Inscription & Profil
+// ============================================================================
+
+export const CIVILITE_VALUES = ['M.', 'Mme', 'Mlle'] as const;
+export const CiviliteSchema = z.enum(CIVILITE_VALUES);
+export type CiviliteType = z.infer<typeof CiviliteSchema>;
+
+export const BUSINESS_ACTIVITY_TYPES = [
+  'Boutique e-commerce',
+  'Entreprise / Société',
+  'Auto-entrepreneur / Indépendant',
+  'Marque / Showroom',
+  'Grossiste / Distributeur',
+  'Autre',
+] as const;
+
+export const MODE_PAIEMENT_VALUES = ['espece', 'virement_bancaire'] as const;
+export const ModePaiementSchema = z.enum(MODE_PAIEMENT_VALUES);
+export type ModePaiementType = z.infer<typeof ModePaiementSchema>;
+
+export const RETURN_TYPE_VALUES = ['agence', 'adresse_personnalisee'] as const;
+export const ReturnTypeSchema = z.enum(RETURN_TYPE_VALUES);
+export type ReturnType = z.infer<typeof ReturnTypeSchema>;
+
+export const BANQUE_STATUS_VALUES = ['active', 'inactive'] as const;
+export const BanqueStatusSchema = z.enum(BANQUE_STATUS_VALUES);
+export type BanqueStatus = z.infer<typeof BanqueStatusSchema>;
+
+export const INSCRIPTION_STATUT_VALUES = ['en_attente', 'acceptee', 'refusee'] as const;
+export const InscriptionStatutSchema = z.enum(INSCRIPTION_STATUT_VALUES);
+export type InscriptionStatut = z.infer<typeof InscriptionStatutSchema>;
+
+export const RibPrefixCodeSchema = z
+  .string()
+  .trim()
+  .regex(/^\d{3}$/, 'Le code RIB doit contenir exactement 3 chiffres.');
+
+export const RegisterClientSchema = z
+  .object({
+    nomComplet: z.string().trim().min(2, 'Nom complet requis').max(255),
+    civilite: CiviliteSchema.nullable().optional(),
+    email: z.string().trim().email('Adresse e-mail invalide').max(255),
+    telephone: z.string().trim().min(8, 'Numéro de téléphone requis (min. 8 caractères)').max(50),
+    sav: z.string().trim().max(255).optional().default(''),
+    villeId: z.number().int().positive('La ville du vendeur est requise'),
+    cin: z.string().trim().max(255).optional().default(''),
+    lienLocalisationMaps: z.string().trim().max(500).optional().default(''),
+    password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères').max(128),
+    passwordConfirmation: z.string().min(8, 'Confirmation du mot de passe requise').max(128),
+    businessName: z.string().trim().min(2, "Le nom de l'enseigne est requis").max(255),
+    businessType: z.string().trim().max(255).nullable().optional(),
+    businessTelephone: z.string().trim().max(50).nullable().optional(),
+    businessEmail: z
+      .string()
+      .trim()
+      .email('E-mail enseigne invalide')
+      .max(150)
+      .nullable()
+      .optional()
+      .or(z.literal('')),
+    businessAdresse: z.string().trim().max(255).nullable().optional(),
+    businessVilleId: z.number().int().positive().nullable().optional(),
+    businessIce: z.string().trim().max(50).nullable().optional(),
+    businessRc: z.string().trim().max(50).nullable().optional(),
+  })
+  .refine((data) => data.password === data.passwordConfirmation, {
+    message: 'Les deux mots de passe ne correspondent pas.',
+    path: ['passwordConfirmation'],
+  });
+export type RegisterClientDto = z.infer<typeof RegisterClientSchema>;
+
+export const RefuserInscriptionSchema = z.object({
+  motif: z
+    .string()
+    .trim()
+    .min(3, 'Un motif de refus (au moins 3 caractères) est obligatoire.')
+    .max(500, 'Le motif ne peut pas dépasser 500 caractères.'),
+});
+export type RefuserInscriptionDto = z.infer<typeof RefuserInscriptionSchema>;
+
+export const CreateBusinessSchema = z.object({
+  userId: z.number().int().positive().optional(),
+  name: z.string().trim().min(2, 'Le nom du business est requis').max(255),
+  type: z.string().trim().max(255).nullable().optional(),
+  logo: z.string().trim().max(255).nullable().optional(),
+  adresse: z.string().trim().max(255).nullable().optional(),
+  email: z
+    .string()
+    .trim()
+    .email('Adresse e-mail invalide')
+    .max(150)
+    .nullable()
+    .optional()
+    .or(z.literal('')),
+  ice: z.string().trim().max(50).nullable().optional(),
+  rc: z.string().trim().max(50).nullable().optional(),
+  telephone: z.string().trim().max(50).nullable().optional(),
+  villeId: z.number().int().positive().nullable().optional(),
+  agencyId: z.number().int().positive().nullable().optional(),
+  isActive: z.boolean().optional().default(true),
+  modePaiement: ModePaiementSchema.nullable().optional(),
+  defaultFragile: z.boolean().optional().default(false),
+  defaultOpenpackage: z.boolean().optional().default(true),
+  defaultEssayage: z.boolean().optional().default(false),
+  labelMessage: z.string().trim().max(255).nullable().optional(),
+  autoSendPreparation: z.boolean().optional().default(false),
+  returnType: ReturnTypeSchema.nullable().optional(),
+  returnRecipient: z.string().trim().max(255).nullable().optional(),
+  returnPhone: z.string().trim().max(30).nullable().optional(),
+  returnVilleId: z.number().int().positive().nullable().optional(),
+  returnAddress: z.string().trim().max(2000).nullable().optional(),
+  returnNote: z.string().trim().max(2000).nullable().optional(),
+});
+export type CreateBusinessDto = z.infer<typeof CreateBusinessSchema>;
+
+export const UpdateBusinessSchema = CreateBusinessSchema.partial().omit({ userId: true });
+export type UpdateBusinessDto = z.infer<typeof UpdateBusinessSchema>;
+
+export const CreateCompteBancaireSchema = z.object({
+  banqueId: z.number().int().positive().nullable().optional(),
+  banqueNomCustom: z.string().trim().max(255).nullable().optional(),
+  rib: z
+    .string()
+    .trim()
+    .transform((value) => value.replace(/[^0-9A-Za-z]/g, ''))
+    .refine((value) => value.length >= 16 && value.length <= 34, {
+      message: 'Le RIB doit contenir entre 16 et 34 caractères (24 chiffres au Maroc).',
+    }),
+  titulaireNom: z.string().trim().min(2, 'Le nom du titulaire est requis').max(255),
+});
+export type CreateCompteBancaireDto = z.infer<typeof CreateCompteBancaireSchema>;
+
+export const UpdateCompteBancaireSchema = CreateCompteBancaireSchema.partial();
+export type UpdateCompteBancaireDto = z.infer<typeof UpdateCompteBancaireSchema>;
+
+export const CreateBanqueSchema = z.object({
+  name: z.string().trim().min(2, 'Nom de la banque requis').max(255),
+  swiftCode: z.string().trim().max(255).nullable().optional(),
+  logo: z.string().trim().max(255).nullable().optional(),
+  status: BanqueStatusSchema.optional().default('active'),
+  codes: z.array(RibPrefixCodeSchema).optional().default([]),
+});
+export type CreateBanqueDto = z.infer<typeof CreateBanqueSchema>;
+
+export const UpdateBanqueSchema = CreateBanqueSchema.partial();
+export type UpdateBanqueDto = z.infer<typeof UpdateBanqueSchema>;
+
+export const UpdateProfileSchema = z.object({
+  nomComplet: z.string().trim().min(2, 'Nom complet requis').max(255),
+  civilite: CiviliteSchema.nullable().optional(),
+  villeId: z.number().int().positive().nullable().optional(),
+  cin: z.string().trim().max(255).optional().default(''),
+  lienLocalisationMaps: z.string().trim().max(500).optional().default(''),
+});
+export type UpdateProfileDto = z.infer<typeof UpdateProfileSchema>;
+
+export const ChangePasswordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Mot de passe actuel requis').max(128),
+    newPassword: z.string().min(8, 'Nouveau mot de passe : minimum 8 caractères').max(128),
+    newPasswordConfirmation: z.string().min(8, 'Confirmation requise').max(128),
+  })
+  .refine((data) => data.newPassword === data.newPasswordConfirmation, {
+    message: 'Les deux nouveaux mots de passe ne correspondent pas.',
+    path: ['newPasswordConfirmation'],
+  });
+export type ChangePasswordDto = z.infer<typeof ChangePasswordSchema>;
+
+export const RequestContactChangeSchema = z.object({
+  type: z.enum(['email', 'telephone', 'sav']),
+  nouvelleValeur: z.string().trim().min(3, 'Nouvelle valeur requise').max(255),
+  motif: z.string().trim().min(3, 'Un motif est requis').max(500),
+});
+export type RequestContactChangeDto = z.infer<typeof RequestContactChangeSchema>;
+
+export interface VilleOptionDto {
+  id: number;
+  nameFr: string;
+  codeZone: string;
+  zoneId: number | null;
+}
+
+export interface InvoiceBankResolutionDto {
+  banqueNom: string;
+  banqueLogo: string | null;
+  rib: string;
+  titulaireNom: string;
+  estBanqueCustom: boolean;
+  source: 'banque_relation' | 'banque_nom_custom' | 'rib_prefix' | 'indetermine';
+}

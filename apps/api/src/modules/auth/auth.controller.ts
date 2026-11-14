@@ -6,6 +6,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Req,
   Res,
@@ -154,5 +155,57 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Body() body: unknown, @Req() request: FastifyRequest) {
     return this.authService.resetPassword(body, this.extractMeta(request));
+  }
+
+  @Get('villes')
+  @ApiOperation({ summary: 'Référentiel public des villes actives pour inscription et profil' })
+  listVilles() {
+    return this.authService.listPublicVilles();
+  }
+
+  @Post('register')
+  @SkipCsrf()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Inscription vendeur publique (InscrireClient) + première enseigne' })
+  register(@Body() body: unknown, @Req() request: FastifyRequest) {
+    return this.authService.registerClient(body, this.extractMeta(request));
+  }
+
+  @Get('profile')
+  @UseGuards(SessionAuthGuard)
+  @ApiOperation({ summary: 'Profil personnel complet de l’utilisateur connecté' })
+  getProfile(@CurrentAuth() auth: AuthContext) {
+    return this.authService.getOwnProfile(auth.user.id);
+  }
+
+  @Patch('profile')
+  @UseGuards(SessionAuthGuard)
+  @ApiOperation({ summary: 'Mise à jour des informations personnelles non critiques' })
+  updateProfile(@CurrentAuth() auth: AuthContext, @Body() body: unknown) {
+    return this.authService.updateOwnProfile(auth.user.id, body);
+  }
+
+  @Post('profile/password')
+  @UseGuards(SessionAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Changement sécurisé du mot de passe du compte connecté' })
+  changePassword(
+    @CurrentAuth() auth: AuthContext,
+    @Body() body: unknown,
+    @Req() request: FastifyRequest,
+  ) {
+    return this.authService.changeOwnPassword(auth.user.id, body, this.extractMeta(request));
+  }
+
+  @Post('profile/contact-change')
+  @UseGuards(SessionAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Demande encadrée de modification email / téléphone / SAV' })
+  requestContactChange(
+    @CurrentAuth() auth: AuthContext,
+    @Body() body: unknown,
+    @Req() request: FastifyRequest,
+  ) {
+    return this.authService.requestContactChange(auth.user.id, body, this.extractMeta(request));
   }
 }

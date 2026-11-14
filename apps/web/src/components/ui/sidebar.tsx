@@ -258,7 +258,7 @@ export function SidebarTrigger({ className, onClick, ...props }: React.Component
       aria-expanded={isExpanded}
       title={`${label} (Ctrl+B)`}
       className={cn(
-        'group/toggle relative inline-flex size-[42px] shrink-0 cursor-pointer items-center justify-center rounded-[12px] border border-slate-200/80 bg-transparent text-[#12476c] transition-all duration-[180ms] ease-out hover:border-[#1a5fa0]/25 hover:bg-[#1a5fa0]/[0.07] hover:text-[#1a5fa0] active:translate-y-[0.5px] active:bg-[#1a5fa0]/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1b9dd9]/40 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 dark:border-slate-700/80 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-800 dark:hover:text-white dark:active:bg-slate-800/80',
+        'group/toggle relative inline-flex size-[42px] shrink-0 cursor-pointer items-center justify-center rounded-[12px] border border-slate-200/80 bg-transparent text-primary transition-all duration-[180ms] ease-out hover:border-primary/30 hover:bg-primary/[0.08] hover:text-primary active:translate-y-[0.5px] active:bg-primary/[0.14] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-1 disabled:pointer-events-none disabled:opacity-50 dark:border-slate-700/80 dark:text-primary dark:hover:border-primary/40 dark:hover:bg-primary/[0.12] dark:hover:text-primary dark:active:bg-primary/[0.18]',
         className,
       )}
       onClick={(event) => {
@@ -272,7 +272,7 @@ export function SidebarTrigger({ className, onClick, ...props }: React.Component
         width={22}
         height={22}
         aria-hidden="true"
-        className="size-[22px] shrink-0 transition-transform duration-[180ms] ease-out"
+        className="size-[22px] shrink-0 text-primary transition-transform duration-[180ms] ease-out"
       />
       <span
         role="tooltip"

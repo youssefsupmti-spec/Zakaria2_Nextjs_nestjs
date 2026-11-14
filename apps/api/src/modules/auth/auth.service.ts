@@ -1,15 +1,28 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
-import { BadRequestException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { loadBackendEnv } from '@zakaria/backend-config';
 import { DatabaseService } from '@zakaria/backend-database';
 import {
+  ChangePasswordSchema,
   ForgotPasswordRequestSchema,
   LoginRequestSchema,
+  RegisterClientSchema,
+  RequestContactChangeSchema,
   ResetPasswordRequestSchema,
   SESSION_DURATION_TTL_SECONDS,
+  UpdateProfileSchema,
   type LoginResponseDto,
   type SessionDuration,
+  type VilleOptionDto,
 } from '@zakaria/shared-contracts';
+import { parseOrThrowZod } from '../../common/validation/zod-validation';
 import { AccessContextService } from '../access-control/access-context.service';
 import { AuthAuditService } from './auth-audit.service';
 import { AuthRateLimitService } from './auth-rate-limit.service';
@@ -295,6 +308,386 @@ export class AuthService {
     return {
       message:
         'Votre mot de passe a été réinitialisé avec succès. Vous pouvez maintenant vous connecter.',
+    };
+  }
+
+  /** Liste publique des villes actives pour le formulaire d'inscription et le profil. */
+  async listPublicVilles(): Promise<{ villes: VilleOptionDto[] }> {
+    const villes = await this.database.prisma.ville.findMany({
+      where: { deletedAt: null },
+      select: {
+        id: true,
+        nameFr: true,
+        codeZone: true,
+        zoneId: true,
+      },
+      orderBy: { nameFr: 'asc' },
+    });
+    return { villes };
+  }
+
+  /**
+   * Action métier InscrireClient : crée un vendeur en attente de validation et sa première enseigne,
+   * ou restaure une précédente inscription refusée en conservant l'historique des refus.
+   */
+  async registerClient(rawPayload: unknown, meta: RequestMeta) {
+    const dto = parseOrThrowZod(
+      RegisterClientSchema,
+      rawPayload,
+      "Données d'inscription vendeur invalides.",
+    );
+
+    const emailNormalized = dto.email.trim().toLowerCase();
+    const telephoneNormalized = dto.telephone.trim();
+    const businessVilleId = dto.businessVilleId ?? dto.villeId;
+
+    const [villeClient, villeBusiness] = await Promise.all([
+      this.database.prisma.ville.findFirst({
+        where: { id: dto.villeId, deletedAt: null },
+        select: { id: true, nameFr: true },
+      }),
+      businessVilleId === dto.villeId
+        ? Promise.resolve(null)
+        : this.database.prisma.ville.findFirst({
+            where: { id: businessVilleId, deletedAt: null },
+            select: { id: true },
+          }),
+    ]);
+
+    if (!villeClient) {
+      throw new BadRequestException('La ville sélectionnée pour le vendeur est introuvable.');
+    }
+    if (businessVilleId !== dto.villeId && !villeBusiness) {
+      throw new BadRequestException("La ville sélectionnée pour l'enseigne est introuvable.");
+    }
+
+    const existingMatches = await this.database.prisma.user.findMany({
+      where: {
+        OR: [{ email: emailNormalized }, { telephone: telephoneNormalized }],
+      },
+      select: {
+        id: true,
+        email: true,
+        telephone: true,
+        inscriptionStatut: true,
+        deletedAt: true,
+      },
+      orderBy: { id: 'asc' },
+    });
+
+    const blockingMatches = existingMatches.filter((u) => u.inscriptionStatut !== 'refusee');
+    if (blockingMatches.length > 0) {
+      const doublons: Array<{ field: 'email' | 'telephone'; message: string; email: string }> = [];
+      for (const m of blockingMatches) {
+        if (m.email.toLowerCase() === emailNormalized) {
+          doublons.push({
+            field: 'email',
+            message:
+              m.inscriptionStatut === 'en_attente'
+                ? 'Une demande avec cette adresse e-mail est déjà en attente de validation.'
+                : 'Un compte existe déjà avec cette adresse e-mail.',
+            email: m.email,
+          });
+        }
+        if (m.telephone.trim() === telephoneNormalized) {
+          doublons.push({
+            field: 'telephone',
+            message: 'Ce numéro de téléphone est déjà associé à un compte existant.',
+            email: m.email,
+          });
+        }
+      }
+      throw new ConflictException({
+        message: 'Un compte existe déjà avec ces coordonnées.',
+        details: doublons,
+        doublons,
+      });
+    }
+
+    const refusedToRestore =
+      existingMatches.find((u) => u.email.toLowerCase() === emailNormalized) ??
+      existingMatches[0] ??
+      null;
+
+    const passwordHash = await this.passwordHasher.hashArgon2(dto.password);
+
+    const result = await this.database.prisma.$transaction(async (tx) => {
+      let clientRole = await tx.role.findFirst({
+        where: { name: 'client' },
+        select: { id: true },
+      });
+      if (!clientRole) {
+        clientRole = await tx.role.create({
+          data: {
+            name: 'client',
+            guardName: 'web',
+            portee: 'client',
+            systeme: true,
+            libelle: 'Vendeur / Client G4D',
+          },
+          select: { id: true },
+        });
+      }
+
+      let userId: number;
+      let restored = false;
+
+      if (refusedToRestore) {
+        const updatedUser = await tx.user.update({
+          where: { id: refusedToRestore.id },
+          data: {
+            nomComplet: dto.nomComplet.trim(),
+            civilite: dto.civilite ?? null,
+            email: emailNormalized,
+            telephone: telephoneNormalized,
+            sav: dto.sav?.trim() ?? '',
+            villeId: villeClient.id,
+            villeName: villeClient.nameFr,
+            cin: dto.cin?.trim() ?? '',
+            lienLocalisationMaps: dto.lienLocalisationMaps?.trim() ?? '',
+            password: passwordHash,
+            passwordAlgo: 'argon2id',
+            active: false,
+            deletedAt: null,
+            inscriptionStatut: 'en_attente',
+            inscriptionTraiteePar: null,
+            inscriptionTraiteeLe: null,
+          },
+          select: { id: true },
+        });
+        userId = updatedUser.id;
+        restored = true;
+      } else {
+        const createdUser = await tx.user.create({
+          data: {
+            nomComplet: dto.nomComplet.trim(),
+            civilite: dto.civilite ?? null,
+            email: emailNormalized,
+            telephone: telephoneNormalized,
+            sav: dto.sav?.trim() ?? '',
+            villeId: villeClient.id,
+            villeName: villeClient.nameFr,
+            cin: dto.cin?.trim() ?? '',
+            lienLocalisationMaps: dto.lienLocalisationMaps?.trim() ?? '',
+            password: passwordHash,
+            passwordAlgo: 'argon2id',
+            active: false,
+            emailsend: 'non',
+            inscriptionStatut: 'en_attente',
+            inscriptionRefusNombre: 0,
+          },
+          select: { id: true },
+        });
+        userId = createdUser.id;
+      }
+
+      const existingRoleLink = await tx.userRole.findFirst({
+        where: { userId, roleId: clientRole.id },
+      });
+      if (!existingRoleLink) {
+        await tx.userRole.create({
+          data: {
+            userId,
+            roleId: clientRole.id,
+          },
+        });
+      }
+
+      const createdBusiness = await tx.business.create({
+        data: {
+          userId,
+          name: dto.businessName.trim(),
+          type: dto.businessType ?? null,
+          telephone: dto.businessTelephone?.trim() || telephoneNormalized,
+          email: dto.businessEmail?.trim().toLowerCase() || emailNormalized,
+          adresse: dto.businessAdresse?.trim() || null,
+          villeId: businessVilleId,
+          ice: dto.businessIce?.trim() || null,
+          rc: dto.businessRc?.trim() || null,
+          isActive: true,
+        },
+        select: { id: true, name: true },
+      });
+
+      return { userId, restored, businessId: createdBusiness.id, businessName: createdBusiness.name };
+    });
+
+    await this.permissionResolver.invalidateUserCache(result.userId);
+    await this.accessContextService.invalidateUser(result.userId);
+    await this.audit.record(
+      'client_registered',
+      result.userId,
+      meta,
+      `business:${result.businessName} (restored:${result.restored})`,
+    );
+
+    return {
+      ok: true,
+      restored: result.restored,
+      userId: result.userId,
+      businessId: result.businessId,
+      message:
+        'Votre demande d’inscription a bien été enregistrée. Elle est en cours de vérification par notre équipe.',
+    };
+  }
+
+  /** Retourne le profil détaillé de l'utilisateur connecté et l'historique des demandes support coordonnées. */
+  async getOwnProfile(userId: number) {
+    const user = await this.database.prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        nomComplet: true,
+        civilite: true,
+        email: true,
+        telephone: true,
+        sav: true,
+        villeId: true,
+        villeName: true,
+        cin: true,
+        lienLocalisationMaps: true,
+        active: true,
+        inscriptionStatut: true,
+        createdAt: true,
+        ville: {
+          select: { id: true, nameFr: true, codeZone: true },
+        },
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('Profil utilisateur introuvable.');
+    }
+
+    const contactRequests = await this.database.prisma.authenticationLog.findMany({
+      where: { userId, event: 'contact_change_requested' },
+      select: {
+        id: true,
+        location: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+    });
+
+    return {
+      profile: user,
+      contactChangeRequests: contactRequests.map((entry) => ({
+        id: Number(entry.id),
+        detail: entry.location ?? '',
+        createdAt: entry.createdAt?.toISOString() ?? null,
+      })),
+    };
+  }
+
+  /** Met à jour les informations personnelles modifiables (coordonnées critiques protégées). */
+  async updateOwnProfile(userId: number, rawPayload: unknown) {
+    const dto = parseOrThrowZod(
+      UpdateProfileSchema,
+      rawPayload,
+      'Données de mise à jour du profil invalides.',
+    );
+
+    let resolvedVilleName: string | undefined;
+    if (dto.villeId !== undefined && dto.villeId !== null) {
+      const ville = await this.database.prisma.ville.findFirst({
+        where: { id: dto.villeId, deletedAt: null },
+        select: { id: true, nameFr: true },
+      });
+      if (!ville) {
+        throw new BadRequestException('Ville sélectionnée introuvable.');
+      }
+      resolvedVilleName = ville.nameFr;
+    } else if (dto.villeId === null) {
+      resolvedVilleName = '';
+    }
+
+    const updated = await this.database.prisma.user.update({
+      where: { id: userId },
+      data: {
+        nomComplet: dto.nomComplet.trim(),
+        ...(dto.civilite !== undefined ? { civilite: dto.civilite } : {}),
+        ...(dto.villeId !== undefined ? { villeId: dto.villeId } : {}),
+        ...(resolvedVilleName !== undefined ? { villeName: resolvedVilleName } : {}),
+        cin: dto.cin?.trim() ?? '',
+        lienLocalisationMaps: dto.lienLocalisationMaps?.trim() ?? '',
+      },
+      select: {
+        id: true,
+        nomComplet: true,
+        civilite: true,
+        email: true,
+        telephone: true,
+        sav: true,
+        villeId: true,
+        villeName: true,
+        cin: true,
+        lienLocalisationMaps: true,
+      },
+    });
+
+    await this.permissionResolver.invalidateUserCache(userId);
+    return {
+      ok: true,
+      profile: updated,
+      message: 'Vos informations personnelles ont été enregistrées.',
+    };
+  }
+
+  /** Modifie le mot de passe du compte connecté après vérification du mot de passe actuel. */
+  async changeOwnPassword(userId: number, rawPayload: unknown, meta: RequestMeta) {
+    const dto = parseOrThrowZod(
+      ChangePasswordSchema,
+      rawPayload,
+      'Données de changement de mot de passe invalides.',
+    );
+
+    const user = await this.database.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, password: true },
+    });
+    if (!user) {
+      throw new NotFoundException('Utilisateur introuvable.');
+    }
+
+    const check = await this.passwordHasher.verifyAndCheckRehash(dto.currentPassword, user.password);
+    if (!check.valid) {
+      throw new BadRequestException('Le mot de passe actuel est incorrect.');
+    }
+
+    const newHash = await this.passwordHasher.hashArgon2(dto.newPassword);
+    await this.database.prisma.user.update({
+      where: { id: userId },
+      data: {
+        password: newHash,
+        passwordAlgo: 'argon2id',
+        passwordResetAt: new Date(),
+      },
+    });
+
+    await this.permissionResolver.invalidateUserCache(userId);
+    await this.audit.record('password_changed', userId, meta);
+
+    return {
+      ok: true,
+      message: 'Votre mot de passe a été modifié avec succès.',
+    };
+  }
+
+  /** Enregistre une demande encadrée de modification d'email, téléphone ou SAV via le journal support. */
+  async requestContactChange(userId: number, rawPayload: unknown, meta: RequestMeta) {
+    const dto = parseOrThrowZod(
+      RequestContactChangeSchema,
+      rawPayload,
+      'Demande de modification invalide.',
+    );
+
+    const summary = `${dto.type} => ${dto.nouvelleValeur.trim()} | Motif: ${dto.motif.trim()}`;
+    await this.audit.record('contact_change_requested', userId, meta, summary);
+
+    return {
+      ok: true,
+      message:
+        'Votre demande de modification de coordonnées a été transmise à notre équipe support pour vérification.',
     };
   }
 }

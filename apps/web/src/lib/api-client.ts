@@ -105,7 +105,11 @@ export async function apiFetch<T = unknown>(
     if (response.status === 401 && typeof window !== 'undefined') {
       const p = window.location.pathname;
       const isPublicPage =
-        p === '/' || p === '/login' || p === '/forgot-password' || p === '/reset-password';
+        p === '/' ||
+        p === '/login' ||
+        p === '/register' ||
+        p === '/forgot-password' ||
+        p === '/reset-password';
       if (!isPublicPage) {
         const next = `${p}${window.location.search}`;
         window.location.replace(`/login?next=${encodeURIComponent(next)}`);

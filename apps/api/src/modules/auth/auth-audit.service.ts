@@ -2,7 +2,16 @@ import { Injectable, Logger } from '@nestjs/common';
 import { DatabaseService } from '@zakaria/backend-database';
 import type { RequestMeta } from './auth.types';
 
-export type AuthAuditEvent = 'login' | 'logout' | 'login_failed' | 'password_reset';
+export type AuthAuditEvent =
+  | 'login'
+  | 'logout'
+  | 'login_failed'
+  | 'password_reset'
+  | 'client_registered'
+  | 'password_changed'
+  | 'contact_change_requested'
+  | 'inscription_accepted'
+  | 'inscription_rejected';
 
 function parseUserAgentSummary(userAgent: string | null): {
   browser: string | null;
@@ -38,7 +47,12 @@ export class AuthAuditService {
 
   constructor(private readonly database: DatabaseService) {}
 
-  async record(event: AuthAuditEvent, userId: number | null, meta: RequestMeta): Promise<void> {
+  async record(
+    event: AuthAuditEvent,
+    userId: number | null,
+    meta: RequestMeta,
+    detail: string | null = null,
+  ): Promise<void> {
     const parsed = parseUserAgentSummary(meta.userAgent);
     try {
       await this.database.prisma.authenticationLog.create({
@@ -50,7 +64,7 @@ export class AuthAuditService {
           browser: parsed.browser,
           platform: parsed.platform,
           device: parsed.device,
-          location: null,
+          location: detail ? detail.slice(0, 255) : null,
         },
       });
     } catch (error) {

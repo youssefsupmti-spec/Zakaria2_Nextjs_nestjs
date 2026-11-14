@@ -5,6 +5,9 @@ import { LoggerModule } from 'nestjs-pino';
 import { AccessControlModule } from '../modules/access-control/access-control.module';
 import { AgencesModule } from '../modules/agences/agences.module';
 import { AuthModule } from '../modules/auth/auth.module';
+import { BanquesModule } from '../modules/banques/banques.module';
+import { BusinessesModule } from '../modules/businesses/businesses.module';
+import { InscriptionsModule } from '../modules/inscriptions/inscriptions.module';
 import { PartenairesModule } from '../modules/partenaires/partenaires.module';
 import { RolesModule } from '../modules/roles/roles.module';
 import { SecurityModule } from '../modules/security/security.module';
@@ -51,6 +54,9 @@ const env = loadBackendEnv();
     PartenairesModule,
     RolesModule,
     UsersModule,
+    InscriptionsModule,
+    BusinessesModule,
+    BanquesModule,
   ],
   controllers: [HealthController],
 })
