@@ -219,6 +219,13 @@ async function main(): Promise<void> {
     const userCols = await getMysqlTableColumns(mysqlConn, mysqlDbName, 'users');
     const roleCols = await getMysqlTableColumns(mysqlConn, mysqlDbName, 'roles');
     const villeCols = await getMysqlTableColumns(mysqlConn, mysqlDbName, 'villes');
+    const agenceCols = await getMysqlTableColumns(mysqlConn, mysqlDbName, 'agences');
+
+    const [zonesRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
+      `SELECT id, name, code, deleted_at, created_at, updated_at
+       FROM zones
+       ORDER BY id ASC`,
+    );
 
     const [villesRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
       `SELECT id, name_fr, code_zone, name_ar, zone_id, deleted_at, created_at, updated_at
@@ -298,6 +305,71 @@ async function main(): Promise<void> {
        ORDER BY id ASC`,
     );
 
+    const [agencesRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
+      `SELECT id, name, code,
+              ${agenceCols.has('ville_id') ? 'ville_id,' : 'NULL AS ville_id,'}
+              responsable_id, telephone, adresse, active, deleted_at, created_at, updated_at
+       FROM agences
+       ORDER BY id ASC`,
+    );
+
+    const [agenceZoneRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
+      `SELECT id, agence_id, zone_id, livraison, ramassage, created_at, updated_at
+       FROM agence_zone
+       ORDER BY id ASC`,
+    );
+
+    const [agenceMembreRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
+      `SELECT id, agence_id, user_id, role, actif, depuis, jusqua, created_at, updated_at
+       FROM agence_membres
+       ORDER BY id ASC`,
+    );
+
+    const [membreZoneRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
+      `SELECT id, agence_membre_id, zone_id, activite, actif, created_at, updated_at
+       FROM membre_zones
+       ORDER BY id ASC`,
+    );
+
+    const [partenairesRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
+      `SELECT id, code, raison_sociale, ice, telephone, email, actif, deleted_at, created_at, updated_at
+       FROM partenaires
+       ORDER BY id ASC`,
+    );
+
+    const [agencePartenaireRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
+      `SELECT id, agence_id, partenaire_id, depuis, jusqua, actif, created_at, updated_at
+       FROM agence_partenaires
+       ORDER BY id ASC`,
+    );
+
+    const [partenaireZoneRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
+      `SELECT id, agence_partenaire_id, zone_id, actif, created_at, updated_at
+       FROM partenaire_zones
+       ORDER BY id ASC`,
+    );
+
+    const [partenaireCoursierRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
+      `SELECT id, partenaire_id, nom, telephone, user_id, actif, created_at, updated_at
+       FROM partenaire_coursiers
+       ORDER BY id ASC`,
+    );
+
+    const [partenaireConnexionRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
+      `SELECT pc.id, pc.partenaire_id, COALESCE(at.cle, 'custom') AS api_type_code,
+              pc.base_url, pc.identifiant, pc.secret, pc.actif, pc.created_at, pc.updated_at
+       FROM partenaire_connexions pc
+       LEFT JOIN api_types at ON at.id = pc.api_type_id
+       ORDER BY pc.id ASC`,
+    );
+
+    const [apiIdentifiantRows] = await mysqlConn.query<mysql.RowDataPacket[]>(
+      `SELECT id, partenaire_id, user_id, libelle, cle_publique, secret_empreinte,
+              droits, expire_le, revoque_le, dernier_usage_le, created_at, updated_at
+       FROM api_identifiants
+       ORDER BY id ASC`,
+    );
+
     // Détection et résolution des doublons d'e-mails
     const byNormalizedEmail = new Map<string, DuplicateGroup['users']>();
     const unresolvedSoftDeletedIgnored = new Map<string, number>();
@@ -340,6 +412,7 @@ async function main(): Promise<void> {
       JSON.stringify(
         {
           sourceCounts: {
+            zones: zonesRows.length,
             villes: villesRows.length,
             roles: rolesRows.length,
             permissions: permRows.length,
@@ -349,6 +422,16 @@ async function main(): Promise<void> {
             modelHasPermissions: userPermRows.length,
             passwordResetTokens: resetTokenRows.length,
             authenticationLogs: authLogRows.length,
+            agences: agencesRows.length,
+            agenceZone: agenceZoneRows.length,
+            agenceMembres: agenceMembreRows.length,
+            membreZones: membreZoneRows.length,
+            partenaires: partenairesRows.length,
+            agencePartenaires: agencePartenaireRows.length,
+            partenaireZones: partenaireZoneRows.length,
+            partenaireCoursiers: partenaireCoursierRows.length,
+            partenaireConnexions: partenaireConnexionRows.length,
+            apiIdentifiants: apiIdentifiantRows.length,
           },
           appliedEmailOverrides: Array.from(options.emailOverrides.entries()).map(
             ([id, email]) => ({
@@ -388,31 +471,66 @@ async function main(): Promise<void> {
       return;
     }
 
+    const zoneIdSet = new Set(zonesRows.map((z) => Number(z['id'])));
     const villeIdSet = new Set(villesRows.map((v) => Number(v['id'])));
     const roleIdSet = new Set(rolesRows.map((r) => Number(r['id'])));
     const permIdSet = new Set(permRows.map((p) => Number(p['id'])));
     const userIdSet = new Set(userRows.map((u) => Number(u['id'])));
+    const agenceIdSet = new Set(agencesRows.map((a) => Number(a['id'])));
+    const partenaireIdSet = new Set(partenairesRows.map((p) => Number(p['id'])));
 
     const pgClient = await pgPool.connect();
     try {
       await pgClient.query('BEGIN');
+
+      // 0. Zones (avant Villes pour respecter FK villes.zone_id -> zones.id)
+      if (zonesRows.length > 0) {
+        await upsertBatch(
+          pgClient,
+          `INSERT INTO "zones" ("id", "nom", "code", "actif", "deleted_at", "created_at", "updated_at") VALUES`,
+          7,
+          zonesRows.map((z) => {
+            const deletedAt = asNullableDate(z['deleted_at']);
+            return [
+              Number(z['id']),
+              asString(z['name']).trim(),
+              asString(z['code']).trim(),
+              deletedAt === null,
+              deletedAt,
+              asNullableDate(z['created_at']),
+              asNullableDate(z['updated_at']),
+            ];
+          }),
+          `ON CONFLICT ("id") DO UPDATE SET
+            "nom" = EXCLUDED."nom",
+            "code" = EXCLUDED."code",
+            "actif" = EXCLUDED."actif",
+            "deleted_at" = EXCLUDED."deleted_at",
+            "created_at" = EXCLUDED."created_at",
+            "updated_at" = EXCLUDED."updated_at"`,
+        );
+      }
 
       // 1. Villes
       await upsertBatch(
         pgClient,
         `INSERT INTO "villes" ("id", "name_fr", "code_zone", "name_ar", "zone_id", "standard_tarif_id", "deleted_at", "created_at", "updated_at") VALUES`,
         9,
-        villesRows.map((v) => [
-          Number(v['id']),
-          asString(v['name_fr']),
-          asString(v['code_zone']),
-          asNullableString(v['name_ar']),
-          asNullableInt(v['zone_id']),
-          asNullableInt(v['standard_tarif_id']),
-          asNullableDate(v['deleted_at']),
-          asNullableDate(v['created_at']),
-          asNullableDate(v['updated_at']),
-        ]),
+        villesRows.map((v) => {
+          const rawZoneId = asNullableInt(v['zone_id']);
+          const safeZoneId = rawZoneId && zoneIdSet.has(rawZoneId) ? rawZoneId : null;
+          return [
+            Number(v['id']),
+            asString(v['name_fr']),
+            asString(v['code_zone']),
+            asNullableString(v['name_ar']),
+            safeZoneId,
+            asNullableInt(v['standard_tarif_id']),
+            asNullableDate(v['deleted_at']),
+            asNullableDate(v['created_at']),
+            asNullableDate(v['updated_at']),
+          ];
+        }),
         `ON CONFLICT ("id") DO UPDATE SET
           "name_fr" = EXCLUDED."name_fr",
           "code_zone" = EXCLUDED."code_zone",
@@ -545,11 +663,23 @@ async function main(): Promise<void> {
         `ON CONFLICT ("id") DO UPDATE SET
           "nom_complet" = EXCLUDED."nom_complet",
           "civilite" = EXCLUDED."civilite",
-          "picture" = EXCLUDED."picture",
+          "picture" = CASE
+            WHEN "users"."picture" LIKE 'avatars/2026-%' THEN "users"."picture"
+            ELSE EXCLUDED."picture"
+          END,
           "email" = EXCLUDED."email",
-          "password" = EXCLUDED."password",
-          "password_algo" = EXCLUDED."password_algo",
-          "password_reset_at" = EXCLUDED."password_reset_at",
+          "password" = CASE
+            WHEN "users"."password_algo" = 'argon2id' THEN "users"."password"
+            ELSE EXCLUDED."password"
+          END,
+          "password_algo" = CASE
+            WHEN "users"."password_algo" = 'argon2id' THEN "users"."password_algo"
+            ELSE EXCLUDED."password_algo"
+          END,
+          "password_reset_at" = CASE
+            WHEN "users"."password_algo" = 'argon2id' THEN "users"."password_reset_at"
+            ELSE EXCLUDED."password_reset_at"
+          END,
           "telephone" = EXCLUDED."telephone",
           "sav" = EXCLUDED."sav",
           "ville_name" = EXCLUDED."ville_name",
@@ -686,22 +816,376 @@ async function main(): Promise<void> {
             asNullableDate(l['created_at']),
           ];
         }),
-        `ON CONFLICT ("id") DO NOTHING`,
+        `ON CONFLICT ("id") DO UPDATE SET
+          "user_id" = EXCLUDED."user_id",
+          "event" = EXCLUDED."event",
+          "ip_address" = EXCLUDED."ip_address",
+          "user_agent" = EXCLUDED."user_agent",
+          "location" = EXCLUDED."location",
+          "device" = EXCLUDED."device",
+          "browser" = EXCLUDED."browser",
+          "platform" = EXCLUDED."platform",
+          "created_at" = EXCLUDED."created_at"`,
         800,
       );
 
-      // 11. Resynchronisation des séquences PostgreSQL
-      for (const table of ['users', 'roles', 'permissions', 'authentication_logs']) {
+      // 11. Multi-Organisations (Agences, Zones Agence/Membres, Partenaires, Connexions & Clés API)
+      if (agencesRows.length > 0) {
+        await upsertBatch(
+          pgClient,
+          `INSERT INTO "agences" ("id", "nom", "code", "ville_id", "responsable_id", "telephone", "adresse", "actif", "deleted_at", "created_at", "updated_at") VALUES`,
+          11,
+          agencesRows.map((a) => {
+            const rawVilleId = asNullableInt(a['ville_id']);
+            const safeVilleId = rawVilleId && villeIdSet.has(rawVilleId) ? rawVilleId : null;
+            const rawRespId = asNullableInt(a['responsable_id']);
+            const safeRespId = rawRespId && userIdSet.has(rawRespId) ? rawRespId : null;
+            return [
+              Number(a['id']),
+              asString(a['name']).trim(),
+              asString(a['code']).trim(),
+              safeVilleId,
+              safeRespId,
+              asNullableString(a['telephone']),
+              asNullableString(a['adresse']),
+              asBoolean(a['active']),
+              asNullableDate(a['deleted_at']),
+              asNullableDate(a['created_at']),
+              asNullableDate(a['updated_at']),
+            ];
+          }),
+          `ON CONFLICT ("id") DO UPDATE SET
+            "nom" = EXCLUDED."nom",
+            "code" = EXCLUDED."code",
+            "ville_id" = COALESCE(EXCLUDED."ville_id", "agences"."ville_id"),
+            "responsable_id" = EXCLUDED."responsable_id",
+            "telephone" = EXCLUDED."telephone",
+            "adresse" = EXCLUDED."adresse",
+            "actif" = EXCLUDED."actif",
+            "deleted_at" = EXCLUDED."deleted_at",
+            "created_at" = EXCLUDED."created_at",
+            "updated_at" = EXCLUDED."updated_at"`,
+        );
+      }
+
+      const validAgenceZones = agenceZoneRows.filter(
+        (az) => agenceIdSet.has(Number(az['agence_id'])) && zoneIdSet.has(Number(az['zone_id'])),
+      );
+      if (validAgenceZones.length > 0) {
+        await upsertBatch(
+          pgClient,
+          `INSERT INTO "agence_zone" ("id", "agence_id", "zone_id", "livraison", "ramassage", "created_at", "updated_at") VALUES`,
+          7,
+          validAgenceZones.map((az) => [
+            Number(az['id']),
+            Number(az['agence_id']),
+            Number(az['zone_id']),
+            asBoolean(az['livraison']),
+            asBoolean(az['ramassage']),
+            asNullableDate(az['created_at']),
+            asNullableDate(az['updated_at']),
+          ]),
+          `ON CONFLICT ("id") DO UPDATE SET
+            "agence_id" = EXCLUDED."agence_id",
+            "zone_id" = EXCLUDED."zone_id",
+            "livraison" = EXCLUDED."livraison",
+            "ramassage" = EXCLUDED."ramassage",
+            "created_at" = EXCLUDED."created_at",
+            "updated_at" = EXCLUDED."updated_at"`,
+        );
+      }
+
+      const validAgenceMembres = agenceMembreRows.filter(
+        (am) => agenceIdSet.has(Number(am['agence_id'])) && userIdSet.has(Number(am['user_id'])),
+      );
+      const agenceMembreIdSet = new Set(validAgenceMembres.map((am) => Number(am['id'])));
+      if (validAgenceMembres.length > 0) {
+        await upsertBatch(
+          pgClient,
+          `INSERT INTO "agence_membres" ("id", "agence_id", "user_id", "role", "actif", "depuis", "jusqua", "created_at", "updated_at") VALUES`,
+          9,
+          validAgenceMembres.map((am) => [
+            Number(am['id']),
+            Number(am['agence_id']),
+            Number(am['user_id']),
+            asString(am['role']).trim(),
+            asBoolean(am['actif']),
+            asNullableDate(am['depuis']),
+            asNullableDate(am['jusqua']),
+            asNullableDate(am['created_at']),
+            asNullableDate(am['updated_at']),
+          ]),
+          `ON CONFLICT ("id") DO UPDATE SET
+            "agence_id" = EXCLUDED."agence_id",
+            "user_id" = EXCLUDED."user_id",
+            "role" = EXCLUDED."role",
+            "actif" = EXCLUDED."actif",
+            "depuis" = EXCLUDED."depuis",
+            "jusqua" = EXCLUDED."jusqua",
+            "created_at" = EXCLUDED."created_at",
+            "updated_at" = EXCLUDED."updated_at"`,
+        );
+      }
+
+      const validMembreZones = membreZoneRows.filter(
+        (mz) =>
+          agenceMembreIdSet.has(Number(mz['agence_membre_id'])) &&
+          zoneIdSet.has(Number(mz['zone_id'])),
+      );
+      if (validMembreZones.length > 0) {
+        await upsertBatch(
+          pgClient,
+          `INSERT INTO "membre_zones" ("id", "agence_membre_id", "zone_id", "activite", "actif", "created_at", "updated_at") VALUES`,
+          7,
+          validMembreZones.map((mz) => [
+            Number(mz['id']),
+            Number(mz['agence_membre_id']),
+            Number(mz['zone_id']),
+            asString(mz['activite']).trim(),
+            asBoolean(mz['actif']),
+            asNullableDate(mz['created_at']),
+            asNullableDate(mz['updated_at']),
+          ]),
+          `ON CONFLICT ("id") DO UPDATE SET
+            "agence_membre_id" = EXCLUDED."agence_membre_id",
+            "zone_id" = EXCLUDED."zone_id",
+            "activite" = EXCLUDED."activite",
+            "actif" = EXCLUDED."actif",
+            "created_at" = EXCLUDED."created_at",
+            "updated_at" = EXCLUDED."updated_at"`,
+        );
+      }
+
+      if (partenairesRows.length > 0) {
+        await upsertBatch(
+          pgClient,
+          `INSERT INTO "partenaires" ("id", "code", "raison_sociale", "ice", "telephone", "email", "actif", "deleted_at", "created_at", "updated_at") VALUES`,
+          10,
+          partenairesRows.map((p) => [
+            Number(p['id']),
+            asString(p['code']).trim(),
+            asString(p['raison_sociale']).trim(),
+            asNullableString(p['ice']),
+            asNullableString(p['telephone']),
+            asNullableString(p['email']),
+            asBoolean(p['actif']),
+            asNullableDate(p['deleted_at']),
+            asNullableDate(p['created_at']),
+            asNullableDate(p['updated_at']),
+          ]),
+          `ON CONFLICT ("id") DO UPDATE SET
+            "code" = EXCLUDED."code",
+            "raison_sociale" = EXCLUDED."raison_sociale",
+            "ice" = EXCLUDED."ice",
+            "telephone" = EXCLUDED."telephone",
+            "email" = EXCLUDED."email",
+            "actif" = EXCLUDED."actif",
+            "deleted_at" = EXCLUDED."deleted_at",
+            "created_at" = EXCLUDED."created_at",
+            "updated_at" = EXCLUDED."updated_at"`,
+        );
+      }
+
+      const validAgencePartenaires = agencePartenaireRows.filter(
+        (ap) =>
+          agenceIdSet.has(Number(ap['agence_id'])) &&
+          partenaireIdSet.has(Number(ap['partenaire_id'])),
+      );
+      const agencePartenaireIdSet = new Set(validAgencePartenaires.map((ap) => Number(ap['id'])));
+      if (validAgencePartenaires.length > 0) {
+        await upsertBatch(
+          pgClient,
+          `INSERT INTO "agence_partenaires" ("id", "agence_id", "partenaire_id", "depuis", "jusqua", "actif", "created_at", "updated_at") VALUES`,
+          8,
+          validAgencePartenaires.map((ap) => [
+            Number(ap['id']),
+            Number(ap['agence_id']),
+            Number(ap['partenaire_id']),
+            asNullableDate(ap['depuis']),
+            asNullableDate(ap['jusqua']),
+            asBoolean(ap['actif']),
+            asNullableDate(ap['created_at']),
+            asNullableDate(ap['updated_at']),
+          ]),
+          `ON CONFLICT ("id") DO UPDATE SET
+            "agence_id" = EXCLUDED."agence_id",
+            "partenaire_id" = EXCLUDED."partenaire_id",
+            "depuis" = EXCLUDED."depuis",
+            "jusqua" = EXCLUDED."jusqua",
+            "actif" = EXCLUDED."actif",
+            "created_at" = EXCLUDED."created_at",
+            "updated_at" = EXCLUDED."updated_at"`,
+        );
+      }
+
+      const validPartenaireZones = partenaireZoneRows.filter(
+        (pz) =>
+          agencePartenaireIdSet.has(Number(pz['agence_partenaire_id'])) &&
+          zoneIdSet.has(Number(pz['zone_id'])),
+      );
+      if (validPartenaireZones.length > 0) {
+        await upsertBatch(
+          pgClient,
+          `INSERT INTO "partenaire_zones" ("id", "agence_partenaire_id", "zone_id", "actif", "created_at", "updated_at") VALUES`,
+          6,
+          validPartenaireZones.map((pz) => [
+            Number(pz['id']),
+            Number(pz['agence_partenaire_id']),
+            Number(pz['zone_id']),
+            asBoolean(pz['actif']),
+            asNullableDate(pz['created_at']),
+            asNullableDate(pz['updated_at']),
+          ]),
+          `ON CONFLICT ("id") DO UPDATE SET
+            "agence_partenaire_id" = EXCLUDED."agence_partenaire_id",
+            "zone_id" = EXCLUDED."zone_id",
+            "actif" = EXCLUDED."actif",
+            "created_at" = EXCLUDED."created_at",
+            "updated_at" = EXCLUDED."updated_at"`,
+        );
+      }
+
+      const seenCoursierUsers = new Set<number>();
+      const validPartenaireCoursiers = partenaireCoursierRows.filter((pc) =>
+        partenaireIdSet.has(Number(pc['partenaire_id'])),
+      );
+      if (validPartenaireCoursiers.length > 0) {
+        await upsertBatch(
+          pgClient,
+          `INSERT INTO "partenaire_coursiers" ("id", "partenaire_id", "nom", "telephone", "user_id", "actif", "created_at", "updated_at") VALUES`,
+          8,
+          validPartenaireCoursiers.map((pc) => {
+            const rawUid = asNullableInt(pc['user_id']);
+            let safeUid: number | null = null;
+            if (rawUid && userIdSet.has(rawUid) && !seenCoursierUsers.has(rawUid)) {
+              safeUid = rawUid;
+              seenCoursierUsers.add(rawUid);
+            }
+            return [
+              Number(pc['id']),
+              Number(pc['partenaire_id']),
+              asString(pc['nom']).trim(),
+              asNullableString(pc['telephone']),
+              safeUid,
+              asBoolean(pc['actif']),
+              asNullableDate(pc['created_at']),
+              asNullableDate(pc['updated_at']),
+            ];
+          }),
+          `ON CONFLICT ("id") DO UPDATE SET
+            "partenaire_id" = EXCLUDED."partenaire_id",
+            "nom" = EXCLUDED."nom",
+            "telephone" = EXCLUDED."telephone",
+            "user_id" = EXCLUDED."user_id",
+            "actif" = EXCLUDED."actif",
+            "created_at" = EXCLUDED."created_at",
+            "updated_at" = EXCLUDED."updated_at"`,
+        );
+      }
+
+      const validPartenaireConnexions = partenaireConnexionRows.filter((conn) =>
+        partenaireIdSet.has(Number(conn['partenaire_id'])),
+      );
+      if (validPartenaireConnexions.length > 0) {
+        await upsertBatch(
+          pgClient,
+          `INSERT INTO "partenaire_connexions" ("id", "partenaire_id", "api_type_code", "base_url", "identifiant_chiffre", "secret_chiffre", "actif", "created_at", "updated_at") VALUES`,
+          9,
+          validPartenaireConnexions.map((conn) => [
+            Number(conn['id']),
+            Number(conn['partenaire_id']),
+            asString(conn['api_type_code'], 'custom').trim(),
+            asString(conn['base_url']).trim(),
+            asString(conn['identifiant']),
+            asString(conn['secret']),
+            asBoolean(conn['actif']),
+            asNullableDate(conn['created_at']),
+            asNullableDate(conn['updated_at']),
+          ]),
+          `ON CONFLICT ("id") DO UPDATE SET
+            "partenaire_id" = EXCLUDED."partenaire_id",
+            "api_type_code" = EXCLUDED."api_type_code",
+            "base_url" = EXCLUDED."base_url",
+            "identifiant_chiffre" = EXCLUDED."identifiant_chiffre",
+            "secret_chiffre" = EXCLUDED."secret_chiffre",
+            "actif" = EXCLUDED."actif",
+            "created_at" = EXCLUDED."created_at",
+            "updated_at" = EXCLUDED."updated_at"`,
+        );
+      }
+
+      if (apiIdentifiantRows.length > 0) {
+        await upsertBatch(
+          pgClient,
+          `INSERT INTO "api_identifiants" ("id", "partenaire_id", "user_id", "libelle", "cle_publique", "secret_empreinte", "scopes", "actif", "expires_at", "last_used_at", "revoked_at", "created_at", "updated_at") VALUES`,
+          13,
+          apiIdentifiantRows.map((apiKey) => {
+            const rawPid = asNullableInt(apiKey['partenaire_id']);
+            const safePid = rawPid && partenaireIdSet.has(rawPid) ? rawPid : null;
+            const rawUid = asNullableInt(apiKey['user_id']);
+            const safeUid = rawUid && userIdSet.has(rawUid) ? rawUid : null;
+            const revokedAt = asNullableDate(apiKey['revoque_le']);
+            return [
+              Number(apiKey['id']),
+              safePid,
+              safeUid,
+              asString(apiKey['libelle']).trim(),
+              asString(apiKey['cle_publique']).trim(),
+              asString(apiKey['secret_empreinte']).trim(),
+              normalizeJsonValue(apiKey['droits']),
+              revokedAt === null,
+              asNullableDate(apiKey['expire_le']),
+              asNullableDate(apiKey['dernier_usage_le']),
+              revokedAt,
+              asNullableDate(apiKey['created_at']),
+              asNullableDate(apiKey['updated_at']),
+            ];
+          }),
+          `ON CONFLICT ("id") DO UPDATE SET
+            "partenaire_id" = EXCLUDED."partenaire_id",
+            "user_id" = EXCLUDED."user_id",
+            "libelle" = EXCLUDED."libelle",
+            "cle_publique" = EXCLUDED."cle_publique",
+            "secret_empreinte" = EXCLUDED."secret_empreinte",
+            "scopes" = EXCLUDED."scopes",
+            "actif" = EXCLUDED."actif",
+            "expires_at" = EXCLUDED."expires_at",
+            "last_used_at" = EXCLUDED."last_used_at",
+            "revoked_at" = EXCLUDED."revoked_at",
+            "created_at" = EXCLUDED."created_at",
+            "updated_at" = EXCLUDED."updated_at"`,
+        );
+      }
+
+      // 12. Resynchronisation des séquences PostgreSQL
+      for (const table of [
+        'zones',
+        'users',
+        'roles',
+        'permissions',
+        'authentication_logs',
+        'agences',
+        'agence_zone',
+        'agence_membres',
+        'membre_zones',
+        'partenaires',
+        'agence_partenaires',
+        'partenaire_zones',
+        'partenaire_coursiers',
+        'partenaire_connexions',
+        'api_identifiants',
+      ]) {
         await pgClient.query(
-          `SELECT setval(pg_get_serial_sequence($1, 'id'), COALESCE((SELECT MAX(id) FROM "${table}"), 1), true)`,
+          `SELECT setval(pg_get_serial_sequence($1, 'id'), COALESCE((SELECT MAX(id) FROM "${table}"), 1), COALESCE((SELECT MAX(id) FROM "${table}"), 0) > 0)`,
           [table],
         );
       }
 
       await pgClient.query('COMMIT');
 
-      // 12. Contrôle de parité post-migration
+      // 13. Contrôle de parité post-migration
       const countRes = await pgClient.query<{
+        zones: string;
         villes: string;
         roles: string;
         permissions: string;
@@ -711,9 +1195,20 @@ async function main(): Promise<void> {
         user_perms: string;
         reset_tokens: string;
         auth_logs: string;
+        agences: string;
+        agence_zone: string;
+        agence_membres: string;
+        membre_zones: string;
+        partenaires: string;
+        agence_partenaires: string;
+        partenaire_zones: string;
+        partenaire_coursiers: string;
+        partenaire_connexions: string;
+        api_identifiants: string;
         active_users_without_role: string;
       }>(`
         SELECT
+          (SELECT COUNT(*) FROM "zones") AS zones,
           (SELECT COUNT(*) FROM "villes") AS villes,
           (SELECT COUNT(*) FROM "roles") AS roles,
           (SELECT COUNT(*) FROM "permissions") AS permissions,
@@ -723,6 +1218,16 @@ async function main(): Promise<void> {
           (SELECT COUNT(*) FROM "user_permissions") AS user_perms,
           (SELECT COUNT(*) FROM "password_reset_tokens") AS reset_tokens,
           (SELECT COUNT(*) FROM "authentication_logs") AS auth_logs,
+          (SELECT COUNT(*) FROM "agences") AS agences,
+          (SELECT COUNT(*) FROM "agence_zone") AS agence_zone,
+          (SELECT COUNT(*) FROM "agence_membres") AS agence_membres,
+          (SELECT COUNT(*) FROM "membre_zones") AS membre_zones,
+          (SELECT COUNT(*) FROM "partenaires") AS partenaires,
+          (SELECT COUNT(*) FROM "agence_partenaires") AS agence_partenaires,
+          (SELECT COUNT(*) FROM "partenaire_zones") AS partenaire_zones,
+          (SELECT COUNT(*) FROM "partenaire_coursiers") AS partenaire_coursiers,
+          (SELECT COUNT(*) FROM "partenaire_connexions") AS partenaire_connexions,
+          (SELECT COUNT(*) FROM "api_identifiants") AS api_identifiants,
           (SELECT COUNT(*) FROM "users" u
            WHERE u."deleted_at" IS NULL AND u."active" = true
              AND NOT EXISTS (SELECT 1 FROM "user_roles" ur WHERE ur."user_id" = u."id")) AS active_users_without_role
