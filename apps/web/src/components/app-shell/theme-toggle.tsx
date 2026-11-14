@@ -11,17 +11,18 @@ const THEME_STORAGE_KEY = 'g4d-theme';
 const THEME_COOKIE_NAME = 'g4d_theme';
 const THEME_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
-function applyDocumentTheme(mode: ThemeMode) {
+export function applyDocumentTheme(mode: ThemeMode) {
   document.documentElement.classList.toggle('dark', mode === 'dark');
 }
 
-function persistTheme(mode: ThemeMode) {
+export function persistTheme(mode: ThemeMode) {
   try {
     window.localStorage.setItem(THEME_STORAGE_KEY, mode);
   } catch {
     // Ignorer si localStorage est bloqué par le navigateur
   }
   document.cookie = `${THEME_COOKIE_NAME}=${mode}; path=/; max-age=${THEME_COOKIE_MAX_AGE}; SameSite=Lax`;
+  window.dispatchEvent(new CustomEvent<ThemeMode>('g4d-theme-changed', { detail: mode }));
 }
 
 export function ThemeToggle({
@@ -56,9 +57,19 @@ export function ThemeToggle({
       }
     };
 
+    const onCustomThemeChange = (event: Event) => {
+      const detail = (event as CustomEvent<ThemeMode>).detail;
+      if (detail === 'dark' || detail === 'light') {
+        setTheme(detail);
+        applyDocumentTheme(detail);
+      }
+    };
+
     window.addEventListener('storage', onStorage);
+    window.addEventListener('g4d-theme-changed', onCustomThemeChange);
     return () => {
       window.removeEventListener('storage', onStorage);
+      window.removeEventListener('g4d-theme-changed', onCustomThemeChange);
       // Nettoyer la classe .dark en quittant l'espace authentifié (ex: vitrine publique /)
       document.documentElement.classList.remove('dark');
     };

@@ -64,6 +64,14 @@ export function AppShell({
     });
     document.body.style.overflow = '';
     document.body.style.paddingInlineEnd = '';
+    try {
+      const savedVariant = window.localStorage.getItem('badgeVariant');
+      const normalizedVariant =
+        savedVariant === 'solid' || savedVariant === 'outline' ? savedVariant : 'soft';
+      document.documentElement.dataset.badgeVariant = normalizedVariant;
+    } catch {
+      document.documentElement.dataset.badgeVariant = 'soft';
+    }
   }, []);
 
   useEffect(() => {

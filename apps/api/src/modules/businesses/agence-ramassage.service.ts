@@ -4,10 +4,7 @@ import type { AuthUserDto } from '@zakaria/shared-contracts';
 import { PolicyService } from '../access-control/policy.service';
 
 export type CouvertureBusinessStatut =
-  | 'rattache'
-  | 'couvert_par_zone'
-  | 'hors_zone'
-  | 'orphelin_sans_ville';
+  'rattache' | 'couvert_par_zone' | 'hors_zone' | 'orphelin_sans_ville';
 
 export interface AgenceLightDto {
   id: number;
@@ -42,8 +39,7 @@ export class AgenceRamassageService {
   /** Indique si l'acteur voit l'ensemble du périmètre clients/enseignes sans restriction d'agence. */
   hasGlobalClientScope(actor: AuthUserDto): boolean {
     return (
-      this.policy.isPlatformAdmin(actor) ||
-      this.policy.hasPermission(actor, 'Bypass:AgenceScope')
+      this.policy.isPlatformAdmin(actor) || this.policy.hasPermission(actor, 'Bypass:AgenceScope')
     );
   }
 
@@ -204,4 +200,3 @@ export class AgenceRamassageService {
     };
   }
 }
-

@@ -9,6 +9,9 @@ export type AuthAuditEvent =
   | 'password_reset'
   | 'client_registered'
   | 'password_changed'
+  | 'profile_updated'
+  | 'avatar_updated'
+  | 'sessions_revoked_others'
   | 'contact_change_requested'
   | 'inscription_accepted'
   | 'inscription_rejected';

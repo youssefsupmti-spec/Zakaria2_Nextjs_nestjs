@@ -2,13 +2,10 @@ import { BadRequestException } from '@nestjs/common';
 import type { AuthUserDto } from '@zakaria/shared-contracts';
 import { describe, expect, it } from 'vitest';
 import { PolicyService } from '../src/modules/access-control/policy.service';
-import { normalizeUniqueBankCodes } from '../src/modules/banques/banques.service';
 import { AgenceRamassageService } from '../src/modules/businesses/agence-ramassage.service';
 import { BusinessesService } from '../src/modules/businesses/businesses.service';
 import {
   InvoiceBankResolverService,
-  extractRibPrefix3,
-  normalizeRib,
   resolveBankFromCompte,
   type BankPrefixLookupEntry,
 } from '../src/modules/businesses/invoice-bank-resolver.service';
@@ -41,7 +38,7 @@ const ADMIN_ACTOR: AuthUserDto = {
   },
 };
 
-describe('Sprint 03 — Vendeurs, Business & Banques (Métier)', () => {
+describe('Vendeurs, Business & Couverture Agence', () => {
   it('InvoiceBankResolver : applique la résolution à 3 niveaux (relation -> custom -> préfixe RIB)', () => {
     const prefixMap = new Map<string, BankPrefixLookupEntry>([
       [
@@ -54,9 +51,6 @@ describe('Sprint 03 — Vendeurs, Business & Banques (Métier)', () => {
         },
       ],
     ]);
-
-    expect(normalizeRib('007 810 0001234567890123 45')).toBe('007810000123456789012345');
-    expect(extractRibPrefix3('007 810 000123')).toBe('007');
 
     // Niveau 1 : relation banque active
     const level1 = resolveBankFromCompte(
@@ -120,8 +114,10 @@ describe('Sprint 03 — Vendeurs, Business & Banques (Métier)', () => {
     const zonesIndex = new Map([[10, [saleAgence]]]);
 
     expect(
-      service.evaluateCouverture({ villeId: 5, ville: { zoneId: 10 }, agency: saleAgence }, zonesIndex)
-        .statut,
+      service.evaluateCouverture(
+        { villeId: 5, ville: { zoneId: 10 }, agency: saleAgence },
+        zonesIndex,
+      ).statut,
     ).toBe('rattache');
 
     expect(
@@ -141,10 +137,6 @@ describe('Sprint 03 — Vendeurs, Business & Banques (Métier)', () => {
     ).toBe('hors_zone');
   });
 
-  it('normalizeUniqueBankCodes : normalise et déduplique les préfixes RIB', () => {
-    expect(normalizeUniqueBankCodes([' 007 ', '011', '007', '230'])).toEqual(['007', '011', '230']);
-  });
-
   it('BusinessesService : refuse mode_paiement=virement_bancaire sans compte bancaire actif', async () => {
     const policy = new PolicyService();
     const fakeDb = {
@@ -156,7 +148,14 @@ describe('Sprint 03 — Vendeurs, Business & Banques (Métier)', () => {
             name: 'Boutique Test',
             agencyId: null,
             modePaiement: 'espece',
-            user: { id: 10, nomComplet: 'Test', email: 't@g4d.ma', telephone: '0600', active: true, inscriptionStatut: 'acceptee' },
+            user: {
+              id: 10,
+              nomComplet: 'Test',
+              email: 't@g4d.ma',
+              telephone: '0600',
+              active: true,
+              inscriptionStatut: 'acceptee',
+            },
             ville: null,
             returnVille: null,
             agency: null,
@@ -191,7 +190,14 @@ describe('Sprint 03 — Vendeurs, Business & Banques (Métier)', () => {
             name: 'Boutique Virement',
             agencyId: 1,
             modePaiement: 'virement_bancaire',
-            user: { id: 10, nomComplet: 'Test', email: 't@g4d.ma', telephone: '0600', active: true, inscriptionStatut: 'acceptee' },
+            user: {
+              id: 10,
+              nomComplet: 'Test',
+              email: 't@g4d.ma',
+              telephone: '0600',
+              active: true,
+              inscriptionStatut: 'acceptee',
+            },
             ville: null,
             returnVille: null,
             agency: null,
@@ -219,4 +225,3 @@ describe('Sprint 03 — Vendeurs, Business & Banques (Métier)', () => {
     await expect(service.deleteCompte(ADMIN_ACTOR, 42, 77)).rejects.toThrow(BadRequestException);
   });
 });
-

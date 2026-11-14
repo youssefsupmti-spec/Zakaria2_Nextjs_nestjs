@@ -554,15 +554,27 @@ export const UpdateProfileSchema = z.object({
   civilite: CiviliteSchema.nullable().optional(),
   villeId: z.number().int().positive().nullable().optional(),
   cin: z.string().trim().max(255).optional().default(''),
+  sav: z.string().trim().max(255).optional(),
   lienLocalisationMaps: z.string().trim().max(500).optional().default(''),
 });
 export type UpdateProfileDto = z.infer<typeof UpdateProfileSchema>;
+
+export const UploadAvatarSchema = z.object({
+  dataUrl: z
+    .string()
+    .trim()
+    .min(20, 'Image requise.')
+    .max(1_500_000, 'Image trop volumineuse (max 1 Mo).'),
+  filename: z.string().trim().max(120).optional(),
+});
+export type UploadAvatarDto = z.infer<typeof UploadAvatarSchema>;
 
 export const ChangePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, 'Mot de passe actuel requis').max(128),
     newPassword: z.string().min(8, 'Nouveau mot de passe : minimum 8 caractères').max(128),
     newPasswordConfirmation: z.string().min(8, 'Confirmation requise').max(128),
+    revokeOtherSessions: z.boolean().optional().default(true),
   })
   .refine((data) => data.newPassword === data.newPasswordConfirmation, {
     message: 'Les deux nouveaux mots de passe ne correspondent pas.',
@@ -571,9 +583,9 @@ export const ChangePasswordSchema = z
 export type ChangePasswordDto = z.infer<typeof ChangePasswordSchema>;
 
 export const RequestContactChangeSchema = z.object({
-  type: z.enum(['email', 'telephone', 'sav']),
-  nouvelleValeur: z.string().trim().min(3, 'Nouvelle valeur requise').max(255),
-  motif: z.string().trim().min(3, 'Un motif est requis').max(500),
+  type: z.enum(['email', 'telephone', 'sav', 'ville']),
+  nouvelleValeur: z.string().trim().min(2, 'Nouvelle valeur requise').max(255),
+  motif: z.string().trim().min(3, 'Un motif justificatif est requis').max(500),
 });
 export type RequestContactChangeDto = z.infer<typeof RequestContactChangeSchema>;
 

@@ -145,6 +145,20 @@ export class AuthController {
     return { ok: true };
   }
 
+  @Post('sessions/revoke-others')
+  @UseGuards(SessionAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Déconnecte toutes les autres sessions actives sauf l’appareil courant',
+  })
+  revokeOtherSessions(@CurrentAuth() auth: AuthContext, @Req() request: FastifyRequest) {
+    return this.authService.revokeOtherSessions(
+      auth.user.id,
+      auth.sessionId,
+      this.extractMeta(request),
+    );
+  }
+
   @Post('forgot-password')
   @HttpCode(HttpStatus.OK)
   async forgotPassword(@Body() body: unknown, @Req() request: FastifyRequest) {
@@ -181,8 +195,37 @@ export class AuthController {
   @Patch('profile')
   @UseGuards(SessionAuthGuard)
   @ApiOperation({ summary: 'Mise à jour des informations personnelles non critiques' })
-  updateProfile(@CurrentAuth() auth: AuthContext, @Body() body: unknown) {
-    return this.authService.updateOwnProfile(auth.user.id, body);
+  updateProfile(
+    @CurrentAuth() auth: AuthContext,
+    @Body() body: unknown,
+    @Req() request: FastifyRequest,
+  ) {
+    return this.authService.updateOwnProfile(
+      auth.user.id,
+      body,
+      auth.user.isSuperAdmin,
+      this.extractMeta(request),
+    );
+  }
+
+  @Post('profile/avatar')
+  @UseGuards(SessionAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Enregistre ou met à jour la photo de profil' })
+  uploadAvatar(
+    @CurrentAuth() auth: AuthContext,
+    @Body() body: unknown,
+    @Req() request: FastifyRequest,
+  ) {
+    return this.authService.uploadOwnAvatar(auth.user.id, body, this.extractMeta(request));
+  }
+
+  @Delete('profile/avatar')
+  @UseGuards(SessionAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Supprime la photo de profil personnalisée' })
+  deleteAvatar(@CurrentAuth() auth: AuthContext, @Req() request: FastifyRequest) {
+    return this.authService.deleteOwnAvatar(auth.user.id, this.extractMeta(request));
   }
 
   @Post('profile/password')
@@ -194,13 +237,18 @@ export class AuthController {
     @Body() body: unknown,
     @Req() request: FastifyRequest,
   ) {
-    return this.authService.changeOwnPassword(auth.user.id, body, this.extractMeta(request));
+    return this.authService.changeOwnPassword(
+      auth.user.id,
+      body,
+      this.extractMeta(request),
+      auth.sessionId,
+    );
   }
 
   @Post('profile/contact-change')
   @UseGuards(SessionAuthGuard)
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Demande encadrée de modification email / téléphone / SAV' })
+  @ApiOperation({ summary: 'Demande encadrée de modification email / téléphone / SAV / ville' })
   requestContactChange(
     @CurrentAuth() auth: AuthContext,
     @Body() body: unknown,

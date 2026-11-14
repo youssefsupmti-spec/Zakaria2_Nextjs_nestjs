@@ -276,6 +276,63 @@ export class SessionService {
     await this.revokeSessionById(targetSessionId, 'user_revoked');
   }
 
+  /** Révoque toutes les autres sessions actives d'un utilisateur en préservant la session courante. */
+  async revokeOtherUserSessions(
+    userId: number,
+    currentSessionId: string,
+    reason = 'user_revoked_others',
+  ): Promise<{ revokedCount: number }> {
+    const otherSessions = await this.database.prisma.authSession.findMany({
+      where: {
+        userId,
+        revokedAt: null,
+        id: { not: currentSessionId },
+      },
+      select: { id: true },
+    });
+
+    if (otherSessions.length === 0) {
+      return { revokedCount: 0 };
+    }
+
+    await this.database.prisma.authSession.updateMany({
+      where: {
+        userId,
+        revokedAt: null,
+        id: { not: currentSessionId },
+      },
+      data: {
+        revokedAt: new Date(),
+        revokedReason: reason,
+      },
+    });
+
+    const redis = this.database.getCacheRedisClient();
+    if (redis.status === 'ready') {
+      await redis
+        .del(...otherSessions.map((s) => this.sessionCacheKey(s.id)))
+        .catch(() => undefined);
+    }
+
+    await this.permissionResolver.invalidateUserCache(userId);
+    return { revokedCount: otherSessions.length };
+  }
+
+  /** Met à jour createdAt d'une session (utilisé après changement volontaire de mot de passe pour garder l'appareil courant connecté). */
+  async refreshSessionCreatedAt(sessionId: string, timestamp: Date): Promise<void> {
+    await this.database.prisma.authSession
+      .update({
+        where: { id: sessionId },
+        data: { createdAt: timestamp, lastActiveAt: timestamp },
+      })
+      .catch(() => undefined);
+
+    const redis = this.database.getCacheRedisClient();
+    if (redis.status === 'ready') {
+      await redis.del(this.sessionCacheKey(sessionId)).catch(() => undefined);
+    }
+  }
+
   async revokeSessionByToken(rawToken: string, reason = 'logout'): Promise<number | null> {
     if (!rawToken) return null;
     const sessionId = this.hashToken(rawToken);
